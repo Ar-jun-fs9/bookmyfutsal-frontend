@@ -258,7 +258,7 @@ export default function SuperAdminDashboard() {
 
   const fetchBookings = async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/bookings/all', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/bookings/all`, {
         headers: {
           'Authorization': `Bearer ${tokens?.accessToken}`,
           'Content-Type': 'application/json'
@@ -278,7 +278,7 @@ export default function SuperAdminDashboard() {
 
   const fetchBlockedUsers = async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/users/blocked/list', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/users/blocked/list`, {
         headers: {
           'Authorization': `Bearer ${tokens?.accessToken}`,
           'Content-Type': 'application/json'
@@ -298,7 +298,7 @@ export default function SuperAdminDashboard() {
 
   const fetchRatings = async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/ratings', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/ratings`, {
         headers: {
           'Authorization': `Bearer ${tokens?.accessToken}`,
           'Content-Type': 'application/json'
@@ -319,7 +319,7 @@ export default function SuperAdminDashboard() {
 
   const fetchFutsals = async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/futsals', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/futsals`, {
         headers: {
           'Authorization': `Bearer ${tokens?.accessToken}`,
           'Content-Type': 'application/json'
@@ -339,7 +339,7 @@ export default function SuperAdminDashboard() {
 
   const fetchFutsalAdmins = async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/futsal-admins', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/futsal-admins`, {
         headers: {
           'Authorization': `Bearer ${tokens?.accessToken}`,
           'Content-Type': 'application/json'
@@ -359,7 +359,7 @@ export default function SuperAdminDashboard() {
 
   const fetchUsers = async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/users', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/users`, {
         headers: {
           'Authorization': `Bearer ${tokens?.accessToken}`,
           'Content-Type': 'application/json'
@@ -384,7 +384,7 @@ export default function SuperAdminDashboard() {
       onConfirm: async () => {
         setConfirmModal({ isOpen: false, message: '', onConfirm: () => {} });
         try {
-          const response = await fetch(`http://localhost:5000/api/futsals/${id}`, {
+          const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/futsals/${id}`, {
             method: 'DELETE',
           });
 
@@ -409,7 +409,7 @@ export default function SuperAdminDashboard() {
       onConfirm: async () => {
         setConfirmModal({ isOpen: false, message: '', onConfirm: () => {} });
         try {
-          const response = await fetch(`http://localhost:5000/api/futsal-admins/${id}`, {
+          const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/futsal-admins/${id}`, {
             method: 'DELETE',
             headers: {
               'Authorization': `Bearer ${tokens?.accessToken}`,
@@ -437,7 +437,7 @@ export default function SuperAdminDashboard() {
       onConfirm: async () => {
         setConfirmModal({ isOpen: false, message: '', onConfirm: () => {} });
         try {
-          const response = await fetch(`http://localhost:5000/api/users/${id}`, {
+          const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/users/${id}`, {
             method: 'DELETE',
             headers: {
               'Authorization': `Bearer ${tokens?.accessToken}`,
@@ -471,7 +471,7 @@ export default function SuperAdminDashboard() {
       onConfirm: async () => {
         setConfirmModal({ isOpen: false, message: '', onConfirm: () => {} });
         try {
-          const response = await fetch(`http://localhost:5000/api/bookings/${id}`, {
+          const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/bookings/${id}`, {
             method: 'DELETE',
           });
 
@@ -491,7 +491,7 @@ export default function SuperAdminDashboard() {
 
   const handleDeleteBooking = async (id: number) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/bookings/delete/${id}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/bookings/delete/${id}`, {
         method: 'DELETE',
       });
 
@@ -528,7 +528,7 @@ export default function SuperAdminDashboard() {
         setConfirmModal({ isOpen: false, message: '', onConfirm: () => {} });
 
         try {
-          const response = await fetch(`http://localhost:5000/api/bookings/super-admin/bulk-delete`, {
+          const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/bookings/super-admin/bulk-delete`, {
             method: 'DELETE',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -705,7 +705,7 @@ export default function SuperAdminDashboard() {
         body.users_type = users_type;
       }
 
-      const response = await fetch(`http://localhost:5000/api/ratings/${ratingId}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/ratings/${ratingId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
@@ -733,7 +733,7 @@ export default function SuperAdminDashboard() {
       onConfirm: async () => {
         setConfirmModal({ isOpen: false, message: '', onConfirm: () => {} });
         try {
-          const response = await fetch(`http://localhost:5000/api/ratings/${id}`, {
+          const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/ratings/${id}`, {
             method: 'DELETE',
             headers: {
               'Authorization': `Bearer ${tokens?.accessToken}`,
@@ -769,7 +769,7 @@ export default function SuperAdminDashboard() {
 
         try {
           const deletePromises = selectedRatings.map(ratingId =>
-            fetch(`http://localhost:5000/api/ratings/${ratingId}`, {
+            fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/ratings/${ratingId}`, {
               method: 'DELETE',
             })
           );
@@ -809,7 +809,7 @@ export default function SuperAdminDashboard() {
 
         try {
           const deletePromises = selectedFutsals.map(futsalId =>
-            fetch(`http://localhost:5000/api/futsals/${futsalId}`, {
+            fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/futsals/${futsalId}`, {
               method: 'DELETE',
             })
           );
@@ -848,7 +848,7 @@ export default function SuperAdminDashboard() {
 
         try {
           const deletePromises = selectedFutsalAdmins.map(adminId =>
-            fetch(`http://localhost:5000/api/futsal-admins/${adminId}`, {
+            fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/futsal-admins/${adminId}`, {
               method: 'DELETE',
             })
           );
@@ -887,7 +887,7 @@ export default function SuperAdminDashboard() {
 
         try {
           const deletePromises = selectedUsers.map(userId =>
-            fetch(`http://localhost:5000/api/users/${userId}`, {
+            fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/users/${userId}`, {
               method: 'DELETE',
             })
           );
@@ -926,7 +926,7 @@ export default function SuperAdminDashboard() {
 
         try {
           const unblockPromises = selectedBlockedUsers.map(userId =>
-            fetch(`http://localhost:5000/api/users/${userId}/unblock`, {
+            fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/users/${userId}/unblock`, {
               method: 'POST',
             })
           );
@@ -954,7 +954,7 @@ export default function SuperAdminDashboard() {
 
   const fetchSlots = async (futsalId: number, date: string) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/time-slots/admin/futsal/${futsalId}/date/${date}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/time-slots/admin/futsal/${futsalId}/date/${date}`, {
         headers: {
           'Authorization': `Bearer ${tokens?.accessToken}`,
           'Content-Type': 'application/json'
@@ -984,7 +984,7 @@ export default function SuperAdminDashboard() {
       const allSlots: any[] = [];
       for (const futsal of futsals) {
         try {
-          const response = await fetch(`http://localhost:5000/api/time-slots/admin/futsal/${futsal.futsal_id}/date/${currentDate}`, {
+          const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/time-slots/admin/futsal/${futsal.futsal_id}/date/${currentDate}`, {
             headers: {
               'Authorization': `Bearer ${tokens?.accessToken}`,
               'Content-Type': 'application/json'
@@ -1032,11 +1032,11 @@ export default function SuperAdminDashboard() {
         try {
           let response;
           if (selectedFutsal) {
-            response = await fetch(`http://localhost:5000/api/time-slots/futsal/${selectedFutsal}/date/${slotDate}/${action}-all`, {
+            response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/time-slots/futsal/${selectedFutsal}/date/${slotDate}/${action}-all`, {
               method: 'PUT',
             });
           } else {
-            response = await fetch(`http://localhost:5000/api/time-slots/${action}-all-available`, {
+            response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/time-slots/${action}-all-available`, {
               method: 'PUT',
             });
           }
@@ -1070,7 +1070,7 @@ export default function SuperAdminDashboard() {
     const newStatus = currentStatus === 'available' ? 'disabled' : 'available';
 
     try {
-      const response = await fetch(`http://localhost:5000/api/time-slots/${slotId}/status`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/time-slots/${slotId}/status`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: newStatus }),
@@ -1095,7 +1095,7 @@ export default function SuperAdminDashboard() {
       userId,
       onConfirm: async (reason: string) => {
         try {
-          const response = await fetch(`http://localhost:5000/api/users/${userId}/block`, {
+          const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/users/${userId}/block`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -1128,7 +1128,7 @@ export default function SuperAdminDashboard() {
       onConfirm: async () => {
         setConfirmModal({ isOpen: false, message: '', onConfirm: () => {} });
         try {
-          const response = await fetch(`http://localhost:5000/api/users/${userId}/unblock`, {
+          const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/users/${userId}/unblock`, {
             method: 'POST',
             headers: {
               'Authorization': `Bearer ${tokens?.accessToken}`,
@@ -1578,7 +1578,7 @@ export default function SuperAdminDashboard() {
                               {futsal.images && futsal.images.length > 0 && (
                                 <div className="flex flex-wrap gap-2 mt-2">
                                   {futsal.images.slice(0, 3).map((img, index) => (
-                                    <img key={index} src={`http://localhost:5000/uploads/${img}`} alt={`${futsal.name} ${index + 1}`} className="w-16 h-16 object-cover" />
+                                    <img key={index} src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/${img}`} alt={`${futsal.name} ${index + 1}`} className="w-16 h-16 object-cover" />
                                   ))}
                                   {futsal.images.length > 3 && <span className="text-sm text-gray-500">+{futsal.images.length - 3} more</span>}
                                 </div>
@@ -1586,7 +1586,7 @@ export default function SuperAdminDashboard() {
                               {futsal.video && (
                                 <div className="mt-2">
                                   <video controls className="w-32 h-18">
-                                    <source src={`http://localhost:5000/uploads/${futsal.video}`} type="video/mp4" />
+                                    <source src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/${futsal.video}`} type="video/mp4" />
                                   </video>
                                 </div>
                               )}
@@ -2497,7 +2497,7 @@ export default function SuperAdminDashboard() {
                   <strong>Images:</strong>
                   <div className="flex flex-wrap gap-2 mt-2">
                     {viewingFutsalDetails.images.map((img, index) => (
-                      <img key={index} src={`http://localhost:5000/uploads/${img}`} alt={`${viewingFutsalDetails.name} ${index + 1}`} className="w-32 h-32 object-cover" />
+                      <img key={index} src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/${img}`} alt={`${viewingFutsalDetails.name} ${index + 1}`} className="w-32 h-32 object-cover" />
                     ))}
                   </div>
                 </div>
@@ -2507,7 +2507,7 @@ export default function SuperAdminDashboard() {
                   <strong>Video:</strong>
                   <div className="mt-2">
                     <video controls className="w-64 h-36">
-                      <source src={`http://localhost:5000/uploads/${viewingFutsalDetails.video}`} type="video/mp4" />
+                      <source src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/${viewingFutsalDetails.video}`} type="video/mp4" />
                     </video>
                   </div>
                 </div>
@@ -2533,7 +2533,7 @@ function SuperAdminCreateRatingForm({ futsals, onSuccess, onCancel, setNotificat
     setLoading(true);
 
     try {
-      const response = await fetch('http://localhost:5000/api/ratings', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/ratings`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -2840,7 +2840,7 @@ function EditFutsalForm({ futsal, onUpdate, onCancel, setNotification }: { futsa
     data.append('removed_video', removedVideo.toString());
 
     try {
-      const response = await fetch(`http://localhost:5000/api/futsals/${futsal.futsal_id}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/futsals/${futsal.futsal_id}`, {
         method: 'PUT',
         body: data,
       });
@@ -2994,7 +2994,7 @@ function EditFutsalForm({ futsal, onUpdate, onCancel, setNotification }: { futsa
           <div className="flex flex-wrap gap-2 mt-2">
             {existingImages.map((img, index) => (
               <div key={index} className="relative">
-                <img src={`http://localhost:5000/uploads/${img}`} alt={`Existing ${index + 1}`} className="w-32 h-32 object-cover" />
+                <img src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/${img}`} alt={`Existing ${index + 1}`} className="w-32 h-32 object-cover" />
                 <button
                   type="button"
                   onClick={() => removeImage(img)}
@@ -3012,7 +3012,7 @@ function EditFutsalForm({ futsal, onUpdate, onCancel, setNotification }: { futsa
           <strong>Existing Video:</strong>
           <div className="relative mt-2">
             <video controls className="w-64 h-36">
-              <source src={`http://localhost:5000/uploads/${existingVideo}`} type="video/mp4" />
+              <source src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/${existingVideo}`} type="video/mp4" />
             </video>
             <button
               type="button"
@@ -3056,7 +3056,7 @@ function EditAdminForm({ admin, tokens, onUpdate, onCancel, setNotification }: {
     setLoading(true);
 
     try {
-      const response = await fetch(`http://localhost:5000/api/futsal-admins/${admin.id}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/futsal-admins/${admin.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -3164,7 +3164,7 @@ function CreateFutsalForm({ onSuccess, setNotification }: { onSuccess: () => voi
     if (video) data.append('video', video);
 
     try {
-      const response = await fetch('http://localhost:5000/api/futsals', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/futsals`, {
         method: 'POST',
         body: data,
       });
@@ -3383,7 +3383,7 @@ function CreateFutsalAdminForm({ futsals, superAdminId, setNotification, tokens 
     setLoading(true);
 
     try {
-      const response = await fetch('http://localhost:5000/api/futsal-admins', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/futsal-admins`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -3463,7 +3463,7 @@ function EditUserForm({ user, onUpdate, onCancel, setNotification }: { user: any
     setLoading(true);
 
     try {
-      const response = await fetch(`http://localhost:5000/api/users/${user.user_id}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/users/${user.user_id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
@@ -3521,7 +3521,7 @@ function EditSuperAdminForm({ user, onUpdate, onCancel, setNotification }: { use
     setLoading(true);
 
     try {
-      const response = await fetch(`http://localhost:5000/api/superadmin/${user.id}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/superadmin/${user.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
@@ -3583,7 +3583,7 @@ function EditBookingForm({ booking, onUpdate, onCancel, setNotification }: { boo
   const handleShiftSubmit = async () => {
     if (selectedShift && selectedDate && futsalId) {
       try {
-        const response = await fetch(`http://localhost:5000/api/time-slots/futsal/${futsalId}/date/${selectedDate}/shift/${selectedShift}`);
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/time-slots/futsal/${futsalId}/date/${selectedDate}/shift/${selectedShift}`);
         if (response.ok) {
           const data = await response.json();
           setAvailableSlots(data.slots);
@@ -3600,7 +3600,7 @@ function EditBookingForm({ booking, onUpdate, onCancel, setNotification }: { boo
 
     setLoading(true);
     try {
-      const response = await fetch(`http://localhost:5000/api/bookings/${booking.booking_id}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/bookings/${booking.booking_id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

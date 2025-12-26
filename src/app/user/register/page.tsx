@@ -189,7 +189,7 @@ export default function UserRegister() {
     setError("");
 
     try {
-      const response = await fetch("http://localhost:5000/api/users/register", {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/users/register`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -225,7 +225,7 @@ export default function UserRegister() {
     try {
       // Resend email OTP
       const emailResponse = await fetch(
-        "http://localhost:5000/api/otp/generate",
+        `${process.env.NEXT_PUBLIC_API_URL}/api/otp/generate`,
         {
           method: "POST",
           headers: {
@@ -241,7 +241,7 @@ export default function UserRegister() {
 
       // Resend phone OTP
       const phoneResponse = await fetch(
-        "http://localhost:5000/api/otp/generate",
+        `${process.env.NEXT_PUBLIC_API_URL}/api/otp/generate`,
         {
           method: "POST",
           headers: {
@@ -281,7 +281,7 @@ export default function UserRegister() {
 
     try {
       const response = await fetch(
-        "http://localhost:5000/api/users/verify-registration",
+        `${process.env.NEXT_PUBLIC_API_URL}/api/users/verify-registration`,
         {
           method: "POST",
           headers: {

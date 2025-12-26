@@ -76,7 +76,7 @@ export default function UserLogin() {
     setError("");
 
     try {
-      const response = await fetch("http://localhost:5000/api/users/login", {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/users/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -112,7 +112,7 @@ export default function UserLogin() {
 
     try {
       const response = await fetch(
-        "http://localhost:5000/api/users/forgot-password",
+        `${process.env.NEXT_PUBLIC_API_URL}/api/users/forgot-password`,
         {
           method: "POST",
           headers: {
@@ -148,7 +148,7 @@ export default function UserLogin() {
 
     try {
       const response = await fetch(
-        "http://localhost:5000/api/users/verify-forgot-otp",
+        `${process.env.NEXT_PUBLIC_API_URL}/api/users/verify-forgot-otp`,
         {
           method: "POST",
           headers: {
@@ -187,7 +187,7 @@ export default function UserLogin() {
 
     try {
       const response = await fetch(
-        "http://localhost:5000/api/users/reset-password",
+        `${process.env.NEXT_PUBLIC_API_URL}/api/users/reset-password`,
         {
           method: "POST",
           headers: {
@@ -992,7 +992,7 @@ export default function UserLogin() {
                             setLoading(true);
                             try {
                               const response = await fetch(
-                                "http://localhost:5000/api/users/forgot-password",
+                                `${process.env.NEXT_PUBLIC_API_URL}/api/users/forgot-password`,
                                 {
                                   method: "POST",
                                   headers: {

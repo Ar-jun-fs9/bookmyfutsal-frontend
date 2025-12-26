@@ -77,7 +77,7 @@ export default function FutsalAdminSignin() {
 
     try {
       const response = await fetch(
-        "http://localhost:5000/api/futsal-admins/login",
+        `${process.env.NEXT_PUBLIC_API_URL}/api/futsal-admins/login`,
         {
           method: "POST",
           headers: {
@@ -112,7 +112,7 @@ export default function FutsalAdminSignin() {
 
     try {
       const response = await fetch(
-        "http://localhost:5000/api/futsal-admins/forgot-password",
+        `${process.env.NEXT_PUBLIC_API_URL}/api/futsal-admins/forgot-password`,
         {
           method: "POST",
           headers: {
@@ -148,7 +148,7 @@ export default function FutsalAdminSignin() {
 
     try {
       const response = await fetch(
-        "http://localhost:5000/api/futsal-admins/verify-forgot-otp",
+        `${process.env.NEXT_PUBLIC_API_URL}/api/futsal-admins/verify-forgot-otp`,
         {
           method: "POST",
           headers: {
@@ -187,7 +187,7 @@ export default function FutsalAdminSignin() {
 
     try {
       const response = await fetch(
-        "http://localhost:5000/api/futsal-admins/reset-password",
+        `${process.env.NEXT_PUBLIC_API_URL}/api/futsal-admins/reset-password`,
         {
           method: "POST",
           headers: {
@@ -984,7 +984,7 @@ export default function FutsalAdminSignin() {
                             setLoading(true);
                             try {
                               const response = await fetch(
-                                "http://localhost:5000/api/futsal-admins/forgot-password",
+                                `${process.env.NEXT_PUBLIC_API_URL}/api/futsal-admins/forgot-password`,
                                 {
                                   method: "POST",
                                   headers: {

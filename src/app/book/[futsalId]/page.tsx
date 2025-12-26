@@ -468,7 +468,7 @@ export default function BookFutsal() {
   const checkSlotStatus = async (slotId: number): Promise<string> => {
     try {
       const response = await fetch(
-        `http://localhost:5000/api/time-slots/${slotId}/status`
+        `${process.env.NEXT_PUBLIC_API_URL}/api/time-slots/${slotId}/status`
       );
       if (response.ok) {
         const data = await response.json();
@@ -499,7 +499,7 @@ export default function BookFutsal() {
 
         // Reserve new slot
         const reserveResponse = await fetch(
-          `http://localhost:5000/api/time-slots/${slot.slot_id}/reserve`,
+          `${process.env.NEXT_PUBLIC_API_URL}/api/time-slots/${slot.slot_id}/reserve`,
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -554,7 +554,7 @@ export default function BookFutsal() {
   // Release slot reservation when user goes back or changes selection
   const releaseSlotReservation = async (slotId: number) => {
     try {
-      await fetch(`http://localhost:5000/api/time-slots/${slotId}/release`, {
+      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/time-slots/${slotId}/release`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
       });
@@ -599,7 +599,7 @@ export default function BookFutsal() {
     try {
       // First check if phone number is already registered
       const registeredResponse = await fetch(
-        `http://localhost:5000/api/users/check-registered/${bookingState.phone}`
+        `${process.env.NEXT_PUBLIC_API_URL}/api/users/check-registered/${bookingState.phone}`
       );
       const registeredData = await registeredResponse.json();
 
@@ -614,7 +614,7 @@ export default function BookFutsal() {
 
       // Check if phone is already verified
       const checkResponse = await fetch(
-        `http://localhost:5000/api/otp/check-verified?contact=${bookingState.phone}&contact_type=phone`
+        `${process.env.NEXT_PUBLIC_API_URL}/api/otp/check-verified?contact=${bookingState.phone}&contact_type=phone`
       );
       const checkData = await checkResponse.json();
 
@@ -632,7 +632,7 @@ export default function BookFutsal() {
       } else {
         // Need to verify phone first
         const otpResponse = await fetch(
-          "http://localhost:5000/api/otp/generate",
+          `${process.env.NEXT_PUBLIC_API_URL}/api/otp/generate`,
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -673,7 +673,7 @@ export default function BookFutsal() {
   const handleResendOTP = async () => {
     try {
       const otpResponse = await fetch(
-        "http://localhost:5000/api/otp/generate",
+        `${process.env.NEXT_PUBLIC_API_URL}/api/otp/generate`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -705,7 +705,7 @@ export default function BookFutsal() {
 
     try {
       const verifyResponse = await fetch(
-        "http://localhost:5000/api/otp/verify",
+        `${process.env.NEXT_PUBLIC_API_URL}/api/otp/verify`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -2026,7 +2026,7 @@ export default function BookFutsal() {
                                       // Check for verified phone and pre-populate if available
                                       try {
                                         const response = await fetch(
-                                          `http://localhost:5000/api/bookings/last-verified/${value}`
+                                          `${process.env.NEXT_PUBLIC_API_URL}/api/bookings/last-verified/${value}`
                                         );
                                         const data = await response.json();
                                         if (data.verified && data.guest_name) {
@@ -2081,7 +2081,7 @@ export default function BookFutsal() {
                                       // Check if phone is verified for OTP note
                                       try {
                                         const checkResponse = await fetch(
-                                          `http://localhost:5000/api/otp/check-verified?contact=${value}&contact_type=phone`
+                                          `${process.env.NEXT_PUBLIC_API_URL}/api/otp/check-verified?contact=${value}&contact_type=phone`
                                         );
                                         const checkData =
                                           await checkResponse.json();
@@ -3311,7 +3311,7 @@ export default function BookFutsal() {
                         if (bookingState.booking) {
                           try {
                             await fetch(
-                              `http://localhost:5000/api/bookings/cancel/${bookingState.booking.tracking_code}`,
+                              `${process.env.NEXT_PUBLIC_API_URL}/api/bookings/cancel/${bookingState.booking.tracking_code}`,
                               {
                                 method: "DELETE",
                               }

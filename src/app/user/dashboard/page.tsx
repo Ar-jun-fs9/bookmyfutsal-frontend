@@ -267,7 +267,7 @@ export default function UserDashboard() {
         setConfirmModal({ isOpen: false, message: '', onConfirm: () => { } });
 
         try {
-          const response = await fetch(`http://localhost:5000/api/bookings/user/bulk-delete`, {
+          const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/bookings/user/bulk-delete`, {
             method: 'DELETE',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -723,7 +723,7 @@ export default function UserDashboard() {
                           <div className="relative h-56 overflow-hidden group">
                             {currentImage && (
                               <img
-                                src={`http://localhost:5000/uploads/${currentImage}`}
+                                src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/${currentImage}`}
                                 alt={futsal.name}
                                 className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                               />
@@ -1107,7 +1107,7 @@ export default function UserDashboard() {
               <video
                 controls
                 className="w-full h-auto max-h-[70vh] rounded"
-                src={`http://localhost:5000/uploads/${videoModal.futsal.video}`}
+                src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/${videoModal.futsal.video}`}
               >
                 Your browser does not support the video tag.
               </video>
@@ -1218,7 +1218,7 @@ function DetailsModal({ futsal, onClose }: { futsal: Futsal, onClose: () => void
                 <h4 className="text-lg font-semibold mb-3">Images</h4>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {futsal.images.map((img, index) => (
-                    <img key={index} src={`http://localhost:5000/uploads/${img}`} alt={`${futsal.name} ${index + 1}`} className="w-full h-48 object-cover rounded-lg" />
+                    <img key={index} src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/${img}`} alt={`${futsal.name} ${index + 1}`} className="w-full h-48 object-cover rounded-lg" />
                   ))}
                 </div>
               </div>
@@ -1269,7 +1269,7 @@ function DetailsModal({ futsal, onClose }: { futsal: Futsal, onClose: () => void
               <div>
                 <h4 className="text-lg font-semibold mb-3">Video</h4>
                 <video controls className="w-full max-w-2xl rounded-lg">
-                  <source src={`http://localhost:5000/uploads/${futsal.video}`} type="video/mp4" />
+                  <source src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/${futsal.video}`} type="video/mp4" />
                 </video>
               </div>
             )}
@@ -1338,7 +1338,7 @@ function RatingModal({ futsal, onClose, onRatingSubmitted, showNotification }: {
 
   const fetchRatings = async () => {
     try {
-      const response = await fetch(`http://localhost:5000/api/ratings/futsal/${futsal.futsal_id}`);
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/ratings/futsal/${futsal.futsal_id}`);
       if (response.ok) {
         const data = await response.json();
         setRatings(data);
@@ -1355,7 +1355,7 @@ function RatingModal({ futsal, onClose, onRatingSubmitted, showNotification }: {
 
       if (userData) {
         // Registered user - check if they have rated this futsal
-        const response = await fetch(`http://localhost:5000/api/ratings/futsal/${futsal.futsal_id}`);
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/ratings/futsal/${futsal.futsal_id}`);
         if (response.ok) {
           const futsalRatings = await response.json();
           const userRating = futsalRatings.find((r: any) => r.user_id === userData.user_id);
@@ -1379,7 +1379,7 @@ function RatingModal({ futsal, onClose, onRatingSubmitted, showNotification }: {
             const ratingInfo = JSON.parse(storedRatingInfo);
 
             // Try to find the rating by ID first
-            const response = await fetch(`http://localhost:5000/api/ratings/futsal/${futsal.futsal_id}`);
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/ratings/futsal/${futsal.futsal_id}`);
             if (response.ok) {
               const futsalRatings = await response.json();
               let userRating = futsalRatings.find((r: any) => r.id === ratingInfo.rating_id);
@@ -1458,7 +1458,7 @@ function RatingModal({ futsal, onClose, onRatingSubmitted, showNotification }: {
         }
       }
 
-      const response = await fetch(`http://localhost:5000/api/ratings/${userExistingRating.id}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/ratings/${userExistingRating.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -1510,7 +1510,7 @@ function RatingModal({ futsal, onClose, onRatingSubmitted, showNotification }: {
 
     setLoading(true);
     try {
-      const response = await fetch(`http://localhost:5000/api/ratings/${userExistingRating.id}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/ratings/${userExistingRating.id}`, {
         method: 'DELETE'
       });
 
@@ -1572,7 +1572,7 @@ function RatingModal({ futsal, onClose, onRatingSubmitted, showNotification }: {
         }
       }
 
-      const response = await fetch('http://localhost:5000/api/ratings', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/ratings`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -1965,7 +1965,7 @@ function EditUserForm({ user, onUpdate, onCancel, showNotification }: { user: Us
     setLoading(true);
 
     try {
-      const response = await fetch(`http://localhost:5000/api/users/${user.user_id}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/users/${user.user_id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -2082,7 +2082,7 @@ function BookingModal({ futsal, user, onClose, onSuccess, setSuccessModal, setCo
       // Refetch slots if restoring progress at step 3 or higher
       if (selectedDate && selectedShift && step >= 3) {
         try {
-          const response = await fetch(`http://localhost:5000/api/time-slots/futsal/${futsal.futsal_id}/date/${selectedDate}/shift/${selectedShift}`);
+          const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/time-slots/futsal/${futsal.futsal_id}/date/${selectedDate}/shift/${selectedShift}`);
           if (response.ok) {
             const data = await response.json();
             setAvailableSlots(data.slots);
@@ -2097,7 +2097,7 @@ function BookingModal({ futsal, user, onClose, onSuccess, setSuccessModal, setCo
   // Check slot status before allowing selection
   const checkSlotStatus = async (slotId: number): Promise<string> => {
     try {
-      const response = await fetch(`http://localhost:5000/api/time-slots/${slotId}/status`);
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/time-slots/${slotId}/status`);
       if (response.ok) {
         const data = await response.json();
         return data.status;
@@ -2121,7 +2121,7 @@ function BookingModal({ futsal, user, onClose, onSuccess, setSuccessModal, setCo
         setAvailableSlots(prev => prev.map(s => s.slot_id === slot.slot_id ? { ...s, display_status: 'available', status: 'available' } : s));
       } else {
         // Select: reserve slot
-        const reserveResponse = await fetch(`http://localhost:5000/api/time-slots/${slot.slot_id}/reserve`, {
+        const reserveResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/time-slots/${slot.slot_id}/reserve`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' }
         });
@@ -2147,7 +2147,7 @@ function BookingModal({ futsal, user, onClose, onSuccess, setSuccessModal, setCo
 
           // Refresh slots
           try {
-            const response = await fetch(`http://localhost:5000/api/time-slots/futsal/${futsal.futsal_id}/date/${selectedDate}/shift/${selectedShift}`);
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/time-slots/futsal/${futsal.futsal_id}/date/${selectedDate}/shift/${selectedShift}`);
             if (response.ok) {
               const data = await response.json();
               setAvailableSlots(data.slots);
@@ -2166,7 +2166,7 @@ function BookingModal({ futsal, user, onClose, onSuccess, setSuccessModal, setCo
   // Release slot reservation when user goes back or changes selection
   const releaseSlotReservation = async (slotId: number) => {
     try {
-      await fetch(`http://localhost:5000/api/time-slots/${slotId}/release`, {
+      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/time-slots/${slotId}/release`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' }
       });
@@ -2194,7 +2194,7 @@ function BookingModal({ futsal, user, onClose, onSuccess, setSuccessModal, setCo
         setSelectedSlotIds([]);
       }
       try {
-        const response = await fetch(`http://localhost:5000/api/time-slots/futsal/${futsal.futsal_id}/date/${selectedDate}/shift/${selectedShift}`);
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/time-slots/futsal/${futsal.futsal_id}/date/${selectedDate}/shift/${selectedShift}`);
         if (response.ok) {
           const data = await response.json();
           setAvailableSlots(data.slots);
@@ -2225,7 +2225,7 @@ function BookingModal({ futsal, user, onClose, onSuccess, setSuccessModal, setCo
         setSelectedSlotIds([]);
         // Refresh slots
         try {
-          const response = await fetch(`http://localhost:5000/api/time-slots/futsal/${futsal.futsal_id}/date/${selectedDate}/shift/${selectedShift}`);
+          const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/time-slots/futsal/${futsal.futsal_id}/date/${selectedDate}/shift/${selectedShift}`);
           if (response.ok) {
             const data = await response.json();
             setAvailableSlots(data.slots);
@@ -2249,7 +2249,7 @@ function BookingModal({ futsal, user, onClose, onSuccess, setSuccessModal, setCo
       let failedSlots: number[] = [];
 
       for (const slotId of selectedSlotIds) {
-        const response = await fetch('http://localhost:5000/api/bookings', {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/bookings`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -3119,7 +3119,7 @@ function UpdateBookingModal({ booking, onClose, onSuccess, setSuccessModal, show
   useEffect(() => {
     const fetchFutsal = async () => {
       try {
-        const response = await fetch(`http://localhost:5000/api/futsals/${futsalId}`);
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/futsals/${futsalId}`);
         if (response.ok) {
           const data = await response.json();
           setFutsal(data);
@@ -3152,7 +3152,7 @@ function UpdateBookingModal({ booking, onClose, onSuccess, setSuccessModal, show
   // Check slot status before allowing selection
   const checkSlotStatus = async (slotId: number): Promise<string> => {
     try {
-      const response = await fetch(`http://localhost:5000/api/time-slots/${slotId}/status`);
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/time-slots/${slotId}/status`);
       if (response.ok) {
         const data = await response.json();
         return data.status;
@@ -3170,7 +3170,7 @@ function UpdateBookingModal({ booking, onClose, onSuccess, setSuccessModal, show
 
     try {
       // Try to reserve the slot
-      const reserveResponse = await fetch(`http://localhost:5000/api/time-slots/${slot.slot_id}/reserve`, {
+      const reserveResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/time-slots/${slot.slot_id}/reserve`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' }
       });
@@ -3194,7 +3194,7 @@ function UpdateBookingModal({ booking, onClose, onSuccess, setSuccessModal, show
 
         // Refresh slots to show updated status
         try {
-          const response = await fetch(`http://localhost:5000/api/time-slots/futsal/${futsalId}/date/${selectedDate}/shift/${selectedShift}`);
+          const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/time-slots/futsal/${futsalId}/date/${selectedDate}/shift/${selectedShift}`);
           if (response.ok) {
             const data = await response.json();
             setAvailableSlots(data.slots);
@@ -3212,7 +3212,7 @@ function UpdateBookingModal({ booking, onClose, onSuccess, setSuccessModal, show
   // Release slot reservation when user goes back or changes selection
   const releaseSlotReservation = async (slotId: number) => {
     try {
-      await fetch(`http://localhost:5000/api/time-slots/${slotId}/release`, {
+      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/time-slots/${slotId}/release`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' }
       });
@@ -3233,7 +3233,7 @@ function UpdateBookingModal({ booking, onClose, onSuccess, setSuccessModal, show
   const handleShiftSubmit = async () => {
     if (selectedShift && selectedDate && futsalId) {
       try {
-        const response = await fetch(`http://localhost:5000/api/time-slots/futsal/${futsalId}/date/${selectedDate}/shift/${selectedShift}`);
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/time-slots/futsal/${futsalId}/date/${selectedDate}/shift/${selectedShift}`);
         if (response.ok) {
           const data = await response.json();
           setAvailableSlots(data.slots);
@@ -3264,7 +3264,7 @@ function UpdateBookingModal({ booking, onClose, onSuccess, setSuccessModal, show
       setSelectedSlotIds([]);
       // Refresh slots
       try {
-        const response = await fetch(`http://localhost:5000/api/time-slots/futsal/${futsalId}/date/${selectedDate}/shift/${selectedShift}`);
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/time-slots/futsal/${futsalId}/date/${selectedDate}/shift/${selectedShift}`);
         if (response.ok) {
           const data = await response.json();
           setAvailableSlots(data.slots);
@@ -3278,7 +3278,7 @@ function UpdateBookingModal({ booking, onClose, onSuccess, setSuccessModal, show
     setLoading(true);
     try {
       const user = JSON.parse(sessionStorage.getItem('user') || '{}');
-      const response = await fetch(`http://localhost:5000/api/bookings/user/${booking.booking_id}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/bookings/user/${booking.booking_id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

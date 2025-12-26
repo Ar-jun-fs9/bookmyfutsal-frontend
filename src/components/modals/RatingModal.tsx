@@ -42,7 +42,7 @@ export default function RatingModal({ futsal, onClose, onRatingSubmitted }: Rati
 
   const fetchRatings = async () => {
     try {
-      const response = await fetch(`http://localhost:5000/api/ratings/futsal/${futsal.futsal_id}`);
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/ratings/futsal/${futsal.futsal_id}`);
       if (response.ok) {
         const data = await response.json();
         setRatings(data);
@@ -58,7 +58,7 @@ export default function RatingModal({ futsal, onClose, onRatingSubmitted }: Rati
       const userData = user ? JSON.parse(user) : null;
 
       if (userData) {
-        const response = await fetch(`http://localhost:5000/api/ratings/futsal/${futsal.futsal_id}`);
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/ratings/futsal/${futsal.futsal_id}`);
         if (response.ok) {
           const futsalRatings = await response.json();
           const userRating = futsalRatings.find((r: Rating) => r.id === userData.user_id);
@@ -77,7 +77,7 @@ export default function RatingModal({ futsal, onClose, onRatingSubmitted }: Rati
         if (storedRatingInfo) {
           try {
             const ratingInfo = JSON.parse(storedRatingInfo);
-            const response = await fetch(`http://localhost:5000/api/ratings/futsal/${futsal.futsal_id}`);
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/ratings/futsal/${futsal.futsal_id}`);
             if (response.ok) {
               const futsalRatings = await response.json();
               let userRating = futsalRatings.find((r: Rating) => r.id === ratingInfo.rating_id);
@@ -147,7 +147,7 @@ export default function RatingModal({ futsal, onClose, onRatingSubmitted }: Rati
         }
       }
 
-      const response = await fetch(`http://localhost:5000/api/ratings/${userExistingRating.id}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/ratings/${userExistingRating.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -196,7 +196,7 @@ export default function RatingModal({ futsal, onClose, onRatingSubmitted }: Rati
 
     setLoading(true);
     try {
-      const response = await fetch(`http://localhost:5000/api/ratings/${userExistingRating.id}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/ratings/${userExistingRating.id}`, {
         method: 'DELETE'
       });
 
@@ -254,7 +254,7 @@ export default function RatingModal({ futsal, onClose, onRatingSubmitted }: Rati
         }
       }
 
-      const response = await fetch('http://localhost:5000/api/ratings', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/ratings`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

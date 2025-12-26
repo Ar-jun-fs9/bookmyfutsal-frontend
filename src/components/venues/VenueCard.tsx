@@ -158,7 +158,7 @@ const VenueCard = memo(function VenueCard({ futsal, index }: VenueCardProps) {
       <div className="relative h-56 overflow-hidden group">
         {images[currentImageIndex] && (
           <img
-            src={`http://localhost:5000/uploads/${images[currentImageIndex]}`}
+            src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/${images[currentImageIndex]}`}
             alt={futsal.name}
             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
           />

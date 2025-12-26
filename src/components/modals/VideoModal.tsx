@@ -26,7 +26,7 @@ export default function VideoModal({ futsal, onClose }: VideoModalProps) {
           <video
             controls
             className="w-full h-auto max-h-[70vh] rounded-xl shadow-lg"
-            src={`http://localhost:5000/uploads/${futsal.video}`}
+            src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/${futsal.video}`}
           >
             Your browser does not support the video tag.
           </video>

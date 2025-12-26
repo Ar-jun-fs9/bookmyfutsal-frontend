@@ -77,7 +77,7 @@ export default function SuperAdminSignin() {
 
     try {
       const response = await fetch(
-        "http://localhost:5000/api/superadmin/login",
+        `${process.env.NEXT_PUBLIC_API_URL}/api/superadmin/login`,
         {
           method: "POST",
           headers: {
@@ -111,7 +111,7 @@ export default function SuperAdminSignin() {
 
     try {
       const response = await fetch(
-        "http://localhost:5000/api/superadmin/forgot-password",
+        `${process.env.NEXT_PUBLIC_API_URL}/api/superadmin/forgot-password`,
         {
           method: "POST",
           headers: {
@@ -147,7 +147,7 @@ export default function SuperAdminSignin() {
 
     try {
       const response = await fetch(
-        "http://localhost:5000/api/superadmin/verify-forgot-otp",
+        `${process.env.NEXT_PUBLIC_API_URL}/api/superadmin/verify-forgot-otp`,
         {
           method: "POST",
           headers: {
@@ -186,7 +186,7 @@ export default function SuperAdminSignin() {
 
     try {
       const response = await fetch(
-        "http://localhost:5000/api/superadmin/reset-password",
+        `${process.env.NEXT_PUBLIC_API_URL}/api/superadmin/reset-password`,
         {
           method: "POST",
           headers: {
@@ -976,7 +976,7 @@ export default function SuperAdminSignin() {
                             setLoading(true);
                             try {
                               const response = await fetch(
-                                "http://localhost:5000/api/superadmin/forgot-password",
+                                `${process.env.NEXT_PUBLIC_API_URL}/api/superadmin/forgot-password`,
                                 {
                                   method: "POST",
                                   headers: {

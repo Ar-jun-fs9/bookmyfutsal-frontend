@@ -215,7 +215,7 @@ export default function FutsalAdminDashboard() {
     if (!futsal || !admin) return;
 
     try {
-      const response = await fetch(`http://localhost:5000/api/futsals/${futsal.futsal_id}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/futsals/${futsal.futsal_id}`, {
         method: 'PUT',
         body: formData,
       });
@@ -256,7 +256,7 @@ export default function FutsalAdminDashboard() {
         headers['Authorization'] = `Bearer ${tokens.accessToken}`;
       }
 
-      const response = await fetch(`http://localhost:5000/api/futsal-admins/${admin.id}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/futsal-admins/${admin.id}`, {
         method: 'PUT',
         headers,
         body: JSON.stringify(formData),
@@ -332,7 +332,7 @@ export default function FutsalAdminDashboard() {
       onConfirm: async () => {
         setConfirmModal({ isOpen: false, message: '', onConfirm: () => {} });
         try {
-          const response = await fetch(`http://localhost:5000/api/bookings/futsal-admin/${bookingId}`, {
+          const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/bookings/futsal-admin/${bookingId}`, {
             method: 'DELETE',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ futsal_admin_id: admin?.id }),
@@ -490,7 +490,7 @@ export default function FutsalAdminDashboard() {
         body.users_type = users_type;
       }
 
-      const response = await fetch(`http://localhost:5000/api/ratings/${ratingId}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/ratings/${ratingId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
@@ -519,7 +519,7 @@ export default function FutsalAdminDashboard() {
         setConfirmModal({ isOpen: false, message: '', onConfirm: () => {} });
 
         try {
-          const response = await fetch(`http://localhost:5000/api/ratings/${ratingId}`, {
+          const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/ratings/${ratingId}`, {
             method: 'DELETE',
           });
 
@@ -552,7 +552,7 @@ export default function FutsalAdminDashboard() {
 
         try {
           const deletePromises = selectedRatings.map((ratingId: number) =>
-            fetch(`http://localhost:5000/api/ratings/${ratingId}`, {
+            fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/ratings/${ratingId}`, {
               method: 'DELETE',
             })
           );
@@ -672,7 +672,7 @@ export default function FutsalAdminDashboard() {
                         <strong>Images:</strong>
                         <div className="flex flex-wrap ga p-2 mt-2">
                           {futsal.images.map((img: string, index: number) => (
-                            <img key={index} src={`http://localhost:5000/uploads/${img}`} alt={`${futsal?.name || ''} ${index + 1}`} className="w-32 h-32 object-cover" />
+                            <img key={index} src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/${img}`} alt={`${futsal?.name || ''} ${index + 1}`} className="w-32 h-32 object-cover" />
                           ))}
                         </div>
                       </div>
@@ -681,7 +681,7 @@ export default function FutsalAdminDashboard() {
                       <div>
                         <strong>Video:</strong>
                         <video controls className="w-64 h-36 mt-2">
-                          <source src={`http://localhost:5000/uploads/${futsal.video}`} type="video/mp4" />
+                          <source src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/${futsal.video}`} type="video/mp4" />
                         </video>
                       </div>
                     )}
@@ -1259,7 +1259,7 @@ function CreateRatingForm({ futsalId, onSuccess, onCancel, setNotification }: { 
     setLoading(true);
 
     try {
-      const response = await fetch('http://localhost:5000/api/ratings', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/ratings`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -1563,7 +1563,7 @@ function EditBookingForm({ booking, onUpdate, onCancel, adminId, setNotification
   const handleShiftSubmit = async () => {
     if (selectedShift && selectedDate && futsalId) {
       try {
-        const response = await fetch(`http://localhost:5000/api/time-slots/futsal/${futsalId}/date/${selectedDate}/shift/${selectedShift}`);
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/time-slots/futsal/${futsalId}/date/${selectedDate}/shift/${selectedShift}`);
         if (response.ok) {
           const data = await response.json();
           setAvailableSlots(data.slots);
@@ -1580,7 +1580,7 @@ function EditBookingForm({ booking, onUpdate, onCancel, adminId, setNotification
 
     setLoading(true);
     try {
-      const response = await fetch(`http://localhost:5000/api/bookings/futsal-admin/${booking.booking_id}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/bookings/futsal-admin/${booking.booking_id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -2453,7 +2453,7 @@ function EditFutsalForm({ futsal, onUpdate, onCancel }: { futsal: Futsal, onUpda
           <div className="flex flex-wrap ga p-2 mt-2">
             {existingImages.map((img: string, index: number) => (
               <div key={index} className="relative">
-                <img src={`http://localhost:5000/uploads/${img}`} alt={`Existing ${index + 1}`} className="w-32 h-32 object-cover" />
+                <img src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/${img}`} alt={`Existing ${index + 1}`} className="w-32 h-32 object-cover" />
                 <button
                   type="button"
                   onClick={() => removeImage(img)}
@@ -2471,7 +2471,7 @@ function EditFutsalForm({ futsal, onUpdate, onCancel }: { futsal: Futsal, onUpda
           <strong>Existing Video:</strong>
           <div className="relative mt-2">
             <video controls className="w-64 h-36">
-              <source src={`http://localhost:5000/uploads/${existingVideo}`} type="video/mp4" />
+              <source src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/${existingVideo}`} type="video/mp4" />
             </video>
             <button
               type="button"

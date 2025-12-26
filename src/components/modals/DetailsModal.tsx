@@ -52,7 +52,7 @@ export default function DetailsModal({ futsal, onClose }: DetailsModalProps) {
                 <h4 className="text-lg font-semibold mb-3">Images</h4>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {futsal.images.map((img, index) => (
-                    <img key={index} src={`http://localhost:5000/uploads/${img}`} alt={`${futsal.name} ${index + 1}`} className="w-full h-48 object-cover rounded-lg" />
+                    <img key={index} src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/${img}`} alt={`${futsal.name} ${index + 1}`} className="w-full h-48 object-cover rounded-lg" />
                   ))}
                 </div>
               </div>
@@ -103,7 +103,7 @@ export default function DetailsModal({ futsal, onClose }: DetailsModalProps) {
               <div>
                 <h4 className="text-lg font-semibold mb-3">Video</h4>
                 <video controls className="w-full max-w-2xl rounded-lg">
-                  <source src={`http://localhost:5000/uploads/${futsal.video}`} type="video/mp4" />
+                  <source src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/${futsal.video}`} type="video/mp4" />
                 </video>
               </div>
             )}

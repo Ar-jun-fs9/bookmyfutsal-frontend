@@ -46,7 +46,7 @@ export default function VenueCarousel() {
                 <div className="relative h-96 md:h-[500px]">
                   {futsal.images && futsal.images[0] && (
                     <img
-                      src={`http://localhost:5000/uploads/${futsal.images[0]}`}
+                      src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/${futsal.images[0]}`}
                       alt={futsal.name}
                       className="w-full h-full object-cover"
                     />
