@@ -13,7 +13,7 @@ export const SocketProvider = ({ children }: SocketProviderProps) => {
   const { setSocket, setConnected } = useSocketStore();
 
   useEffect(() => {
-    const socketInstance = io('http://localhost:5000', {
+    const socketInstance = io(process.env.NEXT_PUBLIC_API_URL, {
       transports: ['websocket', 'polling'],
     });
 
