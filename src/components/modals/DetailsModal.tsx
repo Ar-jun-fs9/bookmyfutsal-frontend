@@ -1,0 +1,143 @@
+interface Futsal {
+  futsal_id: number;
+  name: string;
+  location: string;
+  city: string;
+  images?: string[];
+  video?: string;
+  price_per_hour: number;
+  latitude?: number;
+  longitude?: number;
+  admin_phone?: string;
+  opening_hours?: string;
+  closing_hours?: string;
+  description?: string;
+  average_rating?: number;
+  total_ratings?: number;
+  game_format?: string;
+  facilities?: string[];
+}
+
+interface DetailsModalProps {
+  futsal: Futsal;
+  onClose: () => void;
+}
+
+export default function DetailsModal({ futsal, onClose }: DetailsModalProps) {
+  const formatTime = (timeString: string): string => {
+    const [hours, minutes] = timeString.split(':').map(Number);
+    const period = hours >= 12 ? 'PM' : 'AM';
+    const displayHours = hours === 0 ? 12 : hours > 12 ? hours - 12 : hours;
+    return `${displayHours}:${minutes.toString().padStart(2, '0')} ${period}`;
+  };
+
+  return (
+    <div className="fixed inset-0 backdrop-blur-sm bg-black/20 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+        <div className="p-6">
+          <div className="flex justify-between items-start mb-6">
+            <h3 className="text-2xl font-bold text-gray-800">{futsal.name}</h3>
+            <button
+              onClick={onClose}
+              className="text-gray-500 hover:text-gray-700 text-3xl hover:bg-gray-100 rounded-lg w-10 h-10 flex items-center justify-center transition-all duration-300"
+            >
+              ×
+            </button>
+          </div>
+
+          <div className="space-y-6">
+            {/* Images */}
+            {futsal.images && futsal.images.length > 0 && (
+              <div>
+                <h4 className="text-lg font-semibold mb-3">Images</h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {futsal.images.map((img, index) => (
+                    <img key={index} src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/${img}`} alt={`${futsal.name} ${index + 1}`} className="w-full h-48 object-cover rounded-lg" />
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Basic Information */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <h4 className="text-lg font-semibold mb-3">Basic Information</h4>
+                <div className="space-y-2">
+                  <p><strong>Name:</strong> {futsal.name}</p>
+                  <p><strong>Location:</strong> {futsal.location}, {futsal.city}</p>
+                  <p><strong>Price per Hour:</strong> Rs. {futsal.price_per_hour}</p>
+                  {futsal.game_format && <p><strong>Game Format:</strong> {futsal.game_format}</p>}
+                  {futsal.opening_hours && futsal.closing_hours && (
+                    <p><strong>Operating Hours:</strong> {formatTime(futsal.opening_hours)} - {formatTime(futsal.closing_hours)}</p>
+                  )}
+                  {futsal.admin_phone && <p><strong>Contact:</strong> {futsal.admin_phone}</p>}
+                </div>
+              </div>
+
+              <div>
+                <h4 className="text-lg font-semibold mb-3">Facilities</h4>
+                {futsal.facilities && futsal.facilities.length > 0 ? (
+                  <div className="flex flex-wrap gap-2">
+                    {futsal.facilities.map((facility, index) => (
+                      <span key={index} className="bg-green-100 text-green-800 px-3 py-1 rounded-lg text-sm">
+                        {facility}
+                      </span>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-gray-500">No facilities information available</p>
+                )}
+              </div>
+            </div>
+
+            {/* Description */}
+            {futsal.description && (
+              <div>
+                <h4 className="text-lg font-semibold mb-3">Description</h4>
+                <p className="text-gray-700 leading-relaxed">{futsal.description}</p>
+              </div>
+            )}
+
+            {/* Video */}
+            {futsal.video && (
+              <div>
+                <h4 className="text-lg font-semibold mb-3">Video</h4>
+                <video controls className="w-full max-w-2xl rounded-lg">
+                  <source src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/${futsal.video}`} type="video/mp4" />
+                </video>
+              </div>
+            )}
+
+            {/* Rating */}
+            {futsal.average_rating !== undefined && futsal.average_rating !== null && futsal.total_ratings !== undefined && futsal.total_ratings > 0 && (
+              <div>
+                <h4 className="text-lg font-semibold mb-3">Rating</h4>
+                <div className="flex items-center">
+                  <div className="flex">
+                    {[...Array(5)].map((_, i) => (
+                      <svg key={i} className={`w-5 h-5 ${i < Math.floor(futsal.average_rating!) ? 'text-yellow-400' : 'text-gray-300'}`} fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                      </svg>
+                    ))}
+                  </div>
+                  <span className="ml-2 text-lg font-medium">
+                    {futsal.average_rating ? Number(futsal.average_rating).toFixed(1) : '0.0'} ({futsal.total_ratings || 0} reviews)
+                  </span>
+                </div>
+              </div>
+            )}
+          </div>
+
+          <div className="flex justify-end mt-8">
+            <button
+              onClick={onClose}
+              className="bg-gray-600 text-white px-6 py-3 rounded-lg hover:bg-gray-700 transition-all duration-300"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
