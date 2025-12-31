@@ -105,25 +105,33 @@ export function useTestimonials() {
   }, []);
 
   const goToNext = () => {
-    setSubIndex(prevSub => {
-      if (prevSub < testimonialsPerPage - 1) {
-        return prevSub + 1;
-      } else {
-        setCurrentTestimonialIndex(prev => prev < 2 ? prev + 1 : 0);
-        return 0;
-      }
-    });
+    if (testimonialsPerPage === 1) {
+      setCurrentTestimonialIndex(prev => prev < testimonials.length - 1 ? prev + 1 : 0);
+    } else {
+      setSubIndex(prevSub => {
+        if (prevSub < testimonialsPerPage - 1) {
+          return prevSub + 1;
+        } else {
+          setCurrentTestimonialIndex(prev => prev < Math.floor(testimonials.length / testimonialsPerPage) - 1 ? prev + 1 : 0);
+          return 0;
+        }
+      });
+    }
   };
 
   const goToPrev = () => {
-    setSubIndex(prevSub => {
-      if (prevSub > 0) {
-        return prevSub - 1;
-      } else {
-        setCurrentTestimonialIndex(prev => prev > 0 ? prev - 1 : 2);
-        return testimonialsPerPage - 1;
-      }
-    });
+    if (testimonialsPerPage === 1) {
+      setCurrentTestimonialIndex(prev => prev > 0 ? prev - 1 : testimonials.length - 1);
+    } else {
+      setSubIndex(prevSub => {
+        if (prevSub > 0) {
+          return prevSub - 1;
+        } else {
+          setCurrentTestimonialIndex(prev => prev > 0 ? prev - 1 : Math.floor(testimonials.length / testimonialsPerPage) - 1);
+          return testimonialsPerPage - 1;
+        }
+      });
+    }
   };
 
   const goToSlide = (index: number) => {
@@ -142,7 +150,7 @@ export function useTestimonials() {
     currentTestimonialIndex,
     subIndex,
     testimonialsPerPage,
-    totalPages: 3,
+    totalPages: Math.ceil(testimonials.length / 3),
     goToNext,
     goToPrev,
     goToSlide,
