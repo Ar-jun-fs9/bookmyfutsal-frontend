@@ -99,7 +99,7 @@ export default function VenueCarousel() {
           </button>
 
           {/* Indicators */}
-          <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
+          {/* <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
             {futsals.map((_: Futsal, index: number) => (
               <button
                 key={index}
@@ -108,7 +108,7 @@ export default function VenueCarousel() {
                   }`}
               />
             ))}
-          </div>
+          </div> */}
         </div>
       </div>
     </section>
