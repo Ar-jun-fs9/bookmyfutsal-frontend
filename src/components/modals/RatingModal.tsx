@@ -1,6 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useNotificationStore } from '@/stores/notificationStore';
 
+interface ConfirmModal {
+  isOpen: boolean;
+  message: string;
+  onConfirm: () => void;
+}
+
 interface Futsal {
   futsal_id: number;
   name: string;
@@ -34,6 +40,7 @@ export default function RatingModal({ futsal, onClose, onRatingSubmitted }: Rati
   const [isAnonymous, setIsAnonymous] = useState(false);
   const [userExistingRating, setUserExistingRating] = useState<Rating | null>(null);
   const [isEditing, setIsEditing] = useState(false);
+  const [confirmModal, setConfirmModal] = useState<ConfirmModal>({ isOpen: false, message: '', onConfirm: () => {} });
 
   useEffect(() => {
     fetchRatings();
@@ -184,7 +191,7 @@ export default function RatingModal({ futsal, onClose, onRatingSubmitted }: Rati
       }
     } catch (error) {
       console.error('Error updating rating:', error);
-      alert('Error updating rating');
+      showNotification({ message: "Error updating rating", type: 'info' });
     } finally {
       setLoading(false);
     }
@@ -192,44 +199,50 @@ export default function RatingModal({ futsal, onClose, onRatingSubmitted }: Rati
 
   const handleDeleteRating = async () => {
     if (!userExistingRating) return;
-    if (!confirm('Are you sure you want to delete your rating?')) return;
 
-    setLoading(true);
-    try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/ratings/${userExistingRating.id}`, {
-        method: 'DELETE'
-      });
+    setConfirmModal({
+      isOpen: true,
+      message: 'Are you sure you want to delete your rating?',
+      onConfirm: async () => {
+        setConfirmModal({ isOpen: false, message: '', onConfirm: () => {} });
+        setLoading(true);
+        try {
+          const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/ratings/${userExistingRating.id}`, {
+            method: 'DELETE'
+          });
 
-      if (response.ok) {
-        showNotification({ message: "Rating deleted successfully!", type: 'success' });
-        setHasRated(false);
-        setUserExistingRating(null);
-        setUserRating(0);
-        setComment('');
-        setUserName('');
-        setIsAnonymous(false);
+          if (response.ok) {
+            showNotification({ message: "Rating deleted successfully!", type: 'success' });
+            setHasRated(false);
+            setUserExistingRating(null);
+            setUserRating(0);
+            setComment('');
+            setUserName('');
+            setIsAnonymous(false);
 
-        const user = sessionStorage.getItem('user');
-        if (!user) {
-          localStorage.removeItem(`rating_${futsal.futsal_id}`);
+            const user = sessionStorage.getItem('user');
+            if (!user) {
+              localStorage.removeItem(`rating_${futsal.futsal_id}`);
+            }
+
+            onRatingSubmitted();
+            fetchRatings();
+          } else {
+            showNotification({ message: "Error deleting rating", type: 'info' });
+          }
+        } catch (error) {
+          console.error('Error deleting rating:', error);
+          showNotification({ message: "Error deleting rating", type: 'info' });
+        } finally {
+          setLoading(false);
         }
-
-        onRatingSubmitted();
-        fetchRatings();
-      } else {
-        showNotification({ message: "Error deleting rating", type: 'info' });
       }
-    } catch (error) {
-      console.error('Error deleting rating:', error);
-      alert('Error deleting rating');
-    } finally {
-      setLoading(false);
-    }
+    });
   };
 
   const handleSubmitRating = async () => {
     if (userRating === 0) {
-      alert('Please select a rating');
+      showNotification({ message: "Please select a rating", type: 'info' });
       return;
     }
 
@@ -294,7 +307,7 @@ export default function RatingModal({ futsal, onClose, onRatingSubmitted }: Rati
       }
     } catch (error) {
       console.error('Error submitting rating:', error);
-      alert('Error submitting rating');
+      showNotification({ message: "Error submitting rating", type: 'info' });
     } finally {
       setLoading(false);
     }
@@ -599,6 +612,29 @@ export default function RatingModal({ futsal, onClose, onRatingSubmitted }: Rati
           </div>
         </div>
       </div>
+
+      {/* Confirmation Modal */}
+      {confirmModal.isOpen && (
+        <div className="fixed inset-0 backdrop-blur-sm bg-black/20 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg p-6 max-w-sm w-full mx-4 text-center shadow-2xl">
+            <p className="text-gray-800 mb-6 text-sm">{confirmModal.message}</p>
+            <div className="flex space-x-3 justify-center">
+              <button
+                onClick={() => setConfirmModal({ isOpen: false, message: '', onConfirm: () => {} })}
+                className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors duration-200 text-sm"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmModal.onConfirm}
+                className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors duration-200 text-sm"
+              >
+                Confirm
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
