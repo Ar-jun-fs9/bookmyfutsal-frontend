@@ -741,17 +741,17 @@ export default function UserDashboard() {
                               <>
                                 <button
                                   onClick={() => handlePrevImage(futsal.futsal_id, images)}
-                                  className="absolute left-3 top-1/2 transform -translate-y-1/2 bg-white/20 backdrop-blur-md text-white p-1 rounded-lg hover:bg-white/30 transition-all duration-300 opacity-0 group-hover:opacity-100"
+                                  className="absolute left-3 top-1/2 transform -translate-y-1/2 bg-white/20 backdrop-blur-md text-white p-0.5 sm:p-1 rounded-lg hover:bg-white/30 transition-all duration-300 opacity-100 sm:opacity-0 sm:group-hover:opacity-100"
                                 >
-                                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <svg className="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                                   </svg>
                                 </button>
                                 <button
                                   onClick={() => handleNextImage(futsal.futsal_id, images)}
-                                  className="absolute right-3 top-1/2 transform -translate-y-1/2 bg-white/20 backdrop-blur-md text-white p-1 rounded-lg hover:bg-white/30 transition-all duration-300 opacity-0 group-hover:opacity-100"
+                                  className="absolute right-3 top-1/2 transform -translate-y-1/2 bg-white/20 backdrop-blur-md text-white p-0.5 sm:p-1 rounded-lg hover:bg-white/30 transition-all duration-300 opacity-100 sm:opacity-0 sm:group-hover:opacity-100"
                                 >
-                                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <svg className="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                                   </svg>
                                 </button>
