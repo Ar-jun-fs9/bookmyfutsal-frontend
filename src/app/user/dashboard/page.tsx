@@ -1785,7 +1785,7 @@ function RatingModal({ futsal, onClose, onRatingSubmitted, showNotification, set
                           placeholder="User Name"
                           value={userName}
                           onChange={(e) => setUserName(e.target.value)}
-                          className="w-full p-2 border rounded"
+                          className="w-full p-2 border border-gray-300 rounded resize-none focus:outline-none focus:ring-0 focus:border-gray-900"
                           required={!isAnonymous}
                         />
                       )}
