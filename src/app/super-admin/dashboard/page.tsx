@@ -1209,7 +1209,7 @@ export default function SuperAdminDashboard() {
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+      <main className="max-w-7xl mx-auto sm:px-6 lg:px-8">
         <div className="px-4 py-6 sm:px-0">
           <div className="space-y-6">
             {/* Dashboard Info */}
@@ -1218,7 +1218,7 @@ export default function SuperAdminDashboard() {
               <div className="absolute inset-0 bg-linear-to-br from-green-50 via-white to-blue-50 opacity-50"></div>
 
               {/* Content */}
-              <div className="relative p-6 sm:p-8">
+              <div className="relative p-2 sm:p-8">
                 {/* Header */}
                 <div className="text-center mb-6">
                   <div className="inline-flex items-center justify-center w-12 h-12 sm:w-14 sm:h-14 bg-linear-to-br from-green-500 to-green-600 rounded-lg mb-3 shadow-lg">
@@ -1240,7 +1240,7 @@ export default function SuperAdminDashboard() {
                       <div className="bg-gray-50 rounded-lg p-4">
                         <div className="flex items-center justify-between">
                           <div>
-                            <h3 className="text-lg font-semibold text-gray-900">👋 Welcome back, {user?.username || ''}!</h3>
+                            <h3 className="text-lg font-semibold text-gray-900">Welcome back, {user?.username || ''}!</h3>
                             <p className="text-gray-600 mt-1">You are logged in as a Super Administrator</p>
                           </div>
                           <button
@@ -1250,7 +1250,7 @@ export default function SuperAdminDashboard() {
                             <svg className="w-4 h-4 mr-2 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                             </svg>
-                            Edit Profile
+                            Edit
                           </button>
                         </div>
                       </div>
