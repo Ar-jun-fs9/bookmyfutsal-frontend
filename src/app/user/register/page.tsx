@@ -723,7 +723,7 @@ export default function UserRegister() {
                           </div>
                           {emailCountdown > 0 && (
                             <p className="text-xs text-red-600 mt-1 px-3">
-                              Resend email OTP in: {Math.floor(emailCountdown / 60)}:{(emailCountdown % 60).toString().padStart(2, '0')}
+                              Resend OTP in: {Math.floor(emailCountdown / 60)}:{(emailCountdown % 60).toString().padStart(2, '0')}
                             </p>
                           )}
                         </div>
@@ -751,7 +751,7 @@ export default function UserRegister() {
                           </div>
                           {phoneCountdown > 0 && (
                             <p className="text-xs text-red-600 mt-1 px-3">
-                              Resend phone OTP in: {Math.floor(phoneCountdown / 60)}:{(phoneCountdown % 60).toString().padStart(2, '0')}
+                              Resend OTP in: {Math.floor(phoneCountdown / 60)}:{(phoneCountdown % 60).toString().padStart(2, '0')}
                             </p>
                           )}
                         </div>

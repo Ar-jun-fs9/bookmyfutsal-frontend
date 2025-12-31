@@ -165,7 +165,7 @@ export default function UserDashboard() {
 
   // Process bookings data with local cancelled bookings
   const processedBookings = bookingsData?.bookings ? (() => {
-    
+
     let mergedBookings = [...bookingsData.bookings];
     let updatedCancelledList = [...cancelledBookings];
 
@@ -177,14 +177,14 @@ export default function UserDashboard() {
         }
         return booking;
       } else if (isInCancelledList) {
-        
+
         return { ...booking, cancelled_by: 'registered user' };
       }
       return booking;
     });
 
     // Do not add cancelled bookings that are not in server data to prevent showing deleted bookings
-    
+
 
     if (updatedCancelledList.length > cancelledBookings.length) {
       setCancelledBookings(updatedCancelledList);
@@ -234,7 +234,7 @@ export default function UserDashboard() {
       isOpen: true,
       message: 'Are you sure you want to delete this booking?',
       onConfirm: async () => {
-        setConfirmModal({ isOpen: false, message: '', onConfirm: () => {} });
+        setConfirmModal({ isOpen: false, message: '', onConfirm: () => { } });
 
         const updatedDeleted = [...deletedBookings, bookingId];
         setDeletedBookings(updatedDeleted);
@@ -577,9 +577,12 @@ export default function UserDashboard() {
                   <p><strong>First Name:</strong> {user?.first_name || ''}</p>
                   <p><strong>Last Name:</strong> {user?.last_name || ''}</p>
                   <p><strong>Username:</strong> {user?.username || ''}</p>
-                  <p><strong>Email:</strong> {user?.email || ''}</p>
                   <p><strong>Phone:</strong> {user?.phone || ''}</p>
+                  <p className="col-span-2">
+                    <strong>Email:</strong> {user?.email || ''}
+                  </p>
                 </div>
+
               )}
             </div>
 
@@ -890,7 +893,7 @@ export default function UserDashboard() {
                         onClick={() => setShowAllFutsals(!showAllFutsals)}
                         className="bg-linear-to-r from-green-500 to-green-600 text-white font-semibold py-3 px-8 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300"
                       >
-                        
+
                         {showAllFutsals ? 'Show Less Futsals' : `Show All Futsals (${filteredFutsals.length})`}
                       </button>
                     </div>
@@ -917,8 +920,8 @@ export default function UserDashboard() {
                             setShowCheckboxes(false);
                           }}
                           className={`px-4 py-2 rounded-lg font-medium transition-all duration-300 flex items-center gap-2 ${filterState.bookingFilter === filter.key
-                              ? 'bg-linear-to-r from-green-500 to-green-600 text-white shadow-lg'
-                              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                            ? 'bg-linear-to-r from-green-500 to-green-600 text-white shadow-lg'
+                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                             }`}
                         >
                           <span>{filter.icon}</span>
@@ -1020,8 +1023,8 @@ export default function UserDashboard() {
                                         onClick={() => handleUpdateBooking(booking)}
                                         disabled={isPastBooking || (booking.update_count || 0) >= 2}
                                         className={`px-2 py-1 rounded-lg text-xs sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 ${isPastBooking || (booking.update_count || 0) >= 2
-                                            ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                                            : 'bg-linear-to-r from-green-500 to-green-600 text-white'
+                                          ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                                          : 'bg-linear-to-r from-green-500 to-green-600 text-white'
                                           }`}
                                       >
                                         {(booking.update_count || 0) >= 2 ? 'Disabled' : 'Update'}
@@ -2445,7 +2448,7 @@ function BookingModal({ futsal, user, onClose, onSuccess, setSuccessModal, setCo
                         isOpen: true,
                         message: 'Confirm Action\nAre you sure you want to cancel this booking?',
                         onConfirm: async () => {
-                          setConfirmModal({ isOpen: false, message: '', onConfirm: () => {} });
+                          setConfirmModal({ isOpen: false, message: '', onConfirm: () => { } });
                           // Release selected slots
                           await Promise.all(selectedSlotIds.map(id => releaseSlotReservation(id)));
                           setSelectedSlotIds([]);
@@ -2550,7 +2553,7 @@ function BookingModal({ futsal, user, onClose, onSuccess, setSuccessModal, setCo
                         isOpen: true,
                         message: 'Confirm Action\nAre you sure you want to cancel this booking?',
                         onConfirm: async () => {
-                          setConfirmModal({ isOpen: false, message: '', onConfirm: () => {} });
+                          setConfirmModal({ isOpen: false, message: '', onConfirm: () => { } });
                           // Release selected slots
                           await Promise.all(selectedSlotIds.map(id => releaseSlotReservation(id)));
                           setSelectedSlotIds([]);
@@ -2571,7 +2574,7 @@ function BookingModal({ futsal, user, onClose, onSuccess, setSuccessModal, setCo
                 {/* <div className="absolute inset-0 bg-linear-to-br from-green-50 via-white to-blue-50 opacity-50"></div> */}
 
                 {/* Content */}
-                <div className="relative p-8">
+                <div className="relative p-2 md:p-8">
                   {/* Header */}
                   <div className="text-center mb-8">
                     <div className="inline-flex items-center justify-center w-16 h-16 bg-linear-to-br from-green-500 to-green-600 rounded-lg mb-4 shadow-lg">
@@ -2681,7 +2684,7 @@ function BookingModal({ futsal, user, onClose, onSuccess, setSuccessModal, setCo
                         isOpen: true,
                         message: 'Confirm Action\nAre you sure you want to cancel this booking?',
                         onConfirm: async () => {
-                          setConfirmModal({ isOpen: false, message: '', onConfirm: () => {} });
+                          setConfirmModal({ isOpen: false, message: '', onConfirm: () => { } });
                           // Release selected slots
                           await Promise.all(selectedSlotIds.map(id => releaseSlotReservation(id)));
                           setSelectedSlotIds([]);
@@ -2738,7 +2741,7 @@ function BookingModal({ futsal, user, onClose, onSuccess, setSuccessModal, setCo
                       </div>
                     </div>
                   </div>
-                  
+
                   {/* Slot Selection */}
                   {availableSlots.length > 0 ? (
                     <div className="mb-8">
@@ -2755,16 +2758,16 @@ function BookingModal({ futsal, user, onClose, onSuccess, setSuccessModal, setCo
                                 slot.status === "pending") && !selectedSlotIds.includes(slot.slot_id)
                             }
                             className={`relative p-4 border-2 rounded-xl text-center transition-all duration-300 transform hover:scale-105 ${selectedSlotIds.includes(slot.slot_id)
-                                ? "bg-linear-to-br from-green-500 to-green-600 border-green-500 text-white shadow-lg"
-                                : slot.display_status === "booked"
-                                  ? "bg-red-50 border-red-300 cursor-not-allowed opacity-60"
-                                  : slot.display_status === "expired"
-                                    ? "bg-yellow-50 border-yellow-300 cursor-not-allowed opacity-60"
-                                    : slot.status === "disabled"
-                                      ? "bg-gray-50 border-gray-300 cursor-not-allowed opacity-60"
-                                      : slot.status === "pending"
-                                        ? "bg-orange-50 border-orange-300 cursor-not-allowed opacity-60"
-                                        : "bg-white border-gray-200 hover:border-green-300 hover:shadow-md"
+                              ? "bg-linear-to-br from-green-500 to-green-600 border-green-500 text-white shadow-lg"
+                              : slot.display_status === "booked"
+                                ? "bg-red-50 border-red-300 cursor-not-allowed opacity-60"
+                                : slot.display_status === "expired"
+                                  ? "bg-yellow-50 border-yellow-300 cursor-not-allowed opacity-60"
+                                  : slot.status === "disabled"
+                                    ? "bg-gray-50 border-gray-300 cursor-not-allowed opacity-60"
+                                    : slot.status === "pending"
+                                      ? "bg-orange-50 border-orange-300 cursor-not-allowed opacity-60"
+                                      : "bg-white border-gray-200 hover:border-green-300 hover:shadow-md"
                               }`}
                           >
                             {selectedSlotIds.includes(slot.slot_id) && (
@@ -2842,7 +2845,7 @@ function BookingModal({ futsal, user, onClose, onSuccess, setSuccessModal, setCo
                                 min="1"
                                 max="10"
                                 required
-                                className="w-full px-4 py-3 pl-12 border-2 border-gray-200 rounded-xl focus:border-green-500 focus:ring-4 focus:ring-green-100 transition-all duration-300 text-gray-700 font-medium"
+                                className="w-full px-4 py-3 pl-12 bg-white border-2 border-gray-200 rounded-lg text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-400/50 focus:border-green-400/50 transition-all duration-300 font-medium text-sm"
                               />
                               <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-green-500">
                                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -2863,7 +2866,7 @@ function BookingModal({ futsal, user, onClose, onSuccess, setSuccessModal, setCo
                                 placeholder="Enter team name"
                                 value={teamName}
                                 onChange={(e) => setTeamName(e.target.value)}
-                                className="w-full px-4 py-3 pl-12 border-2 border-gray-200 rounded-xl focus:border-green-500 focus:ring-4 focus:ring-green-100 transition-all duration-300 text-gray-700 font-medium"
+                                className="w-full px-4 py-3 pl-12 bg-white border-2 border-gray-200 rounded-lg text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-400/50 focus:border-green-400/50 transition-all duration-300 font-medium text-sm"
                               />
                               <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-green-500">
                                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -2945,7 +2948,7 @@ function BookingModal({ futsal, user, onClose, onSuccess, setSuccessModal, setCo
                         isOpen: true,
                         message: 'Confirm Action\nAre you sure you want to cancel this booking?',
                         onConfirm: async () => {
-                          setConfirmModal({ isOpen: false, message: '', onConfirm: () => {} });
+                          setConfirmModal({ isOpen: false, message: '', onConfirm: () => { } });
                           // Release selected slots
                           if (selectedSlotIds.length > 0) {
                             await Promise.all(selectedSlotIds.map(id => releaseSlotReservation(id)));
@@ -2968,7 +2971,7 @@ function BookingModal({ futsal, user, onClose, onSuccess, setSuccessModal, setCo
                 {/* <div className="absolute inset-0 bg-linear-to-br from-green-50 via-white to-blue-50 opacity-50"></div> */}
 
                 {/* Content */}
-                <div className="relative p-8">
+                <div className="relative p-2 md:p-8">
                   {/* Header */}
                   <div className="text-center mb-8">
                     <div className="inline-flex items-center justify-center w-16 h-16 bg-linear-to-br from-green-500 to-green-600 rounded-lg mb-4 shadow-lg">
@@ -3010,7 +3013,7 @@ function BookingModal({ futsal, user, onClose, onSuccess, setSuccessModal, setCo
                           }
                         }}
                         placeholder="Enter your eSewa registered phone number"
-                        className="w-full px-4 py-3 pl-12 border-2 border-gray-200 rounded-xl focus:border-green-500 focus:ring-4 focus:ring-green-100 transition-all duration-300 text-gray-700 font-medium"
+                        className="w-full px-4 py-3 pl-12 bg-white border-2 border-gray-200 rounded-lg text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-400/50 focus:border-green-400/50 transition-all duration-300 font-medium text-sm"
                         required
                         maxLength={10}
                       />
