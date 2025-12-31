@@ -169,7 +169,7 @@ export default function FeedbackModal({ onClose }: FeedbackModalProps) {
                   placeholder="Your Name"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full p-2 border border-gray-300 rounded resize-none focus:outline-none focus:ring-0 focus:border-gray-400 focus:border"
                   maxLength={100}
                 />
               )}
@@ -244,7 +244,7 @@ export default function FeedbackModal({ onClose }: FeedbackModalProps) {
               placeholder="Describe the issue, bug, or suggestion in detail..."
               value={message}
               onChange={(e) => setMessage(e.target.value)}
-              className="w-full p-3 border border-gray-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full p-3 border border-gray-300 rounded resize-none focus:outline-none focus:ring-0 focus:border-gray-400 focus:border"
               rows={5}
               maxLength={2000}
               required
