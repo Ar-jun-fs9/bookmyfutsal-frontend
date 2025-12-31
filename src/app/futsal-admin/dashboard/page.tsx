@@ -613,11 +613,12 @@ export default function FutsalAdminDashboard() {
               ) : (
                 <div className="grid grid-cols-2 gap-4">
                   <p><strong>Username:</strong> {admin?.username || ''}</p>
-                  <p><strong>Email:</strong> {admin?.email || ''}</p>
                   <p><strong>Phone:</strong> {admin?.phone || ''}</p>
                   <p><strong>Futsal:</strong> {admin?.futsal_name || ''}</p>
                   <p><strong>Location:</strong> {admin?.location || ''}</p>
                   <p><strong>City:</strong> {admin?.city || ''}</p>
+                  <p className="col-span-2"><strong>Email:</strong> {admin?.email || ''}
+                  </p>
                 </div>
               )}
             </div>

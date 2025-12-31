@@ -95,7 +95,7 @@ const VenueCard = memo(function VenueCard({ futsal, index }: VenueCardProps) {
         setLocationModal({ isOpen: true, futsal, distance });
       },
       (error) => {
-        let errorMessage = 'Unable to get your location. ';
+        let errorMessage = ' ';
         switch (error.code) {
           case error.PERMISSION_DENIED:
             errorMessage += 'Please allow location access to check distance.';

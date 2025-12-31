@@ -407,7 +407,7 @@ export default function UserDashboard() {
       },
       (error) => {
         console.error('Error getting location:', error);
-        let errorMessage = 'Unable to get your location. ';
+        let errorMessage = ' ';
         switch (error.code) {
           case error.PERMISSION_DENIED:
             errorMessage += 'Please allow location access to check distance.';
