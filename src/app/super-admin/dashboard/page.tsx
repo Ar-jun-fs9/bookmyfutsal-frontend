@@ -2643,7 +2643,7 @@ function SuperAdminCreateRatingForm({ futsals, onSuccess, onCancel, setNotificat
         placeholder="Comment (optional)"
         value={comment}
         onChange={(e) => setComment(e.target.value)}
-        className="w-full p-2 border rounded resize-none"
+        className="w-full p-2 border border-gray-300 rounded resize-none focus:outline-none focus:ring-0 focus:border-gray-900"
         rows={3}
         maxLength={500}
       />
@@ -2717,7 +2717,7 @@ function EditRatingForm({ rating, onUpdate, onCancel }: { rating: any, onUpdate:
         placeholder="Comment (optional)"
         value={comment}
         onChange={(e) => setComment(e.target.value)}
-        className="w-full p-2 border rounded resize-none"
+        className="w-full p-2 border border-gray-300 rounded resize-none focus:outline-none focus:ring-0 focus:border-gray-900"
         rows={3}
         maxLength={500}
       />
@@ -3477,7 +3477,7 @@ function CreateFutsalForm({ onSuccess, setNotification }: { onSuccess: () => voi
             </div>
           </div>
         )}
-        <button type="submit" disabled={loading} className="bg-blue-600 text-white px-4 py-2 rounded disabled:opacity-50">
+        <button type="submit" disabled={loading} className="bg-green-600 text-white px-4 py-2 rounded disabled:opacity-50">
           {loading ? 'Creating...' : 'Create Futsal'}
         </button>
       </form>

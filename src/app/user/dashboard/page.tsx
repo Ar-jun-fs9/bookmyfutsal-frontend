@@ -1132,6 +1132,7 @@ export default function UserDashboard() {
             fetchFutsals();
           }}
           showNotification={showNotification}
+          setConfirmModal={setConfirmModal}
         />
       )}
 
@@ -1315,7 +1316,7 @@ function DetailsModal({ futsal, onClose }: { futsal: Futsal, onClose: () => void
 }
 
 // Rating Modal Component
-function RatingModal({ futsal, onClose, onRatingSubmitted, showNotification }: { futsal: Futsal, onClose: () => void, onRatingSubmitted: () => void, showNotification: (notification: { message: string, type: 'success' | 'info' }) => void }) {
+function RatingModal({ futsal, onClose, onRatingSubmitted, showNotification, setConfirmModal }: { futsal: Futsal, onClose: () => void, onRatingSubmitted: () => void, showNotification: (notification: { message: string, type: 'success' | 'info' }) => void, setConfirmModal: (modal: { isOpen: boolean, message: string, onConfirm: () => void }) => void }) {
   const [ratings, setRatings] = useState<any[]>([]);
   const [userRating, setUserRating] = useState(0);
   const [hoverRating, setHoverRating] = useState(0);
@@ -1512,41 +1513,46 @@ function RatingModal({ futsal, onClose, onRatingSubmitted, showNotification }: {
   const handleDeleteRating = async () => {
     if (!userExistingRating) return;
 
-    if (!confirm('Are you sure you want to delete your rating?')) return;
+    setConfirmModal({
+      isOpen: true,
+      message: 'Are you sure you want to delete your rating?',
+      onConfirm: async () => {
+        setConfirmModal({ isOpen: false, message: '', onConfirm: () => { } });
+        setLoading(true);
+        try {
+          const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/ratings/${userExistingRating.id}`, {
+            method: 'DELETE'
+          });
 
-    setLoading(true);
-    try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/ratings/${userExistingRating.id}`, {
-        method: 'DELETE'
-      });
+          if (response.ok) {
+            showNotification({ message: "Rating deleted successfully!", type: 'success' });
+            setHasRated(false);
+            setUserExistingRating(null);
+            setUserRating(0);
+            setComment('');
+            setUserName('');
+            setIsAnonymous(false);
+            setIsEditing(false);
 
-      if (response.ok) {
-        showNotification({ message: "Rating deleted successfully!", type: 'success' });
-        setHasRated(false);
-        setUserExistingRating(null);
-        setUserRating(0);
-        setComment('');
-        setUserName('');
-        setIsAnonymous(false);
-        setIsEditing(false);
+            // Remove from sessionStorage for unregistered users
+            const user = sessionStorage.getItem('user');
+            if (!user) {
+              sessionStorage.removeItem(`rating_${futsal.futsal_id}`);
+            }
 
-        // Remove from sessionStorage for unregistered users
-        const user = sessionStorage.getItem('user');
-        if (!user) {
-          sessionStorage.removeItem(`rating_${futsal.futsal_id}`);
+            onRatingSubmitted();
+            fetchRatings();
+          } else {
+            showNotification({ message: "Error deleting rating", type: 'info' });
+          }
+        } catch (error) {
+          console.error('Error deleting rating:', error);
+          showNotification({ message: "Error deleting rating", type: 'info' });
+        } finally {
+          setLoading(false);
         }
-
-        onRatingSubmitted();
-        fetchRatings();
-      } else {
-        showNotification({ message: "Error deleting rating", type: 'info' });
       }
-    } catch (error) {
-      console.error('Error deleting rating:', error);
-      alert('Error deleting rating');
-    } finally {
-      setLoading(false);
-    }
+    });
   };
 
   const handleSubmitRating = async () => {
@@ -1731,7 +1737,7 @@ function RatingModal({ futsal, onClose, onRatingSubmitted, showNotification }: {
                       placeholder="Leave a comment (optional)"
                       value={comment}
                       onChange={(e) => setComment(e.target.value)}
-                      className="w-full p-2 border rounded resize-none"
+                      className="w-full p-2 border border-gray-300 rounded resize-none focus:outline-none focus:ring-0 focus:border-gray-900"
                       rows={3}
                       maxLength={500}
                     />
@@ -1740,7 +1746,7 @@ function RatingModal({ futsal, onClose, onRatingSubmitted, showNotification }: {
                       <button
                         onClick={handleUpdateRating}
                         disabled={loading || userRating === 0}
-                        className="bg-blue-600 text-white px-4 py-2 rounded disabled:opacity-50"
+                        className="bg-green-600 text-white px-4 py-2 rounded disabled:opacity-50"
                       >
                         {loading ? 'Updating...' : 'Update Rating'}
                       </button>
@@ -1828,7 +1834,7 @@ function RatingModal({ futsal, onClose, onRatingSubmitted, showNotification }: {
                   placeholder="Leave a comment (optional)"
                   value={comment}
                   onChange={(e) => setComment(e.target.value)}
-                  className="w-full p-2 border rounded resize-none"
+                  className="w-full p-2 border border-gray-300 rounded resize-none focus:outline-none focus:ring-0 focus:border-gray-900"
                   rows={3}
                   maxLength={500}
                 />
@@ -1836,7 +1842,7 @@ function RatingModal({ futsal, onClose, onRatingSubmitted, showNotification }: {
                 <button
                   onClick={handleSubmitRating}
                   disabled={loading || userRating === 0}
-                  className="bg-blue-600 text-white px-4 py-2 rounded disabled:opacity-50"
+                  className="bg-green-600 text-white px-4 py-2 rounded disabled:opacity-50"
                 >
                   {loading ? 'Submitting...' : 'Submit Rating'}
                 </button>

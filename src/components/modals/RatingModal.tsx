@@ -457,7 +457,7 @@ export default function RatingModal({ futsal, onClose, onRatingSubmitted }: Rati
                       placeholder="Comment (optional)"
                       value={comment}
                       onChange={(e) => setComment(e.target.value)}
-                      className="w-full p-2 border rounded resize-none"
+                      className="w-full p-2 border border-gray-300 rounded resize-none focus:outline-none focus:ring-0 focus:border-gray-900"
                       rows={3}
                       maxLength={500}
                     />
@@ -466,7 +466,7 @@ export default function RatingModal({ futsal, onClose, onRatingSubmitted }: Rati
                       <button
                         onClick={handleUpdateRating}
                         disabled={loading || userRating === 0}
-                        className="bg-blue-600 text-white px-4 py-2 rounded disabled:opacity-50"
+                        className="bg-green-600 text-white px-4 py-2 rounded disabled:opacity-50"
                       >
                         {loading ? 'Updating...' : 'Update Rating'}
                       </button>
@@ -553,7 +553,7 @@ export default function RatingModal({ futsal, onClose, onRatingSubmitted }: Rati
                   placeholder="Comment (optional)"
                   value={comment}
                   onChange={(e) => setComment(e.target.value)}
-                  className="w-full p-2 border rounded resize-none"
+                  className="w-full p-2 border border-gray-300 rounded resize-none focus:outline-none focus:ring-0 focus:border-gray-900"
                   rows={3}
                   maxLength={500}
                 />
@@ -562,7 +562,7 @@ export default function RatingModal({ futsal, onClose, onRatingSubmitted }: Rati
                   <button
                     onClick={handleSubmitRating}
                     disabled={loading || userRating === 0}
-                    className="bg-blue-600 text-white px-4 py-2 rounded disabled:opacity-50"
+                    className="bg-green-600 text-white px-4 py-2 rounded disabled:opacity-50"
                   >
                     {loading ? 'Creating...' : 'Create Rating'}
                   </button>
