@@ -1526,7 +1526,7 @@ export default function SuperAdminDashboard() {
                           setFutsals(filtered);
                         }
                       }}
-                      className="w-full p-2 border rounded pr-10"
+                      className="w-full p-2 border border-gray-400 rounded resize-none focus:outline-none focus:ring-0 focus:border-gray-900 focus:border pr-10"
                     />
                     <button
                       onClick={() => {
@@ -1681,7 +1681,7 @@ export default function SuperAdminDashboard() {
                           setFutsalAdmins(filtered);
                         }
                       }}
-                      className="w-full p-2 border rounded pr-10"
+                      className="w-full p-2 border border-gray-400 rounded resize-none focus:outline-none focus:ring-0 focus:border-gray-900 focus:border pr-10"
                     />
                     <button
                       onClick={() => {
@@ -1796,7 +1796,7 @@ export default function SuperAdminDashboard() {
                           setUsers(filtered);
                         }
                       }}
-                      className="w-full p-2 border rounded pr-10"
+                      className="w-full p-2 border border-gray-400 rounded resize-none focus:outline-none focus:ring-0 focus:border-gray-900 focus:border pr-10"
                     />
                     <button
                       onClick={() => {
@@ -1925,7 +1925,7 @@ export default function SuperAdminDashboard() {
                         placeholder="Search by name, phone, or team name..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className="w-full p-2 border rounded pr-10"
+                        className="w-full p-2 border border-gray-400 rounded resize-none focus:outline-none focus:ring-0 focus:border-gray-900 focus:border pr-10"
                       />
                       <button
                         onClick={() => setSearchTerm('')}
@@ -1939,7 +1939,7 @@ export default function SuperAdminDashboard() {
                       <select
                         value={futsalFilter}
                         onChange={(e) => setFutsalFilter(e.target.value)}
-                        className="w-full p-2 border rounded"
+                        className="w-full p-2 border border-gray-400 rounded resize-none focus:outline-none focus:ring-0 focus:border-gray-900 focus:border"
                       >
                         <option value="">All Futsals</option>
                         {futsals.map((futsal) => (
@@ -2182,7 +2182,7 @@ export default function SuperAdminDashboard() {
                             setRatings(filtered);
                           }
                         }}
-                        className="w-full p-2 border rounded"
+                        className="w-full p-2 border border-gray-400 rounded resize-none focus:outline-none focus:ring-0 focus:border-gray-900 focus:border"
                       />
                     </div>
                     <div className="w-64">
@@ -2196,7 +2196,7 @@ export default function SuperAdminDashboard() {
                             setRatings(filtered);
                           }
                         }}
-                        className="w-full p-2 border rounded"
+                        className="w-full p-2 border border-gray-400 rounded resize-none focus:outline-none focus:ring-0 focus:border-gray-900 focus:border"
                       >
                         <option value="">All Futsals</option>
                         {futsals.map((futsal) => (
@@ -2414,7 +2414,7 @@ export default function SuperAdminDashboard() {
                 name="reason"
                 placeholder="Enter reason for blocking..."
                 required
-                className="w-full p-2 border rounded mb-4"
+                className="w-full p-2 border border-gray-400 rounded resize-none focus:outline-none focus:ring-0 focus:border-gray-900 focus:border mb-4"
                 rows={4}
               />
               <div className="flex space-x-4">
@@ -2569,7 +2569,7 @@ function SuperAdminCreateRatingForm({ futsals, onSuccess, onCancel, setNotificat
         value={selectedFutsalId}
         onChange={(e) => setSelectedFutsalId(e.target.value)}
         required
-        className="w-full p-2 border rounded"
+        className="w-full p-2 border border-gray-400 rounded resize-none focus:outline-none focus:ring-0 focus:border-gray-900 focus:border"
       >
         <option value="">Select Futsal</option>
         {futsals.map((futsal) => (
@@ -2607,7 +2607,7 @@ function SuperAdminCreateRatingForm({ futsals, onSuccess, onCancel, setNotificat
           value={userName}
           onChange={(e) => setUserName(e.target.value)}
           required
-          className="w-full p-2 border rounded"
+          className="w-full p-2 border border-gray-400 rounded resize-none focus:outline-none focus:ring-0 focus:border-gray-900 focus:border"
         />
       )}
 
@@ -2684,7 +2684,7 @@ function EditRatingForm({ rating, onUpdate, onCancel }: { rating: any, onUpdate:
           value={users}
           onChange={(e) => setUsers(e.target.value)}
           required
-          className="w-full p-2 border rounded"
+          className="w-full p-2 border border-gray-400 rounded resize-none focus:outline-none focus:ring-0 focus:border-gray-900 focus:border"
         />
       )}
 
@@ -2863,16 +2863,16 @@ function EditFutsalForm({ futsal, onUpdate, onCancel, setNotification }: { futsa
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      <input type="text" placeholder="Name" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} required className="w-full p-2 border rounded" />
-      <input type="text" placeholder="Location" value={formData.location} onChange={(e) => setFormData({ ...formData, location: e.target.value })} required className="w-full p-2 border rounded" />
-      <input type="text" placeholder="City" value={formData.city} onChange={(e) => setFormData({ ...formData, city: e.target.value })} required className="w-full p-2 border rounded" />
+      <input type="text" placeholder="Name" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} required className="w-full p-2 border border-gray-400 rounded resize-none focus:outline-none focus:ring-0 focus:border-gray-900 focus:border" />
+      <input type="text" placeholder="Location" value={formData.location} onChange={(e) => setFormData({ ...formData, location: e.target.value })} required className="w-full p-2 border border-gray-400 rounded resize-none focus:outline-none focus:ring-0 focus:border-gray-900 focus:border" />
+      <input type="text" placeholder="City" value={formData.city} onChange={(e) => setFormData({ ...formData, city: e.target.value })} required className="w-full p-2 border border-gray-400 rounded resize-none focus:outline-none focus:ring-0 focus:border-gray-900 focus:border" />
       <input type="tel" placeholder="Phone (10 digits starting with 9)" value={formData.phone} maxLength={10} pattern="9[0-9]{9}" onChange={(e) => {
         const value = e.target.value.replace(/\D/g, "");
         if (value.length <= 10 && (value === "" || value.startsWith("9"))) {
           setFormData({ ...formData, phone: value });
         }
-      }} className="w-full p-2 border rounded" />
-      <input type="number" placeholder="Price per Hour (Rs.)" value={formData.price_per_hour} onChange={(e) => setFormData({ ...formData, price_per_hour: e.target.value })} step="0.01" className="w-full p-2 border rounded" />
+      }} className="w-full p-2 border border-gray-400 rounded resize-none focus:outline-none focus:ring-0 focus:border-gray-900 focus:border" />
+      <input type="number" placeholder="Price per Hour (Rs.)" value={formData.price_per_hour} onChange={(e) => setFormData({ ...formData, price_per_hour: e.target.value })} step="0.01" className="w-full p-2 border border-gray-400 rounded resize-none focus:outline-none focus:ring-0 focus:border-gray-900 focus:border" />
 
       {/* Game Format */}
       <div>
@@ -2880,7 +2880,7 @@ function EditFutsalForm({ futsal, onUpdate, onCancel, setNotification }: { futsa
         <select
           value={gameFormatOptions.includes(formData.game_format) ? formData.game_format : 'custom'}
           onChange={(e) => handleGameFormatChange(e.target.value)}
-          className="w-full p-2 border rounded mb-2"
+          className="w-full p-2 border border-gray-400 rounded resize-none focus:outline-none focus:ring-0 focus:border-gray-900 focus:border mb-2"
         >
           <option value="">Select Game Format</option>
           {gameFormatOptions.map(option => (
@@ -2897,7 +2897,7 @@ function EditFutsalForm({ futsal, onUpdate, onCancel, setNotification }: { futsa
               setCustomGameFormat(e.target.value);
               setFormData({ ...formData, game_format: e.target.value });
             }}
-            className="w-full p-2 border rounded"
+            className="w-full p-2 border border-gray-400 rounded resize-none focus:outline-none focus:ring-0 focus:border-gray-900 focus:border"
           />
         )}
       </div>
@@ -2924,7 +2924,7 @@ function EditFutsalForm({ futsal, onUpdate, onCancel, setNotification }: { futsa
             placeholder="Add custom facility"
             value={customFacilities}
             onChange={(e) => setCustomFacilities(e.target.value)}
-            className="flex-1 p-2 border rounded"
+            className="flex-1 p-2 border border-gray-400 rounded resize-none focus:outline-none focus:ring-0 focus:border-gray-900 focus:border"
           />
           <button type="button" onClick={addCustomFacility} className="bg-green-600 text-white px-4 py-2 rounded">
             Add
@@ -2946,7 +2946,7 @@ function EditFutsalForm({ futsal, onUpdate, onCancel, setNotification }: { futsa
       </div>
 
       <div className="grid grid-cols-2 gap-4">
-        <select value={formData.opening_hours} onChange={(e) => setFormData({ ...formData, opening_hours: e.target.value })} required className="w-full p-2 border rounded">
+        <select value={formData.opening_hours} onChange={(e) => setFormData({ ...formData, opening_hours: e.target.value })} required className="w-full p-2 border border-gray-400 rounded resize-none focus:outline-none focus:ring-0 focus:border-gray-900 focus:border">
           <option value="">Opening Hours</option>
           <option value="06:00">6 AM</option>
           <option value="07:00">7 AM</option>
@@ -2967,7 +2967,7 @@ function EditFutsalForm({ futsal, onUpdate, onCancel, setNotification }: { futsa
           <option value="22:00">10 PM</option>
           <option value="23:00">11 PM</option>
         </select>
-        <select value={formData.closing_hours} onChange={(e) => setFormData({ ...formData, closing_hours: e.target.value })} required className="w-full p-2 border rounded">
+        <select value={formData.closing_hours} onChange={(e) => setFormData({ ...formData, closing_hours: e.target.value })} required className="w-full p-2 border border-gray-400 rounded resize-none focus:outline-none focus:ring-0 focus:border-gray-900 focus:border">
           <option value="">Closing Hours</option>
           <option value="06:00">6 AM</option>
           <option value="07:00">7 AM</option>
@@ -2989,7 +2989,7 @@ function EditFutsalForm({ futsal, onUpdate, onCancel, setNotification }: { futsa
           <option value="23:00">11 PM</option>
         </select>
       </div>
-      <textarea placeholder="Description" value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} className="w-full p-2 border rounded" />
+      <textarea placeholder="Description" value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} className="w-full p-2 border border-gray-400 rounded resize-none focus:outline-none focus:ring-0 focus:border-gray-900 focus:border" />
       {existingImages.length > 0 && (
         <div>
           <strong>Existing Images:</strong>
@@ -3140,15 +3140,15 @@ function EditAdminForm({ admin, tokens, onUpdate, onCancel, setNotification }: {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      <input type="text" placeholder="Username" value={formData.username} onChange={(e) => setFormData({ ...formData, username: e.target.value })} required className="w-full p-2 border rounded" />
-      <input type="email" placeholder="Email" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} required className="w-full p-2 border rounded" />
+      <input type="text" placeholder="Username" value={formData.username} onChange={(e) => setFormData({ ...formData, username: e.target.value })} required className="w-full p-2 border border-gray-400 rounded resize-none focus:outline-none focus:ring-0 focus:border-gray-900 focus:border" />
+      <input type="email" placeholder="Email" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} required className="w-full p-2 border border-gray-400 rounded resize-none focus:outline-none focus:ring-0 focus:border-gray-900 focus:border" />
       <input type="tel" placeholder="Phone (10 digits starting with 9)" value={formData.phone} maxLength={10} pattern="9[0-9]{9}" onChange={(e) => {
         const value = e.target.value.replace(/\D/g, "");
         if (value.length <= 10 && (value === "" || value.startsWith("9"))) {
           setFormData({ ...formData, phone: value });
         }
-      }} required className="w-full p-2 border rounded" />
-      <input type="password" placeholder="New Password (leave empty)" value={formData.password} onChange={(e) => setFormData({ ...formData, password: e.target.value })} className="w-full p-2 border rounded" />
+      }} required className="w-full p-2 border border-gray-400 rounded resize-none focus:outline-none focus:ring-0 focus:border-gray-900 focus:border" />
+      <input type="password" placeholder="New Password (leave empty)" value={formData.password} onChange={(e) => setFormData({ ...formData, password: e.target.value })} className="w-full p-2 border border-gray-400 rounded resize-none focus:outline-none focus:ring-0 focus:border-gray-900 focus:border" />
       <div className="flex space-x-4">
         <button type="submit" disabled={loading} className="bg-green-600 text-white px-4 py-2 rounded disabled:opacity-50">
           {loading ? 'Updating...' : 'Update Admin'}
@@ -3285,18 +3285,18 @@ function CreateFutsalForm({ onSuccess, setNotification }: { onSuccess: () => voi
     <div className="border rounded-lg p-6 bg-white">
       <h3 className="text-lg font-semibold mb-4">Create New Futsal</h3>
       <form onSubmit={handleSubmit} className="space-y-4">
-        <input type="text" placeholder="Name" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} required className="w-full p-2 border rounded" />
-        <input type="text" placeholder="Location" value={formData.location} onChange={(e) => setFormData({ ...formData, location: e.target.value })} required className="w-full p-2 border rounded" />
-        <input type="text" placeholder="City" value={formData.city} onChange={(e) => setFormData({ ...formData, city: e.target.value })} required className="w-full p-2 border rounded" />
-        <input type="text" placeholder="Latitude" value={formData.latitude} onChange={(e) => setFormData({ ...formData, latitude: e.target.value })} className="w-full p-2 border rounded" />
-        <input type="text" placeholder="Longitude" value={formData.longitude} onChange={(e) => setFormData({ ...formData, longitude: e.target.value })} className="w-full p-2 border rounded" />
+        <input type="text" placeholder="Name" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} required className="w-full p-2 border border-gray-400 rounded resize-none focus:outline-none focus:ring-0 focus:border-gray-900 focus:border" />
+        <input type="text" placeholder="Location" value={formData.location} onChange={(e) => setFormData({ ...formData, location: e.target.value })} required className="w-full p-2 border border-gray-400 rounded resize-none focus:outline-none focus:ring-0 focus:border-gray-900 focus:border" />
+        <input type="text" placeholder="City" value={formData.city} onChange={(e) => setFormData({ ...formData, city: e.target.value })} required className="w-full p-2 border border-gray-400 rounded resize-none focus:outline-none focus:ring-0 focus:border-gray-900 focus:border" />
+        <input type="text" placeholder="Latitude" value={formData.latitude} onChange={(e) => setFormData({ ...formData, latitude: e.target.value })} className="w-full p-2 border border-gray-400 rounded resize-none focus:outline-none focus:ring-0 focus:border-gray-900 focus:border" />
+        <input type="text" placeholder="Longitude" value={formData.longitude} onChange={(e) => setFormData({ ...formData, longitude: e.target.value })} className="w-full p-2 border border-gray-400 rounded resize-none focus:outline-none focus:ring-0 focus:border-gray-900 focus:border" />
         <input type="tel" placeholder="Phone (10 digits starting with 9)" value={formData.phone} maxLength={10} pattern="9[0-9]{9}" onChange={(e) => {
           const value = e.target.value.replace(/\D/g, "");
           if (value.length <= 10 && (value === "" || value.startsWith("9"))) {
             setFormData({ ...formData, phone: value });
           }
-        }} className="w-full p-2 border rounded" />
-        <input type="number" placeholder="Price per Hour (Rs.)" value={formData.price_per_hour} onChange={(e) => setFormData({ ...formData, price_per_hour: e.target.value })} step="0.01" className="w-full p-2 border rounded" />
+        }} className="w-full p-2 border border-gray-400 rounded resize-none focus:outline-none focus:ring-0 focus:border-gray-900 focus:border" />
+        <input type="number" placeholder="Price per Hour (Rs.)" value={formData.price_per_hour} onChange={(e) => setFormData({ ...formData, price_per_hour: e.target.value })} step="0.01" className="w-full p-2 border border-gray-400 rounded resize-none focus:outline-none focus:ring-0 focus:border-gray-900 focus:border" />
 
         {/* Game Format */}
         <div>
@@ -3304,7 +3304,7 @@ function CreateFutsalForm({ onSuccess, setNotification }: { onSuccess: () => voi
           <select
             value={gameFormatOptions.includes(formData.game_format) ? formData.game_format : 'custom'}
             onChange={(e) => handleGameFormatChange(e.target.value)}
-            className="w-full p-2 border rounded mb-2"
+            className="w-full p-2 border border-gray-400 rounded resize-none focus:outline-none focus:ring-0 focus:border-gray-900 focus:border mb-2"
           >
             <option value="">Select Game Format</option>
             {gameFormatOptions.map(option => (
@@ -3321,7 +3321,7 @@ function CreateFutsalForm({ onSuccess, setNotification }: { onSuccess: () => voi
                 setCustomGameFormat(e.target.value);
                 setFormData({ ...formData, game_format: e.target.value });
               }}
-              className="w-full p-2 border rounded"
+              className="w-full p-2 border border-gray-400 rounded resize-none focus:outline-none focus:ring-0 focus:border-gray-900 focus:border"
             />
           )}
         </div>
@@ -3348,7 +3348,7 @@ function CreateFutsalForm({ onSuccess, setNotification }: { onSuccess: () => voi
               placeholder="Add custom facility"
               value={customFacilities}
               onChange={(e) => setCustomFacilities(e.target.value)}
-              className="flex-1 p-2 border rounded"
+              className="flex-1 p-2 border border-gray-400 rounded resize-none focus:outline-none focus:ring-0 focus:border-gray-900 focus:border"
             />
             <button type="button" onClick={addCustomFacility} className="bg-green-600 text-white px-4 py-2 rounded">
               Add
@@ -3370,7 +3370,7 @@ function CreateFutsalForm({ onSuccess, setNotification }: { onSuccess: () => voi
         </div>
 
         <div className="grid grid-cols-2 gap-4">
-          <select value={formData.opening_hours} onChange={(e) => setFormData({ ...formData, opening_hours: e.target.value })} required className="w-full p-2 border rounded">
+          <select value={formData.opening_hours} onChange={(e) => setFormData({ ...formData, opening_hours: e.target.value })} required className="w-full p-2 border border-gray-400 rounded resize-none focus:outline-none focus:ring-0 focus:border-gray-900 focus:border">
             <option value="">Opening Hours</option>
             <option value="06:00">6 AM</option>
             <option value="07:00">7 AM</option>
@@ -3391,7 +3391,7 @@ function CreateFutsalForm({ onSuccess, setNotification }: { onSuccess: () => voi
             <option value="22:00">10 PM</option>
             <option value="23:00">11 PM</option>
           </select>
-          <select value={formData.closing_hours} onChange={(e) => setFormData({ ...formData, closing_hours: e.target.value })} required className="w-full p-2 border rounded">
+          <select value={formData.closing_hours} onChange={(e) => setFormData({ ...formData, closing_hours: e.target.value })} required className="w-full p-2 border border-gray-400 rounded resize-none focus:outline-none focus:ring-0 focus:border-gray-900 focus:border">
             <option value="">Closing Hours</option>
             <option value="06:00">6 AM</option>
             <option value="07:00">7 AM</option>
@@ -3413,7 +3413,7 @@ function CreateFutsalForm({ onSuccess, setNotification }: { onSuccess: () => voi
             <option value="23:00">11 PM</option>
           </select>
         </div>
-        <textarea placeholder="Description" value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} className="w-full p-2 border rounded" />
+        <textarea placeholder="Description" value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} className="w-full p-2 border border-gray-400 rounded resize-none focus:outline-none focus:ring-0 focus:border-gray-900 focus:border" />
         <div>
           <label>Images (up to 5): <input type="file" accept="image/*" multiple onChange={(e) => {
             const files = Array.from(e.target.files || []);
@@ -3541,24 +3541,24 @@ function CreateFutsalAdminForm({ futsals, superAdminId, setNotification, tokens 
             location: selectedFutsal?.location || '',
             city: selectedFutsal?.city || ''
           });
-        }} required className="w-full p-2 border rounded">
+        }} required className="w-full p-2 border border-gray-400 rounded resize-none focus:outline-none focus:ring-0 focus:border-gray-900 focus:border">
           <option value="">Select Futsal</option>
           {futsals.map((futsal) => (
             <option key={futsal.futsal_id} value={futsal.futsal_id}>{futsal.name}</option>
           ))}
         </select>
-        <input type="text" placeholder="Futsal Name" value={formData.futsal_name} readOnly className="w-full p-2 border rounded bg-gray-100" />
-        <input type="text" placeholder="Location" value={formData.location} readOnly className="w-full p-2 border rounded bg-gray-100" />
-        <input type="text" placeholder="City" value={formData.city} readOnly className="w-full p-2 border rounded bg-gray-100" />
-        <input type="text" placeholder="Username" value={formData.username} onChange={(e) => setFormData({ ...formData, username: e.target.value })} required className="w-full p-2 border rounded" />
-        <input type="email" placeholder="Email" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} required className="w-full p-2 border rounded" />
+        <input type="text" placeholder="Futsal Name" value={formData.futsal_name} readOnly className="w-full p-2 border border-gray-400 rounded resize-none focus:outline-none focus:ring-0 focus:border-gray-900 focus:border bg-gray-100" />
+        <input type="text" placeholder="Location" value={formData.location} readOnly className="w-full p-2 border border-gray-400 rounded resize-none focus:outline-none focus:ring-0 focus:border-gray-900 focus:border bg-gray-100" />
+        <input type="text" placeholder="City" value={formData.city} readOnly className="w-full p-2 border border-gray-400 rounded resize-none focus:outline-none focus:ring-0 focus:border-gray-900 focus:border bg-gray-100" />
+        <input type="text" placeholder="Username" value={formData.username} onChange={(e) => setFormData({ ...formData, username: e.target.value })} required className="w-full p-2 border border-gray-400 rounded resize-none focus:outline-none focus:ring-0 focus:border-gray-900 focus:border" />
+        <input type="email" placeholder="Email" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} required className="w-full p-2 border border-gray-400 rounded resize-none focus:outline-none focus:ring-0 focus:border-gray-900 focus:border" />
         <input type="tel" placeholder="Phone (10 digits starting with 9)" value={formData.phone} maxLength={10} pattern="9[0-9]{9}" onChange={(e) => {
           const value = e.target.value.replace(/\D/g, "");
           if (value.length <= 10 && (value === "" || value.startsWith("9"))) {
             setFormData({ ...formData, phone: value });
           }
-        }} required className="w-full p-2 border rounded" />
-        <input type="password" placeholder="Password" value={formData.password} onChange={(e) => setFormData({ ...formData, password: e.target.value })} required className="w-full p-2 border rounded" />
+        }} required className="w-full p-2 border border-gray-400 rounded resize-none focus:outline-none focus:ring-0 focus:border-gray-900 focus:border" />
+        <input type="password" placeholder="Password" value={formData.password} onChange={(e) => setFormData({ ...formData, password: e.target.value })} required className="w-full p-2 border border-gray-400 rounded resize-none focus:outline-none focus:ring-0 focus:border-gray-900 focus:border" />
         <button type="submit" disabled={loading} className="bg-green-600 text-white px-4 py-2 rounded disabled:opacity-50">
           {loading ? 'Creating...' : 'Create Futsal Admin'}
         </button>
@@ -3605,17 +3605,17 @@ function EditUserForm({ user, onUpdate, onCancel, setNotification }: { user: any
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      <input type="text" placeholder="First Name" value={formData.first_name} onChange={(e) => setFormData({ ...formData, first_name: e.target.value })} required className="w-full p-2 border rounded" />
-      <input type="text" placeholder="Last Name" value={formData.last_name} onChange={(e) => setFormData({ ...formData, last_name: e.target.value })} required className="w-full p-2 border rounded" />
-      <input type="text" placeholder="Username" value={formData.username} onChange={(e) => setFormData({ ...formData, username: e.target.value })} required className="w-full p-2 border rounded" />
-      <input type="email" placeholder="Email" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} required className="w-full p-2 border rounded" />
+      <input type="text" placeholder="First Name" value={formData.first_name} onChange={(e) => setFormData({ ...formData, first_name: e.target.value })} required className="w-full p-2 border border-gray-400 rounded resize-none focus:outline-none focus:ring-0 focus:border-gray-900 focus:border" />
+      <input type="text" placeholder="Last Name" value={formData.last_name} onChange={(e) => setFormData({ ...formData, last_name: e.target.value })} required className="w-full p-2 border border-gray-400 rounded resize-none focus:outline-none focus:ring-0 focus:border-gray-900 focus:border" />
+      <input type="text" placeholder="Username" value={formData.username} onChange={(e) => setFormData({ ...formData, username: e.target.value })} required className="w-full p-2 border border-gray-400 rounded resize-none focus:outline-none focus:ring-0 focus:border-gray-900 focus:border" />
+      <input type="email" placeholder="Email" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} required className="w-full p-2 border border-gray-400 rounded resize-none focus:outline-none focus:ring-0 focus:border-gray-900 focus:border" />
       <input type="tel" placeholder="Phone (10 digits starting with 9)" value={formData.phone} maxLength={10} pattern="9[0-9]{9}" onChange={(e) => {
         const value = e.target.value.replace(/\D/g, "");
         if (value.length <= 10 && (value === "" || value.startsWith("9"))) {
           setFormData({ ...formData, phone: value });
         }
-      }} required className="w-full p-2 border rounded" />
-      <input type="password" placeholder="New Password (leave empty)" value={formData.password} onChange={(e) => setFormData({ ...formData, password: e.target.value })} className="w-full p-2 border rounded" />
+      }} required className="w-full p-2 border border-gray-400 rounded resize-none focus:outline-none focus:ring-0 focus:border-gray-900 focus:border" />
+      <input type="password" placeholder="New Password (leave empty)" value={formData.password} onChange={(e) => setFormData({ ...formData, password: e.target.value })} className="w-full p-2 border border-gray-400 rounded resize-none focus:outline-none focus:ring-0 focus:border-gray-900 focus:border" />
       <div className="flex space-x-4">
         <button type="submit" disabled={loading} className="bg-green-600 text-white px-4 py-2 rounded disabled:opacity-50">
           {loading ? 'Updating...' : 'Update User'}
@@ -3663,9 +3663,9 @@ function EditSuperAdminForm({ user, onUpdate, onCancel, setNotification }: { use
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      <input type="text" placeholder="Username" value={formData.username} onChange={(e) => setFormData({ ...formData, username: e.target.value })} required className="w-full p-2 border rounded" />
-      <input type="email" placeholder="Email" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} required className="w-full p-2 border rounded" />
-      <input type="password" placeholder="New Password (leave empty)" value={formData.password} onChange={(e) => setFormData({ ...formData, password: e.target.value })} className="w-full p-2 border rounded" />
+      <input type="text" placeholder="Username" value={formData.username} onChange={(e) => setFormData({ ...formData, username: e.target.value })} required className="w-full p-2 border border-gray-400 rounded resize-none focus:outline-none focus:ring-0 focus:border-gray-900 focus:border" />
+      <input type="email" placeholder="Email" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} required className="w-full p-2 border border-gray-400 rounded resize-none focus:outline-none focus:ring-0 focus:border-gray-900 focus:border" />
+      <input type="password" placeholder="New Password (leave empty)" value={formData.password} onChange={(e) => setFormData({ ...formData, password: e.target.value })} className="w-full p-2 border border-gray-400 rounded resize-none focus:outline-none focus:ring-0 focus:border-gray-900 focus:border" />
       <div className="flex space-x-4">
         <button type="submit" disabled={loading} className="bg-green-600 text-white px-4 py-2 rounded disabled:opacity-50">
           {loading ? 'Updating...' : 'Update Profile'}
