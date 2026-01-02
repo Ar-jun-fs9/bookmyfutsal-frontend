@@ -1382,7 +1382,7 @@ export default function BookFutsal() {
                                   }
                                 }}
                                 required
-                                className="w-full px-4 py-3 pl-12 border-2 border-gray-200 rounded-xl focus:border-green-500 focus:ring-4 focus:ring-green-100 transition-all duration-300 text-gray-700 font-medium"
+                                className="w-full px-4 py-3 pl-12 bg-white border-2 border-gray-200 rounded-lg text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-400/50 focus:border-green-400/50 transition-all duration-300 font-medium text-sm"
                               />
                               <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-green-500">
                                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1404,7 +1404,7 @@ export default function BookFutsal() {
                                 value={bookingState.name}
                                 onChange={(e) => dispatch({ type: 'SET_NAME', payload: e.target.value })}
                                 required
-                                className="w-full px-4 py-3 pl-12 border-2 border-gray-200 rounded-xl focus:border-green-500 focus:ring-4 focus:ring-green-100 transition-all duration-300 text-gray-700 font-medium"
+                                className="w-full px-4 py-3 pl-12 bg-white border-2 border-gray-200 rounded-lg text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-400/50 focus:border-green-400/50 transition-all duration-300 font-medium text-sm"
                               />
                               <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-green-500">
                                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1430,7 +1430,7 @@ export default function BookFutsal() {
                                 min="1"
                                 max="10"
                                 required
-                                className="w-full px-4 py-3 pl-12 border-2 border-gray-200 rounded-xl focus:border-green-500 focus:ring-4 focus:ring-green-100 transition-all duration-300 text-gray-700 font-medium"
+                                className="w-full px-4 py-3 pl-12 bg-white border-2 border-gray-200 rounded-lg text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-400/50 focus:border-green-400/50 transition-all duration-300 font-medium text-sm"
                               />
                               <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-green-500">
                                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1451,7 +1451,7 @@ export default function BookFutsal() {
                                 placeholder="Enter team name"
                                 value={bookingState.teamName}
                                 onChange={(e) => dispatch({ type: 'SET_TEAM_NAME', payload: e.target.value })}
-                                className="w-full px-4 py-3 pl-12 border-2 border-gray-200 rounded-xl focus:border-green-500 focus:ring-4 focus:ring-green-100 transition-all duration-300 text-gray-700 font-medium"
+                                className="w-full px-4 py-3 pl-12 bg-white border-2 border-gray-200 rounded-lg text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-400/50 focus:border-green-400/50 transition-all duration-300 font-medium text-sm"
                               />
                               <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-green-500">
                                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1745,7 +1745,7 @@ export default function BookFutsal() {
                           }
                         }}
                         placeholder="Enter your eSewa registered phone number"
-                        className="w-full px-4 py-3 pl-12 border-2 border-gray-200 rounded-xl focus:border-green-500 focus:ring-4 focus:ring-green-100 transition-all duration-300 text-gray-700 font-medium"
+                        className="w-full px-4 py-3 pl-12 bg-white border-2 border-gray-200 rounded-lg text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-400/50 focus:border-green-400/50 transition-all duration-300 font-medium text-sm"
                         required
                         maxLength={10}
                       />
