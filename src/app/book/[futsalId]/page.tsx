@@ -1083,7 +1083,10 @@ export default function BookFutsal() {
                       {availableShifts.map((shift: string) => (
                         <button
                           key={shift}
-                          onClick={() => dispatch({ type: 'SET_SELECTED_SHIFT', payload: shift })}
+                          onClick={() => {
+                            const newShift = bookingState.selectedShift === shift ? '' : shift;
+                            dispatch({ type: 'SET_SELECTED_SHIFT', payload: newShift });
+                          }}
                           className={`relative p-6 border-2 rounded-xl transition-all duration-300 transform hover:scale-105 ${
                             bookingState.selectedShift === shift
                               ? "bg-linear-to-br from-green-500 to-green-600 border-green-500 text-white shadow-lg"

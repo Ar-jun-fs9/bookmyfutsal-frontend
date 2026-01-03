@@ -69,9 +69,6 @@ export const bookingReducer = (state: BookingState, action: BookingAction): Book
     case 'SET_SELECTED_DATE':
       return { ...state, selectedDate: action.payload, selectedShift: '', availableSlots: [], selectedSlotIds: [] };
     case 'SET_SELECTED_SHIFT':
-      if (action.payload === state.selectedShift) {
-        return state;
-      }
       return { ...state, selectedShift: action.payload, availableSlots: [], selectedSlotIds: [] };
     case 'SET_AVAILABLE_SHIFTS':
       return { ...state, availableShifts: action.payload };
