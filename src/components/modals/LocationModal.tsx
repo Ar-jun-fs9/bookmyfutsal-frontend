@@ -59,7 +59,7 @@ export default function LocationModal({ futsal, distance, onClose }: LocationMod
           <div className="flex space-x-3">
             <button
               onClick={handleShowDirections}
-              className="flex-1 bg-green-400 text-white py-2 px-3 rounded-lg hover:bg-green-700 transition-all duration-300 font-semibold text-sm"
+              className="flex-1 bg-green-600 text-white py-2 px-3 rounded-lg hover:bg-green-700 transition-all duration-300 font-semibold text-sm"
             >
               Yes, Show Directions
             </button>
