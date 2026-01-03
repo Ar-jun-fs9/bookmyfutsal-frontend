@@ -68,9 +68,12 @@ interface Slot {
 // Time formatting functions are now imported from helpers.ts
 
 export default function BookFutsal() {
-   const params = useParams();
-   const futsalId = params?.futsalId ? parseInt(params.futsalId as string, 10) : undefined;
-   const router = useRouter();
+    const params = useParams();
+    const futsalId = params?.futsalId ? parseInt(params.futsalId as string, 10) : undefined;
+    const router = useRouter();
+
+    // Create futsal-specific localStorage key to prevent state leakage between different futsals
+    const storageKey = futsalId ? `bookingProgress_${futsalId}` : 'bookingProgress';
 
   // Server state with React Query
   const { data: futsal, isLoading: futsalLoading } = useFutsal(Number(params.futsalId));
@@ -349,12 +352,12 @@ export default function BookFutsal() {
 
   // Load booking progress from localStorage on mount
   useEffect(() => {
-    const saved = localStorage.getItem('bookingProgress');
+    const saved = localStorage.getItem(storageKey);
     if (saved) {
       const data = JSON.parse(saved);
       dispatch({ type: 'LOAD_PROGRESS', payload: data });
     }
-  }, []);
+  }, [storageKey]);
 
   // Save booking progress to localStorage whenever state changes
   useEffect(() => {
@@ -362,8 +365,8 @@ export default function BookFutsal() {
       ...bookingState,
       esewaPhone,
     };
-    localStorage.setItem('bookingProgress', JSON.stringify(progress));
-  }, [bookingState, esewaPhone]);
+    localStorage.setItem(storageKey, JSON.stringify(progress));
+  }, [bookingState, esewaPhone, storageKey]);
 
   // Calculate available shifts when futsal data is loaded
   useEffect(() => {
@@ -923,7 +926,7 @@ export default function BookFutsal() {
                         message: 'Are you sure you want to cancel this booking?',
                         onConfirm: () => {
                           setConfirmModal({ isOpen: false, message: '', onConfirm: () => {} });
-                          localStorage.removeItem('bookingProgress');
+                          localStorage.removeItem(storageKey);
                           router.push("/");
                         }
                       });
@@ -1031,7 +1034,7 @@ export default function BookFutsal() {
                         message: 'Are you sure you want to cancel this booking?',
                         onConfirm: () => {
                           setConfirmModal({ isOpen: false, message: '', onConfirm: () => {} });
-                          localStorage.removeItem('bookingProgress');
+                          localStorage.removeItem(storageKey);
                           router.push("/");
                         }
                       });
@@ -1163,7 +1166,7 @@ export default function BookFutsal() {
                           // Release selected slots
                           bookingState.selectedSlotIds.forEach(id => releaseSlotReservation(id));
                           dispatch({ type: 'CLEAR_SELECTED_SLOTS' });
-                          localStorage.removeItem('bookingProgress');
+                          localStorage.removeItem(storageKey);
                           router.push("/");
                         }
                       });
@@ -1535,7 +1538,7 @@ export default function BookFutsal() {
                         message: 'Are you sure you want to cancel this booking?',
                         onConfirm: () => {
                           setConfirmModal({ isOpen: false, message: '', onConfirm: () => {} });
-                          localStorage.removeItem('bookingProgress');
+                          localStorage.removeItem(storageKey);
                           router.push("/");
                         }
                       });
@@ -1686,7 +1689,7 @@ export default function BookFutsal() {
                           // Release selected slots
                           bookingState.selectedSlotIds.forEach(id => releaseSlotReservation(id));
                           dispatch({ type: 'CLEAR_SELECTED_SLOTS' });
-                          localStorage.removeItem('bookingProgress');
+                          localStorage.removeItem(storageKey);
                           router.push("/");
                         }
                       });
@@ -2129,7 +2132,7 @@ export default function BookFutsal() {
                               }
                             );
                             showNotification({ message: "Booking cancelled", type: 'info' });
-                            localStorage.removeItem('bookingProgress');
+                            localStorage.removeItem(storageKey);
                             router.push("/");
                           } catch (error) {
                             showNotification({ message: "Error cancelling booking", type: 'info' });
@@ -2150,7 +2153,7 @@ export default function BookFutsal() {
 
                 <button
                   onClick={() => {
-                    localStorage.removeItem('bookingProgress');
+                    localStorage.removeItem(storageKey);
                     router.push("/");
                   }}
                   className="bg-linear-to-r from-green-500 to-green-600 text-white font-semibold py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 border border-green-400/30"
