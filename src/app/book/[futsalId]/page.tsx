@@ -451,6 +451,7 @@ export default function BookFutsal() {
         // Clicking the same slot, release and deselect
         await releaseSlotReservation(slot.slot_id);
         dispatch({ type: 'REMOVE_SELECTED_SLOT', payload: slot.slot_id });
+        dispatch({ type: 'UPDATE_SLOT_STATUS', payload: { slotId: slot.slot_id, status: 'available', display_status: 'available' } });
       } else {
         // Clicking different slot, release previous if any
         if (bookingState.selectedSlotIds.length > 0) {
@@ -474,6 +475,7 @@ export default function BookFutsal() {
         if (reserveResponse.ok) {
           // Reservation successful
           dispatch({ type: 'ADD_SELECTED_SLOT', payload: slot.slot_id });
+          dispatch({ type: 'UPDATE_SLOT_STATUS', payload: { slotId: slot.slot_id, status: 'pending', display_status: 'pending' } });
         } else {
           // Reservation failed
           if (reserveData.status === "pending") {
