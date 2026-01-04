@@ -1,14 +1,57 @@
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import html2canvas from 'html2canvas';
+import { useQueryClient } from '@tanstack/react-query';
 import { useBookingTracker } from '@/hooks/useBookingTracker';
 import { useNotificationStore } from '@/stores/notificationStore';
 import { formatDate, formatTimeRange } from '@/utils/helpers';
 
 export default function BookingTracker() {
   const summaryRef = useRef<HTMLDivElement>(null);
+  const queryClient = useQueryClient();
   const { trackingCode, setTrackingCode, hasSearched, trackedBooking, handleTrackBooking } = useBookingTracker();
   const { showNotification } = useNotificationStore();
   const [confirmModal, setConfirmModal] = useState<{isOpen: boolean, message: string, onConfirm: () => void} | null>(null);
+  const [isExpired, setIsExpired] = useState(false);
+
+  useEffect(() => {
+    setIsExpired(false);
+  }, [trackingCode]);
+
+  useEffect(() => {
+    if (hasSearched && trackedBooking) {
+      if (trackedBooking.cancelled_at) {
+        setIsExpired(true);
+        showNotification({ message: 'Booking not found', type: 'info' });
+        setTrackingCode('');
+        return;
+      }
+
+      const now = new Date();
+      const bookingDate = new Date(trackedBooking.booking_date);
+      const currentDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      const bookDate = new Date(bookingDate.getFullYear(), bookingDate.getMonth(), bookingDate.getDate());
+
+      if (bookDate < currentDate) {
+        setIsExpired(true);
+        showNotification({ message: 'Your booking is expired.', type: 'info' });
+        setTrackingCode('');
+      } else if (bookDate.getTime() === currentDate.getTime()) {
+        const startTime = trackedBooking.time_slot.split('-')[0];
+        const [hours, minutes] = startTime.split(':').map(Number);
+        const bookingStart = new Date(now);
+        bookingStart.setHours(hours, minutes, 0, 0);
+        if (now > bookingStart) {
+          setIsExpired(true);
+          showNotification({ message: 'Your booking is expired.', type: 'info' });
+          setTrackingCode('');
+        } else {
+          setIsExpired(false);
+        }
+      } else {
+        setIsExpired(false);
+      }
+    }
+  }, [hasSearched, trackedBooking, showNotification]);
 
   const handleCancelBooking = () => {
     setConfirmModal({
@@ -23,7 +66,8 @@ export default function BookingTracker() {
 
           if (response.ok) {
             setTrackingCode('');
-            showNotification({ message: 'Booking cancelled successfully!', type: 'success' });
+            queryClient.invalidateQueries({ queryKey: ['booking', 'track', trackedBooking.tracking_code] });
+            showNotification({ message: 'Booking cancelled Successfully', type: 'info' });
           } else {
             showNotification({ message: 'Error cancelling booking', type: 'info' });
           }
@@ -269,7 +313,7 @@ export default function BookingTracker() {
       </div>
 
       {/* Booking Summary */}
-      {trackedBooking && hasSearched && (
+      {trackedBooking && hasSearched && !isExpired && (
         <div className="flex justify-center px-4">
           <div ref={summaryRef} className="bg-white rounded-2xl max-w-lg w-full shadow-2xl border border-gray-200 p-6">
             <div className="text-center mb-6">

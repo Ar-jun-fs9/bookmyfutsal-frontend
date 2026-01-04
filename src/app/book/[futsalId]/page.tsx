@@ -2136,7 +2136,7 @@ export default function BookFutsal() {
                                 method: "DELETE",
                               }
                             );
-                            showNotification({ message: "Booking cancelled", type: 'info' });
+                            showNotification({ message: "Booking cancelled Successfully", type: 'info' });
                             localStorage.removeItem(storageKey);
                             router.push("/");
                           } catch (error) {
