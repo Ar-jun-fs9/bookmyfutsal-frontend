@@ -1,36 +1,35 @@
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import html2canvas from 'html2canvas';
 import { useBookingTracker } from '@/hooks/useBookingTracker';
-import { useModalStore } from '@/stores/modalStore';
 import { useNotificationStore } from '@/stores/notificationStore';
 import { formatDate, formatTimeRange } from '@/utils/helpers';
 
 export default function BookingTracker() {
   const summaryRef = useRef<HTMLDivElement>(null);
   const { trackingCode, setTrackingCode, hasSearched, trackedBooking, handleTrackBooking } = useBookingTracker();
-  const { setConfirmModal } = useModalStore();
   const { showNotification } = useNotificationStore();
+  const [confirmModal, setConfirmModal] = useState<{isOpen: boolean, message: string, onConfirm: () => void} | null>(null);
 
-  const handleCancelBooking = async (bookingId: number) => {
+  const handleCancelBooking = () => {
     setConfirmModal({
       isOpen: true,
       message: 'Are you sure you want to cancel this booking?',
       onConfirm: async () => {
-        setConfirmModal(null);
-
+        setConfirmModal({ isOpen: false, message: '', onConfirm: () => {} });
         try {
           const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/bookings/cancel/${trackedBooking?.tracking_code}`, {
             method: 'DELETE',
           });
 
           if (response.ok) {
-            // Note: trackedBooking will be updated by React Query invalidation
             setTrackingCode('');
+            showNotification({ message: 'Booking cancelled successfully!', type: 'success' });
           } else {
-            // Error handling will be done by notification store
+            showNotification({ message: 'Error cancelling booking', type: 'info' });
           }
         } catch (error) {
           console.error('Error cancelling booking:', error);
+          showNotification({ message: 'Error cancelling booking', type: 'info' });
         }
       }
     });
@@ -250,7 +249,16 @@ export default function BookingTracker() {
             />
 
             <button
-              onClick={handleTrackBooking}
+              onClick={() => {
+                const code = trackingCode.trim();
+                if (code.length === 0) {
+                  showNotification({ message: 'Please enter your 8 digit tracking code', type: 'info' });
+                } else if (code.length !== 8) {
+                  showNotification({ message: 'Please enter 8 digit tracking code', type: 'info' });
+                } else {
+                  handleTrackBooking();
+                }
+              }}
               className="bg-linear-to-r from-green-400 to-blue-500 text-neutral-900 font-semibold py-3 px-3 rounded-lg shadow-lg hover:scale-[1.02] hover:shadow-xl transition-all duration-300"
             >
               Track Booking
@@ -263,7 +271,7 @@ export default function BookingTracker() {
       {/* Booking Summary */}
       {trackedBooking && hasSearched && (
         <div className="flex justify-center px-4">
-          <div className="bg-white rounded-2xl max-w-lg w-full shadow-2xl border border-gray-200 p-6">
+          <div ref={summaryRef} className="bg-white rounded-2xl max-w-lg w-full shadow-2xl border border-gray-200 p-6">
             <div className="text-center mb-6">
               <img src="/logo/logo.png" alt="Logo" className="w-20 h-20 mx-auto mb-4 rounded-lg shadow-lg" />
               <h2 className="text-2xl font-bold text-gray-800">Booking Confirmation</h2>
@@ -296,7 +304,7 @@ export default function BookingTracker() {
                 📥 Download PNG
               </button>
               <button
-                onClick={() => handleCancelBooking(trackedBooking.booking_id)}
+                onClick={handleCancelBooking}
                 className="flex-1 bg-linear-to-r from-red-500 to-red-600 text-white py-3 px-4 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300"
               >
                 ❌ Cancel Booking
@@ -309,6 +317,39 @@ export default function BookingTracker() {
               >
                 Close
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Confirm Modal */}
+      {confirmModal?.isOpen && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="max-w-sm w-full bg-white rounded-2xl shadow-2xl border p-6 transform transition-all duration-300 border-red-200">
+            <div className="text-center">
+              <div className="inline-flex items-center justify-center w-12 h-12 rounded-lg mb-4 bg-red-100">
+                <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                </svg>
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">Confirm Action</h3>
+              <p className="text-sm text-gray-600 mb-6">{confirmModal.message}</p>
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setConfirmModal({ isOpen: false, message: '', onConfirm: () => {} })}
+                  className="flex-1 bg-gray-200 text-gray-800 font-semibold py-2 px-4 rounded-lg hover:bg-gray-300 transition-all duration-300"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => {
+                    confirmModal.onConfirm();
+                  }}
+                  className="flex-1 bg-red-500 text-white font-semibold py-2 px-4 rounded-lg hover:bg-red-600 transition-all duration-300"
+                >
+                  Confirm
+                </button>
+              </div>
             </div>
           </div>
         </div>
