@@ -1728,7 +1728,10 @@ function EditBookingForm({ booking, onUpdate, onCancel, adminId, setNotification
                   {['Morning', 'Day', 'Evening', 'Night'].map((shift) => (
                     <button
                       key={shift}
-                      onClick={() => setSelectedShift(shift)}
+                      onClick={() => {
+                            const newShift = selectedShift === shift ? '' : shift;
+                            setSelectedShift(newShift);
+                          }}
                       className={`relative p-6 border-2 rounded-xl transition-all duration-300 transform hover:scale-105 ${selectedShift === shift
                           ? "bg-linear-to-br from-green-500 to-green-600 border-green-500 text-white shadow-lg"
                           : "bg-white border-gray-200 hover:border-green-300 hover:shadow-md"
