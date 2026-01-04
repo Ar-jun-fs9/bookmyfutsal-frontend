@@ -38,14 +38,14 @@ export default function BookingTracker() {
   const formatTimeRangeBooking = (timeRange: string): string => {
     if (!timeRange) return '';
     const [startTime, endTime] = timeRange.split('-');
-    return `${formatTime(startTime)}-${formatTime(endTime)}`;
+    return `${formatTime(startTime)} - ${formatTime(endTime)}`;
   };
 
   const formatTime = (timeString: string): string => {
     const [hours, minutes] = timeString.split(':').map(Number);
     const period = hours >= 12 ? 'PM' : 'AM';
     const displayHours = hours === 0 ? 12 : hours > 12 ? hours - 12 : hours;
-    return `${displayHours}:${minutes.toString().padStart(2, '0')} ${period}`;
+    return minutes === 0 ? `${displayHours}${period}` : `${displayHours}:${minutes.toString().padStart(2, '0')}${period}`;
   };
 
   const downloadAsPNG = async () => {
