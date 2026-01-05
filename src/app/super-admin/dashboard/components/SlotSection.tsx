@@ -31,7 +31,7 @@ export function SlotSection({ isVisible, onToggle }: SlotSectionProps) {
   useEffect(() => {
     if (isVisible) {
       if (selectedFutsal) {
-        fetchSlots(selectedFutsal, slotDate);
+        fetchSlots(selectedFutsal, slotDate, futsals);
       } else {
         fetchAllSlots(futsals, slotDate);
       }
@@ -67,7 +67,7 @@ export function SlotSection({ isVisible, onToggle }: SlotSectionProps) {
       message: confirmMessage,
       onConfirm: async () => {
         setConfirmModal({ isOpen: false, message: '', onConfirm: () => { } });
-        const result = await bulkUpdateSlots(selectedFutsal, slotDate, action as 'close' | 'open');
+        const result = await bulkUpdateSlots(selectedFutsal, slotDate, action as 'close' | 'open', futsals);
         if (result.success) {
           setNotification({ message: `${result.updatedSlots} slots ${action}d successfully`, type: 'success' });
         } else {

@@ -22,7 +22,7 @@ export function useSlots() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchSlots = async (futsalId?: number, date?: string) => {
+  const fetchSlots = async (futsalId: number, date: string, futsals: any[]) => {
     try {
       setLoading(true);
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/time-slots/admin/futsal/${futsalId}/date/${date}`, {
@@ -34,9 +34,10 @@ export function useSlots() {
 
       if (response.ok) {
         const data = await response.json();
+        const futsalName = futsals.find(f => f.futsal_id === futsalId)?.name || 'Unknown Futsal';
         const slotsWithFutsal = data.slots.map((slot: any) => ({
           ...slot,
-          futsal_name: slot.futsal_name || 'Unknown Futsal'
+          futsal_name: futsalName
         }));
         setSlots(slotsWithFutsal);
         setError(null);
@@ -109,7 +110,7 @@ export function useSlots() {
     }
   };
 
-  const bulkUpdateSlots = async (futsalId: number | null, date: string, action: 'close' | 'open') => {
+  const bulkUpdateSlots = async (futsalId: number | null, date: string, action: 'close' | 'open', futsals: any[]) => {
     try {
       let response;
       if (futsalId) {
@@ -126,9 +127,9 @@ export function useSlots() {
         const data = await response.json();
         // Refresh slots after bulk update
         if (futsalId) {
-          await fetchSlots(futsalId, date);
+          await fetchSlots(futsalId, date, futsals);
         } else {
-          await fetchSlots();
+          await fetchAllSlots(futsals, date);
         }
         return { success: true, updatedSlots: data.updatedSlots };
       } else {
