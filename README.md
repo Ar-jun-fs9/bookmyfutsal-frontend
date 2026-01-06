@@ -8,7 +8,6 @@ BookMyFutsal is a comprehensive web platform for booking futsal venues in Nepal.
 
 </div>
 
-
 ## 🚀 Features
 
 - **User Registration & Authentication**: Secure user registration with email/phone OTP verification
@@ -101,6 +100,7 @@ BookMyFutsal is a comprehensive web platform for booking futsal venues in Nepal.
 │       │   │   │   │   ├── 📄 BookingSection.tsx        # Bookings management section
 │       │   │   │   │   ├── 📄 DashboardHeader.tsx       # Dashboard header component
 │       │   │   │   │   ├── 📄 DashboardInfo.tsx         # Dashboard info and profile section
+│       │   │   │   │   ├── 📄 FeedbackSection.tsx       # Feedback and bugs section
 │       │   │   │   │   ├── 📄 FutsalSection.tsx         # Futsals management section
 │       │   │   │   │   ├── 📄 RatingSection.tsx         # Ratings management section
 │       │   │   │   │   ├── 📄 SlotSection.tsx           # Time slots management section
@@ -124,6 +124,7 @@ BookMyFutsal is a comprehensive web platform for booking futsal venues in Nepal.
 │       │   │   │   │   │   ├── 📄 useBookings.ts             # Hook for bookings data management
 │       │   │   │   │   │   ├── 📄 useBulkOperations.ts       # Hook for bulk operations logic
 │       │   │   │   │   │   ├── 📄 useDashboardSocket.ts      # Hook for dashboard socket handling
+│       │   │   │   │   │   ├── 📄 useFeedbacks.ts            # Hook for feedbacks and bugs
 │       │   │   │   │   │   ├── 📄 useFutsalAdmins.ts         # Hook for futsal admins data
 │       │   │   │   │   │   ├── 📄 useFutsals.ts              # Hook for futsals data
 │       │   │   │   │   │   ├── 📄 useRatings.ts              # Hook for ratings data
