@@ -1,12 +1,13 @@
 <div align="center">
 
-<a name="top">
+<a name="top"></a>
 
-# ⚽️BookMyFutsal
+# ⚽️ BookMyFutsal
 
 BookMyFutsal is a comprehensive web platform for booking futsal venues in Nepal. It allows users to browse, book, and manage futsal reservations with real-time tracking, ratings, and secure authentication. The platform supports multiple user roles including registered users, futsal administrators, and super administrators.
 
 </div>
+
 
 ## 🚀 Features
 
