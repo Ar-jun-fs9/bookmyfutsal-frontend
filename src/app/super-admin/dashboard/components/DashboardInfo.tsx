@@ -102,7 +102,7 @@ export function DashboardInfo({ user, onUpdate }: DashboardInfoProps) {
             onUpdate={(updatedUser) => {
               onUpdate(updatedUser);
               setEditingSuperAdmin(false);
-              setNotification({ message: 'Profile updated successfully!', type: 'success' });
+              setNotification({ message: 'superadmin info update successfully', type: 'success' });
             }}
             onCancel={() => setEditingSuperAdmin(false)}
             setNotification={setNotification}

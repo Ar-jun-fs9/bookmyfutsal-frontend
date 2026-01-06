@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useAuthStore } from '@/stores/authStore';
 
 interface User {
   id: number;
@@ -14,6 +15,7 @@ interface EditSuperAdminFormProps {
 }
 
 export function EditSuperAdminForm({ user, onUpdate, onCancel, setNotification }: EditSuperAdminFormProps) {
+  const { tokens } = useAuthStore();
   const [formData, setFormData] = useState({
     username: user.username,
     email: user.email,
@@ -28,7 +30,10 @@ export function EditSuperAdminForm({ user, onUpdate, onCancel, setNotification }
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/superadmin/${user.id}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${tokens?.accessToken}`,
+        },
         body: JSON.stringify(formData),
       });
 

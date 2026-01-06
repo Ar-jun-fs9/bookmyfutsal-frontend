@@ -101,7 +101,10 @@ export default function SuperAdminDashboard() {
       <main className="max-w-7xl mx-auto sm:px-6 lg:px-8">
         <div className="px-4 py-6 sm:px-0 pb-20">
           <div className="space-y-6">
-            <DashboardInfo user={user} onUpdate={setUser} />
+            <DashboardInfo user={user} onUpdate={(updatedUser) => {
+              setUser(updatedUser);
+              sessionStorage.setItem('superadmin', JSON.stringify(updatedUser));
+            }} />
             {/* Action Buttons */}
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
               <button
