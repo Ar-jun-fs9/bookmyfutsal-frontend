@@ -2,12 +2,13 @@ import { useState } from 'react';
 
 interface EditUserFormProps {
   user: any;
+  updateUser: (id: number, formData: any) => Promise<{success: boolean, error?: string}>;
   onUpdate: (data: any) => void;
   onCancel: () => void;
   setNotification: React.Dispatch<React.SetStateAction<{message: string, type: 'success' | 'info'} | null>>;
 }
 
-export function EditUserForm({ user, onUpdate, onCancel, setNotification }: EditUserFormProps) {
+export function EditUserForm({ user, updateUser, onUpdate, onCancel, setNotification }: EditUserFormProps) {
   const [formData, setFormData] = useState({
     first_name: user.first_name,
     last_name: user.last_name,

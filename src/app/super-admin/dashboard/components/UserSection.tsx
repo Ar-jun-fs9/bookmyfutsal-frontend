@@ -12,7 +12,7 @@ interface UserSectionProps {
 }
 
 export function UserSection({ isVisible, onToggle }: UserSectionProps) {
-  const { users, blockedUsers, deleteUser, bulkDelete, blockUser, refetchUsers } = useUsers();
+  const { users, blockedUsers, updateUser, deleteUser, bulkDelete, blockUser, refetchUsers } = useUsers();
   const { selectedItems, showCheckboxes, toggleSelection, toggleSelectAll, clearSelection, selectedCount } = useBulkOperations();
   const [editingUser, setEditingUser] = useState<any | null>(null);
   const [notification, setNotification] = useState<{message: string, type: 'success' | 'info'} | null>(null);
@@ -230,6 +230,7 @@ export function UserSection({ isVisible, onToggle }: UserSectionProps) {
             <h3 className="text-lg font-semibold mb-4">Edit User</h3>
             <EditUserForm
               user={editingUser}
+              updateUser={updateUser}
               onUpdate={() => {
                 refetchUsers();
                 setEditingUser(null);
