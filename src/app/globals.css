@@ -113,8 +113,7 @@
 }
 
 @keyframes logo-float {
-  0%,
-  100% {
+  0%, 100% {
     transform: translateY(0px) rotate(0deg);
   }
   25% {
@@ -132,36 +131,3 @@
   animation: logo-float 6s ease-in-out infinite;
 }
 
-/* iOS-specific styles for date inputs */
-@supports (-webkit-touch-callout: none) {
-  .ios\:py-4 {
-    padding-top: 1rem;
-    padding-bottom: 1rem;
-  }
-
-  .ios\:min-h-\[44px\] {
-    min-height: 44px;
-  }
-
-  .ios\:text-base {
-    font-size: 1rem;
-    line-height: 1.5rem;
-  }
-}
-
-/* Alternative iOS detection for broader compatibility */
-@supports (-webkit-appearance: none) and (not (-ms-ime-align: auto)) {
-  .ios\:py-4 {
-    padding-top: 1rem;
-    padding-bottom: 1rem;
-  }
-
-  .ios\:min-h-\[44px\] {
-    min-height: 44px;
-  }
-
-  .ios\:text-base {
-    font-size: 1rem;
-    line-height: 1.5rem;
-  }
-}

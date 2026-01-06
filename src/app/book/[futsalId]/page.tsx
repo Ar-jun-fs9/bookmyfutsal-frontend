@@ -68,12 +68,12 @@ interface Slot {
 // Time formatting functions are now imported from helpers.ts
 
 export default function BookFutsal() {
-  const params = useParams();
-  const futsalId = params?.futsalId ? parseInt(params.futsalId as string, 10) : undefined;
-  const router = useRouter();
+    const params = useParams();
+    const futsalId = params?.futsalId ? parseInt(params.futsalId as string, 10) : undefined;
+    const router = useRouter();
 
-  // Create futsal-specific localStorage key to prevent state leakage between different futsals
-  const storageKey = futsalId ? `bookingProgress_${futsalId}` : 'bookingProgress';
+    // Create futsal-specific localStorage key to prevent state leakage between different futsals
+    const storageKey = futsalId ? `bookingProgress_${futsalId}` : 'bookingProgress';
 
   // Server state with React Query
   const { data: futsal, isLoading: futsalLoading } = useFutsal(Number(params.futsalId));
@@ -348,7 +348,7 @@ export default function BookFutsal() {
   const [otpCountdown, setOtpCountdown] = useState(0);
   const [showOtpNote, setShowOtpNote] = useState(false);
   const [esewaPhone, setEsewaPhone] = useState('');
-  const [confirmModal, setConfirmModal] = useState<{ isOpen: boolean, message: string, onConfirm: () => void } | null>(null);
+  const [confirmModal, setConfirmModal] = useState<{isOpen: boolean, message: string, onConfirm: () => void} | null>(null);
 
   // Load booking progress from localStorage on mount
   useEffect(() => {
@@ -794,8 +794,9 @@ export default function BookFutsal() {
           {/* Desktop: Horizontal */}
           <div className="hidden sm:flex sm:flex-row items-center space-x-4">
             <div className="flex items-center">
-              <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold text-sm shadow-lg ${bookingState.step >= 1 ? 'bg-linear-to-r from-green-500 to-green-600' : 'bg-gray-300'
-                }`}>
+              <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold text-sm shadow-lg ${
+                bookingState.step >= 1 ? 'bg-linear-to-r from-green-500 to-green-600' : 'bg-gray-300'
+              }`}>
                 {bookingState.step > 1 ? (
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
@@ -808,8 +809,9 @@ export default function BookFutsal() {
             </div>
             <div className={`w-8 h-0.5 ${bookingState.step > 1 ? 'bg-linear-to-r from-green-500 to-green-600' : 'bg-gray-300'}`}></div>
             <div className="flex items-center">
-              <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold text-sm shadow-lg ${bookingState.step >= 2 ? 'bg-linear-to-r from-green-500 to-green-600' : 'bg-gray-300'
-                }`}>
+              <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold text-sm shadow-lg ${
+                bookingState.step >= 2 ? 'bg-linear-to-r from-green-500 to-green-600' : 'bg-gray-300'
+              }`}>
                 {bookingState.step > 2 ? (
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
@@ -824,8 +826,9 @@ export default function BookFutsal() {
             </div>
             <div className={`w-8 h-0.5 ${bookingState.step > 2 ? 'bg-linear-to-r from-green-500 to-green-600' : 'bg-gray-300'}`}></div>
             <div className="flex items-center">
-              <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold text-sm shadow-lg ${bookingState.step >= 3 ? 'bg-linear-to-r from-green-500 to-green-600' : 'bg-gray-300'
-                }`}>
+              <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold text-sm shadow-lg ${
+                bookingState.step >= 3 ? 'bg-linear-to-r from-green-500 to-green-600' : 'bg-gray-300'
+              }`}>
                 {bookingState.step > 3 ? (
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
@@ -840,8 +843,9 @@ export default function BookFutsal() {
             </div>
             <div className={`w-8 h-0.5 ${bookingState.step > 3 ? 'bg-linear-to-r from-green-500 to-green-600' : 'bg-gray-300'}`}></div>
             <div className="flex items-center">
-              <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold text-sm shadow-lg ${bookingState.step >= 4 ? 'bg-linear-to-r from-green-500 to-green-600' : 'bg-gray-300'
-                }`}>
+              <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold text-sm shadow-lg ${
+                bookingState.step >= 4 ? 'bg-linear-to-r from-green-500 to-green-600' : 'bg-gray-300'
+              }`}>
                 {bookingState.step > 4 ? (
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
@@ -856,8 +860,9 @@ export default function BookFutsal() {
             </div>
             <div className={`w-8 h-0.5 ${bookingState.step > 4 ? 'bg-linear-to-r from-green-500 to-green-600' : 'bg-gray-300'}`}></div>
             <div className="flex items-center">
-              <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold text-sm shadow-lg ${bookingState.step >= 5 ? 'bg-linear-to-r from-green-500 to-green-600' : 'bg-gray-300'
-                }`}>
+              <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold text-sm shadow-lg ${
+                bookingState.step >= 5 ? 'bg-linear-to-r from-green-500 to-green-600' : 'bg-gray-300'
+              }`}>
                 {bookingState.step > 5 ? (
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
@@ -872,8 +877,9 @@ export default function BookFutsal() {
             </div>
             <div className={`w-8 h-0.5 ${bookingState.step > 4 ? 'bg-linear-to-r from-green-500 to-green-600' : 'bg-gray-300'}`}></div>
             <div className="flex items-center">
-              <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold text-sm shadow-lg ${bookingState.step >= 6 ? 'bg-linear-to-r from-green-500 to-green-600' : 'bg-gray-300'
-                }`}>
+              <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold text-sm shadow-lg ${
+                bookingState.step >= 6 ? 'bg-linear-to-r from-green-500 to-green-600' : 'bg-gray-300'
+              }`}>
                 {bookingState.step > 6 ? (
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
@@ -888,8 +894,9 @@ export default function BookFutsal() {
             </div>
             <div className={`w-8 h-0.5 ${bookingState.step > 6 ? 'bg-linear-to-r from-green-500 to-green-600' : 'bg-gray-300'}`}></div>
             <div className="flex items-center">
-              <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold text-sm shadow-lg ${bookingState.step >= 7 ? 'bg-linear-to-r from-green-500 to-green-600' : 'bg-gray-300'
-                }`}>
+              <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold text-sm shadow-lg ${
+                bookingState.step >= 7 ? 'bg-linear-to-r from-green-500 to-green-600' : 'bg-gray-300'
+              }`}>
                 {bookingState.step > 7 ? (
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
@@ -920,7 +927,7 @@ export default function BookFutsal() {
                         isOpen: true,
                         message: 'Are you sure you want to cancel this booking?',
                         onConfirm: () => {
-                          setConfirmModal({ isOpen: false, message: '', onConfirm: () => { } });
+                          setConfirmModal({ isOpen: false, message: '', onConfirm: () => {} });
                           localStorage.removeItem(storageKey);
                           router.push("/");
                         }
@@ -955,7 +962,7 @@ export default function BookFutsal() {
                   {/* Date Input */}
                   <div className="space-y-7">
                     <div className="relative">
-                      <label htmlFor="bookingDate" className="block text-sm font-semibold text-gray-700 mb-2">
+                      <label htmlFor="bookingDate"  className="block text-sm font-semibold text-gray-700 mb-2">
                         📅 Booking Date
                       </label>
                       <div className="relative">
@@ -963,26 +970,10 @@ export default function BookFutsal() {
                           type="date"
                           id="bookingDate"
                           value={bookingState.selectedDate}
-                          onChange={(e) => {
-                            const selectedDate = e.target.value;
-                            const today = new Date();
-                            const todayString = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
-
-                            if (selectedDate >= todayString) {
-                              dispatch({ type: 'SET_SELECTED_DATE', payload: selectedDate });
-                            } else {
-                              showNotification({ message: "Please select today's date or a future date", type: 'info' });
-                              // Reset to today if invalid date selected
-                              dispatch({ type: 'SET_SELECTED_DATE', payload: todayString });
-                            }
-                          }}
-                          min={(() => {
-                            const today = new Date();
-                            return `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
-                          })()}
+                          onChange={(e) => dispatch({ type: 'SET_SELECTED_DATE', payload: e.target.value })}
+                          min={new Date().toISOString().split("T")[0]}
                           required
-                          className="w-full px-4 py-3.5 pl-9 bg-white border border-gray-200 rounded-lg text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-400/50 focus:border-green-400/50 transition-all duration-300 font-medium text-sm
-                                     ios:py-4 ios:min-h-[44px] ios:text-base"
+                          className="w-full px-4 py-3.5 pl-9 bg-white border border-gray-200 rounded-lg text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-400/50 focus:border-green-400/50 transition-all duration-300 font-medium text-sm"
                         />
                         <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-green-500">
                           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1026,7 +1017,7 @@ export default function BookFutsal() {
                     </div>
                   </div>
 
-
+                  
                 </div>
               </div>
             </div>
@@ -1044,7 +1035,7 @@ export default function BookFutsal() {
                         isOpen: true,
                         message: 'Are you sure you want to cancel this booking?',
                         onConfirm: () => {
-                          setConfirmModal({ isOpen: false, message: '', onConfirm: () => { } });
+                          setConfirmModal({ isOpen: false, message: '', onConfirm: () => {} });
                           localStorage.removeItem(storageKey);
                           router.push("/");
                         }
@@ -1098,10 +1089,11 @@ export default function BookFutsal() {
                             const newShift = bookingState.selectedShift === shift ? '' : shift;
                             dispatch({ type: 'SET_SELECTED_SHIFT', payload: newShift });
                           }}
-                          className={`relative p-6 border-2 rounded-xl transition-all duration-300 transform hover:scale-105 ${bookingState.selectedShift === shift
-                            ? "bg-linear-to-br from-green-500 to-green-600 border-green-500 text-white shadow-lg"
-                            : "bg-white border-gray-200 hover:border-green-300 hover:shadow-md"
-                            }`}
+                          className={`relative p-6 border-2 rounded-xl transition-all duration-300 transform hover:scale-105 ${
+                            bookingState.selectedShift === shift
+                              ? "bg-linear-to-br from-green-500 to-green-600 border-green-500 text-white shadow-lg"
+                              : "bg-white border-gray-200 hover:border-green-300 hover:shadow-md"
+                          }`}
                         >
                           {bookingState.selectedShift === shift && (
                             <div className="absolute top-2 right-2 w-6 h-6 bg-white rounded-full flex items-center justify-center">
@@ -1157,7 +1149,7 @@ export default function BookFutsal() {
                     </div>
                   </div>
 
-
+                
                 </div>
               </div>
             </div>
@@ -1175,7 +1167,7 @@ export default function BookFutsal() {
                         isOpen: true,
                         message: 'Are you sure you want to cancel this booking?',
                         onConfirm: () => {
-                          setConfirmModal({ isOpen: false, message: '', onConfirm: () => { } });
+                          setConfirmModal({ isOpen: false, message: '', onConfirm: () => {} });
                           // Release selected slots
                           bookingState.selectedSlotIds.forEach(id => releaseSlotReservation(id));
                           dispatch({ type: 'CLEAR_SELECTED_SLOTS' });
@@ -1251,21 +1243,22 @@ export default function BookFutsal() {
                             onClick={() => handleSlotClick(slot)}
                             disabled={
                               (slot.display_status === "booked" ||
-                                slot.display_status === "expired" ||
-                                slot.status === "disabled") && !bookingState.selectedSlotIds.includes(slot.slot_id)
+                              slot.display_status === "expired" ||
+                              slot.status === "disabled") && !bookingState.selectedSlotIds.includes(slot.slot_id)
                             }
-                            className={`relative p-4 border-2 rounded-xl text-center transition-all duration-300 transform hover:scale-105 ${bookingState.selectedSlotIds.includes(slot.slot_id)
-                              ? "bg-linear-to-br from-green-500 to-green-600 border-green-500 text-white shadow-lg"
-                              : slot.display_status === "booked"
+                            className={`relative p-4 border-2 rounded-xl text-center transition-all duration-300 transform hover:scale-105 ${
+                              bookingState.selectedSlotIds.includes(slot.slot_id)
+                                ? "bg-linear-to-br from-green-500 to-green-600 border-green-500 text-white shadow-lg"
+                                : slot.display_status === "booked"
                                 ? "bg-red-50 border-red-300 cursor-not-allowed opacity-60"
                                 : slot.display_status === "expired"
-                                  ? "bg-yellow-50 border-yellow-300 cursor-not-allowed opacity-60"
-                                  : slot.status === "disabled"
-                                    ? "bg-gray-50 border-gray-300 cursor-not-allowed opacity-60"
-                                    : slot.status === "pending"
-                                      ? "bg-orange-50 border-orange-300 hover:border-green-300 hover:shadow-md"
-                                      : "bg-white border-gray-200 hover:border-green-300 hover:shadow-md"
-                              }`}
+                                ? "bg-yellow-50 border-yellow-300 cursor-not-allowed opacity-60"
+                                : slot.status === "disabled"
+                                ? "bg-gray-50 border-gray-300 cursor-not-allowed opacity-60"
+                                : slot.status === "pending"
+                                ? "bg-orange-50 border-orange-300 hover:border-green-300 hover:shadow-md"
+                                : "bg-white border-gray-200 hover:border-green-300 hover:shadow-md"
+                            }`}
                           >
                             {bookingState.selectedSlotIds.includes(slot.slot_id) && (
                               <div className="absolute top-1 right-2 w-4 h-4 bg-white rounded-lg flex items-center justify-center shadow-sm">
@@ -1274,13 +1267,14 @@ export default function BookFutsal() {
                                 </svg>
                               </div>
                             )}
-                            <div className={`font-bold text-sm mb-1 ${bookingState.selectedSlotIds.includes(slot.slot_id) ? 'text-white' :
+                            <div className={`font-bold text-sm mb-1 ${
+                              bookingState.selectedSlotIds.includes(slot.slot_id) ? 'text-white' :
                               slot.display_status === "booked" ? 'text-red-600' :
                                 slot.display_status === "expired" ? 'text-yellow-600' :
                                   slot.status === "disabled" ? 'text-gray-600' :
                                     slot.status === "pending" ? 'text-orange-400' :
                                       'text-gray-800'
-                              }`}>
+                            }`}>
                               {(() => {
                                 const startHour = parseInt(slot.start_time.split(':')[0]);
                                 const endHour = parseInt(slot.end_time.split(':')[0]);
@@ -1291,24 +1285,25 @@ export default function BookFutsal() {
                                 return `${startDisplay}${startPeriod}-${endDisplay}${endPeriod}`;
                               })()}
                             </div>
-                            <div className={`text-sm ${bookingState.selectedSlotIds.includes(slot.slot_id) ? 'text-white' :
+                            <div className={`text-sm ${
+                              bookingState.selectedSlotIds.includes(slot.slot_id) ? 'text-white' :
                               slot.display_status === "booked" ? 'text-red-500' :
                                 slot.display_status === "expired" ? 'text-yellow-500' :
                                   slot.status === "disabled" ? 'text-gray-500' :
                                     slot.status === "pending" ? 'text-orange-600' :
                                       'text-gray-600'
-                              }`}>
+                            }`}>
                               {bookingState.selectedSlotIds.includes(slot.slot_id)
                                 ? "✅ Selected"
                                 : slot.display_status === "booked"
-                                  ? `👤 Booked`
-                                  : slot.display_status === "expired"
-                                    ? "⏰ Expired"
-                                    : slot.status === "disabled"
-                                      ? "🚫 Disabled"
-                                      : slot.status === "pending"
-                                        ? "⏳ In Process"
-                                        : "✅ Available"}
+                                ? `👤 Booked`
+                                : slot.display_status === "expired"
+                                ? "⏰ Expired"
+                                : slot.status === "disabled"
+                                ? "🚫 Disabled"
+                                : slot.status === "pending"
+                                ? "⏳ In Process"
+                                : "✅ Available"}
                             </div>
                           </button>
                         ))}
@@ -1528,7 +1523,7 @@ export default function BookFutsal() {
                     </div>
                   )}
 
-
+                 
                 </div>
               </div>
             </div>
@@ -1547,7 +1542,7 @@ export default function BookFutsal() {
                         isOpen: true,
                         message: 'Are you sure you want to cancel this booking?',
                         onConfirm: () => {
-                          setConfirmModal({ isOpen: false, message: '', onConfirm: () => { } });
+                          setConfirmModal({ isOpen: false, message: '', onConfirm: () => {} });
                           localStorage.removeItem(storageKey);
                           router.push("/");
                         }
@@ -1695,7 +1690,7 @@ export default function BookFutsal() {
                         isOpen: true,
                         message: 'Are you sure you want to cancel this booking?',
                         onConfirm: () => {
-                          setConfirmModal({ isOpen: false, message: '', onConfirm: () => { } });
+                          setConfirmModal({ isOpen: false, message: '', onConfirm: () => {} });
                           // Release selected slots
                           bookingState.selectedSlotIds.forEach(id => releaseSlotReservation(id));
                           dispatch({ type: 'CLEAR_SELECTED_SLOTS' });
@@ -2060,7 +2055,7 @@ export default function BookFutsal() {
                       </div>
                     </div>
                   </div>
-
+             
                   {/* Important Information */}
                   <div className="bg-linear-to-r from-yellow-50 to-orange-50 rounded-2xl p-6 mb-8 border border-yellow-200" >
                     <h3 className="text-lg font-bold text-yellow-800 mb-4 flex items-center">
@@ -2132,7 +2127,7 @@ export default function BookFutsal() {
                       isOpen: true,
                       message: 'Are you sure you want to cancel this booking?',
                       onConfirm: async () => {
-                        setConfirmModal({ isOpen: false, message: '', onConfirm: () => { } });
+                        setConfirmModal({ isOpen: false, message: '', onConfirm: () => {} });
                         if (bookingState.booking) {
                           try {
                             await fetch(
@@ -2219,7 +2214,7 @@ export default function BookFutsal() {
               <p className="text-sm text-gray-600 mb-6">{confirmModal.message}</p>
               <div className="flex gap-3">
                 <button
-                  onClick={() => setConfirmModal({ isOpen: false, message: '', onConfirm: () => { } })}
+                  onClick={() => setConfirmModal({ isOpen: false, message: '', onConfirm: () => {} })}
                   className="flex-1 bg-gray-200 text-gray-800 font-semibold py-2 px-4 rounded-lg hover:bg-gray-300 transition-all duration-300"
                 >
                   Cancel
@@ -2249,41 +2244,41 @@ export default function BookFutsal() {
               <p className="text-gray-300 mb-4">Your ultimate destination for booking premium futsal venues. Experience the thrill of the game with top-quality facilities.</p>
               <div className="flex space-x-4">
 
-                {/* Instagram */}
-                <a
-                  href="https://www.instagram.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-gray-300 hover:text-pink-500 transition-colors duration-300"
-                >
-                  <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M12 2.163c3.204 0 3.584.012 4.85.07 1.366.062 2.633.343 3.608 1.318.975.975 1.256 2.242 1.318 3.608.058 1.266.07 1.646.07 4.84s-.012 3.574-.07 4.84c-.062 1.366-.343 2.633-1.318 3.608-.975.975-2.242 1.256-3.608 1.318-1.266.058-1.646.07-4.85.07s-3.584-.012-4.85-.07c-1.366-.062-2.633-.343-3.608-1.318-.975-.975-1.256-2.242-1.318-3.608-.058-1.266-.07-1.646-.07-4.84s.012-3.574.07-4.84c.062-1.366.343-2.633 1.318-3.608C4.517 2.576 5.784 2.295 7.15 2.233 8.416 2.175 8.796 2.163 12 2.163zm0 3.675a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zm0 10.162a3.999 3.999 0 1 1 0-7.998 3.999 3.999 0 0 1 0 7.998zm6.406-11.845a1.44 1.44 0 1 1-2.88 0 1.44 1.44 0 0 1 2.88 0z" />
-                  </svg>
-                </a>
-                {/* Facebook */}
-                <a
-                  href="https://www.facebook.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-gray-300 hover:text-blue-600 transition-colors duration-300"
-                >
-                  <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M22.675 0h-21.35C.597 0 0 .597 0 1.326v21.348C0 23.403.597 24 1.326 24H12.82v-9.294H9.692V11.01h3.128V8.309c0-3.1 1.893-4.788 4.659-4.788 1.325 0 2.463.099 2.795.143v3.24l-1.918.001c-1.504 0-1.796.715-1.796 1.763v2.312h3.587l-.467 3.696h-3.12V24h6.116C23.403 24 24 23.403 24 22.674V1.326C24 .597 23.403 0 22.675 0z" />
-                  </svg>
-                </a>
+              {/* Instagram */}
+              <a
+                href="https://www.instagram.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-gray-300 hover:text-pink-500 transition-colors duration-300"
+              >
+                <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M12 2.163c3.204 0 3.584.012 4.85.07 1.366.062 2.633.343 3.608 1.318.975.975 1.256 2.242 1.318 3.608.058 1.266.07 1.646.07 4.84s-.012 3.574-.07 4.84c-.062 1.366-.343 2.633-1.318 3.608-.975.975-2.242 1.256-3.608 1.318-1.266.058-1.646.07-4.85.07s-3.584-.012-4.85-.07c-1.366-.062-2.633-.343-3.608-1.318-.975-.975-1.256-2.242-1.318-3.608-.058-1.266-.07-1.646-.07-4.84s.012-3.574.07-4.84c.062-1.366.343-2.633 1.318-3.608C4.517 2.576 5.784 2.295 7.15 2.233 8.416 2.175 8.796 2.163 12 2.163zm0 3.675a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zm0 10.162a3.999 3.999 0 1 1 0-7.998 3.999 3.999 0 0 1 0 7.998zm6.406-11.845a1.44 1.44 0 1 1-2.88 0 1.44 1.44 0 0 1 2.88 0z" />
+                </svg>
+              </a>
+              {/* Facebook */}
+              <a
+                href="https://www.facebook.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-gray-300 hover:text-blue-600 transition-colors duration-300"
+              >
+                <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M22.675 0h-21.35C.597 0 0 .597 0 1.326v21.348C0 23.403.597 24 1.326 24H12.82v-9.294H9.692V11.01h3.128V8.309c0-3.1 1.893-4.788 4.659-4.788 1.325 0 2.463.099 2.795.143v3.24l-1.918.001c-1.504 0-1.796.715-1.796 1.763v2.312h3.587l-.467 3.696h-3.12V24h6.116C23.403 24 24 23.403 24 22.674V1.326C24 .597 23.403 0 22.675 0z" />
+                </svg>
+              </a>
 
-                {/* YouTube */}
-                <a
-                  href="https://www.youtube.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-gray-300 hover:text-red-600 transition-colors duration-300"
-                >
-                  <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.376.505A3.016 3.016 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.376-.505a3.016 3.016 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
-                  </svg>
-                </a>
-              </div>
+              {/* YouTube */}
+              <a
+                href="https://www.youtube.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-gray-300 hover:text-red-600 transition-colors duration-300"
+              >
+                <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.376.505A3.016 3.016 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.376-.505a3.016 3.016 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
+                </svg>
+              </a>
+            </div>
             </div>
 
             {/* Quick Links and Support - Two columns on mobile */}
@@ -2296,7 +2291,7 @@ export default function BookFutsal() {
                   <li><Link href="/user/dashboard" className="text-gray-300 hover:text-white transition-colors duration-300">My Bookings</Link></li>
                   <li><Link href="/" className="text-gray-300 hover:text-white transition-colors duration-300">About</Link></li>
                   <li><Link href="/" className="text-gray-300 hover:text-white transition-colors duration-300">Contact</Link></li>
-
+                 
                 </ul>
               </div>
 
@@ -2338,41 +2333,41 @@ export default function BookFutsal() {
               <p className="text-gray-300 mb-4">Your ultimate destination for booking premium futsal venues. Experience the thrill of the game with top-quality facilities.</p>
               <div className="flex space-x-4">
 
-                {/* Instagram */}
-                <a
-                  href="https://www.instagram.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-gray-300 hover:text-pink-500 transition-colors duration-300"
-                >
-                  <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M12 2.163c3.204 0 3.584.012 4.85.07 1.366.062 2.633.343 3.608 1.318.975.975 1.256 2.242 1.318 3.608.058 1.266.07 1.646.07 4.84s-.012 3.574-.07 4.84c-.062 1.366-.343 2.633-1.318 3.608-.975.975-2.242 1.256-3.608 1.318-1.266.058-1.646.07-4.85.07s-3.584-.012-4.85-.07c-1.366-.062-2.633-.343-3.608-1.318-.975-.975-1.256-2.242-1.318-3.608-.058-1.266-.07-1.646-.07-4.84s.012-3.574.07-4.84c.062-1.366.343-2.633 1.318-3.608C4.517 2.576 5.784 2.295 7.15 2.233 8.416 2.175 8.796 2.163 12 2.163zm0 3.675a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zm0 10.162a3.999 3.999 0 1 1 0-7.998 3.999 3.999 0 0 1 0 7.998zm6.406-11.845a1.44 1.44 0 1 1-2.88 0 1.44 1.44 0 0 1 2.88 0z" />
-                  </svg>
-                </a>
-                {/* Facebook */}
-                <a
-                  href="https://www.facebook.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-gray-300 hover:text-blue-600 transition-colors duration-300"
-                >
-                  <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M22.675 0h-21.35C.597 0 0 .597 0 1.326v21.348C0 23.403.597 24 1.326 24H12.82v-9.294H9.692V11.01h3.128V8.309c0-3.1 1.893-4.788 4.659-4.788 1.325 0 2.463.099 2.795.143v3.24l-1.918.001c-1.504 0-1.796.715-1.796 1.763v2.312h3.587l-.467 3.696h-3.12V24h6.116C23.403 24 24 23.403 24 22.674V1.326C24 .597 23.403 0 22.675 0z" />
-                  </svg>
-                </a>
+              {/* Instagram */}
+              <a
+                href="https://www.instagram.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-gray-300 hover:text-pink-500 transition-colors duration-300"
+              >
+                <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M12 2.163c3.204 0 3.584.012 4.85.07 1.366.062 2.633.343 3.608 1.318.975.975 1.256 2.242 1.318 3.608.058 1.266.07 1.646.07 4.84s-.012 3.574-.07 4.84c-.062 1.366-.343 2.633-1.318 3.608-.975.975-2.242 1.256-3.608 1.318-1.266.058-1.646.07-4.85.07s-3.584-.012-4.85-.07c-1.366-.062-2.633-.343-3.608-1.318-.975-.975-1.256-2.242-1.318-3.608-.058-1.266-.07-1.646-.07-4.84s.012-3.574.07-4.84c.062-1.366.343-2.633 1.318-3.608C4.517 2.576 5.784 2.295 7.15 2.233 8.416 2.175 8.796 2.163 12 2.163zm0 3.675a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zm0 10.162a3.999 3.999 0 1 1 0-7.998 3.999 3.999 0 0 1 0 7.998zm6.406-11.845a1.44 1.44 0 1 1-2.88 0 1.44 1.44 0 0 1 2.88 0z" />
+                </svg>
+              </a>
+              {/* Facebook */}
+              <a
+                href="https://www.facebook.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-gray-300 hover:text-blue-600 transition-colors duration-300"
+              >
+                <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M22.675 0h-21.35C.597 0 0 .597 0 1.326v21.348C0 23.403.597 24 1.326 24H12.82v-9.294H9.692V11.01h3.128V8.309c0-3.1 1.893-4.788 4.659-4.788 1.325 0 2.463.099 2.795.143v3.24l-1.918.001c-1.504 0-1.796.715-1.796 1.763v2.312h3.587l-.467 3.696h-3.12V24h6.116C23.403 24 24 23.403 24 22.674V1.326C24 .597 23.403 0 22.675 0z" />
+                </svg>
+              </a>
 
-                {/* YouTube */}
-                <a
-                  href="https://www.youtube.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-gray-300 hover:text-red-600 transition-colors duration-300"
-                >
-                  <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.376.505A3.016 3.016 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.376-.505a3.016 3.016 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
-                  </svg>
-                </a>
-              </div>
+              {/* YouTube */}
+              <a
+                href="https://www.youtube.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-gray-300 hover:text-red-600 transition-colors duration-300"
+              >
+                <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.376.505A3.016 3.016 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.376-.505a3.016 3.016 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
+                </svg>
+              </a>
+            </div>
             </div>
 
             {/* Quick Links */}
@@ -2383,7 +2378,7 @@ export default function BookFutsal() {
                 <li><Link href="/user/dashboard" className="text-gray-300 hover:text-white transition-colors duration-300">My Bookings</Link></li>
                 <li><Link href="/" className="text-gray-300 hover:text-white transition-colors duration-300">About</Link></li>
                 <li><Link href="/" className="text-gray-300 hover:text-white transition-colors duration-300">Contact</Link></li>
-
+                
               </ul>
             </div>
 
