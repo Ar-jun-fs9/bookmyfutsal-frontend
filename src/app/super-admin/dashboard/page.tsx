@@ -139,7 +139,7 @@ export default function SuperAdminDashboard() {
             {showCreateAdmin && <CreateFutsalAdminForm futsals={futsals} superAdminId={user?.id || 0} setNotification={setNotification} onSuccess={fetchFutsalAdmins} />}
             <SlotSection isVisible={showSlots} onToggle={() => setShowSlots(!showSlots)} />
             <FutsalSection isVisible={showFutsals} onToggle={() => setShowFutsals(!showFutsals)} />
-            <AdminSection futsals={futsals} superAdminId={user?.id || 0} futsalAdmins={futsalAdmins} setFutsalAdmins={setFutsalAdmins} fetchFutsalAdmins={fetchFutsalAdmins} isVisible={showAdmins} onToggle={() => setShowAdmins(!showAdmins)} />
+            <AdminSection futsals={futsals} superAdminId={user?.id || 0} isVisible={showAdmins} onToggle={() => setShowAdmins(!showAdmins)} />
             <UserSection isVisible={showUsers} onToggle={() => setShowUsers(!showUsers)} />
             <BlockedUserSection isVisible={showBlockedUsers} onToggle={() => setShowBlockedUsers(!showBlockedUsers)} />
             <BookingSection isVisible={showBookings} onToggle={() => setShowBookings(!showBookings)} />

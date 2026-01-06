@@ -17,17 +17,14 @@ interface Futsal {
 interface AdminSectionProps {
   futsals: Futsal[];
   superAdminId: number;
-  futsalAdmins: any[];
-  setFutsalAdmins: (admins: any[]) => void;
-  fetchFutsalAdmins: () => void;
   isVisible: boolean;
   onToggle: () => void;
 }
 
-export function AdminSection({ futsals, superAdminId, futsalAdmins, setFutsalAdmins, fetchFutsalAdmins, isVisible, onToggle }: AdminSectionProps) {
+export function AdminSection({ futsals, superAdminId, isVisible, onToggle }: AdminSectionProps) {
   const { tokens } = useAuthStore();
+  const { admins, loading, error, deleteAdmin, bulkDelete, refetch } = useFutsalAdmins();
   const { selectedItems, showCheckboxes, toggleSelection, toggleSelectAll, clearSelection, selectedCount } = useBulkOperations();
-  const admins = futsalAdmins;
   const [showCreateAdmin, setShowCreateAdmin] = useState(false);
   const [editingAdmin, setEditingAdmin] = useState<any | null>(null);
   const [notification, setNotification] = useState<{message: string, type: 'success' | 'info'} | null>(null);
@@ -43,52 +40,6 @@ export function AdminSection({ futsals, superAdminId, futsalAdmins, setFutsalAdm
     }
   }, [notification]);
 
-  const deleteAdmin = async (id: number) => {
-    try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/futsal-admins/${id}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${tokens?.accessToken}`,
-        },
-      });
-
-      if (response.ok) {
-        setFutsalAdmins(futsalAdmins.filter(a => a.id !== id));
-        return { success: true };
-      } else {
-        return { success: false, error: 'Error deleting futsal admin' };
-      }
-    } catch (err) {
-      console.error('Error deleting futsal admin:', err);
-      return { success: false, error: 'Error deleting futsal admin' };
-    }
-  };
-
-  const bulkDelete = async (adminIds: number[]) => {
-    try {
-      const deletePromises = adminIds.map(id =>
-        fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/futsal-admins/${id}`, {
-          method: 'DELETE',
-          headers: {
-            'Authorization': `Bearer ${tokens?.accessToken}`,
-          },
-        })
-      );
-
-      const results = await Promise.all(deletePromises);
-      const successfulDeletes = results.filter(response => response.ok).length;
-
-      if (successfulDeletes > 0) {
-        setFutsalAdmins(futsalAdmins.filter(a => !adminIds.includes(a.id)));
-        return { success: true, deletedCount: successfulDeletes };
-      } else {
-        return { success: false, error: 'Error deleting futsal admins' };
-      }
-    } catch (err) {
-      console.error('Error bulk deleting futsal admins:', err);
-      return { success: false, error: 'Error deleting futsal admins' };
-    }
-  };
 
   const handleDeleteAdmin = (id: number) => {
     setConfirmModal({
@@ -169,7 +120,7 @@ export function AdminSection({ futsals, superAdminId, futsalAdmins, setFutsalAdm
           futsals={futsals}
           superAdminId={superAdminId}
           setNotification={setNotification}
-          onSuccess={fetchFutsalAdmins}
+          onSuccess={refetch}
         />
       )}
 
@@ -208,7 +159,7 @@ export function AdminSection({ futsals, superAdminId, futsalAdmins, setFutsalAdm
                 admin={admin}
                 tokens={tokens}
                 onUpdate={() => {
-                  fetchFutsalAdmins();
+                  refetch();
                   setEditingAdmin(null);
                 }}
                 onCancel={() => setEditingAdmin(null)}
