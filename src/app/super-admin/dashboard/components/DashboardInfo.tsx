@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { EditSuperAdminForm } from './forms/EditSuperAdminForm';
+import { NotificationModal } from './modals/NotificationModal';
 
 interface User {
   id: number;
@@ -102,12 +103,20 @@ export function DashboardInfo({ user, onUpdate }: DashboardInfoProps) {
             onUpdate={(updatedUser) => {
               onUpdate(updatedUser);
               setEditingSuperAdmin(false);
-              setNotification({ message: 'superadmin info update successfully', type: 'success' });
+              setNotification({ message: 'Profile update successfully', type: 'success' });
             }}
             onCancel={() => setEditingSuperAdmin(false)}
             setNotification={setNotification}
           />
         )}
+
+        {/* Notification Modal */}
+        <NotificationModal
+          isOpen={!!notification}
+          message={notification?.message || ''}
+          type={notification?.type || 'info'}
+          onClose={() => setNotification(null)}
+        />
       </div>
     </div>
   );
