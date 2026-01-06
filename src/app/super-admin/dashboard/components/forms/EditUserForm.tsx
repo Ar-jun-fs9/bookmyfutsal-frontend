@@ -24,17 +24,12 @@ export function EditUserForm({ user, updateUser, onUpdate, onCancel, setNotifica
     setLoading(true);
 
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/users/${user.user_id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
-      });
-
-      if (response.ok) {
+      const result = await updateUser(user.user_id, formData);
+      if (result.success) {
         onUpdate(formData);
         setNotification({ message: "User updated successfully", type: 'success' });
       } else {
-        setNotification({ message: "Error updating user", type: 'info' });
+        setNotification({ message: result.error || "Error updating user", type: 'info' });
       }
     } catch (error) {
       console.error('Error:', error);
