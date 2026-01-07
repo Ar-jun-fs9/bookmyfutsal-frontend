@@ -579,7 +579,7 @@ export default function UserLogin() {
 
 
                     <div className="relative">
-                      <label htmlFor="otpCode" className="block text-sm font-semibold text-gray-700 mb-1.5 text-center">
+                      <label htmlFor="otpCode" className="block text-sm font-semibold text-gray-700 mb-4 text-center">
                         🔐 OTP Code
                       </label>
                       <div className="relative">
@@ -587,7 +587,7 @@ export default function UserLogin() {
                           id="otpCode"
                           type="text"
                           required
-                          className="w-full px-6 py-3 border-2 border-gray-200 rounded-lg text-center text-xl font-mono font-bold tracking-widest focus:border-green-500 focus:ring-4 focus:ring-green-100 transition-all duration-300 text-gray-700"
+                          className="w-full px-4 py-2.5 pl-5 bg-white border border-gray-200 rounded-lg text-center text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-400/50 focus:border-green-400/50 transition-all duration-300 font-medium text-sm"
                           placeholder="000000"
                           value={otpCode}
                           onChange={(e) => setOtpCode(e.target.value)}

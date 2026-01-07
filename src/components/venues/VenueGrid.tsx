@@ -163,12 +163,13 @@ export default function VenueGrid() {
             <div>
               <label className="block text-sm font-semibold text-gray-800 mb-2">⭐ Sort by Rating</label>
               <select
-                value={filterState.sortByRating ? 'highest' : ''}
-                onChange={(e) => updateFilter('sortByRating', e.target.value === 'highest')}
+                value={filterState.sortByRating}
+                onChange={(e) => updateFilter('sortByRating', e.target.value as 'none' | 'highest' | 'lowest')}
                 className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none focus:ring-2 focus:ring-green-400/50 focus:border-green-400/50 transition-all text-sm"
               >
-                <option value="">No Rating Sort</option>
+                <option value="none">No Rating Sort</option>
                 <option value="highest">Highest Rating</option>
+                <option value="lowest">Lowest Rating</option>
               </select>
             </div>
 

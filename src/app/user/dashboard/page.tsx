@@ -511,8 +511,11 @@ export default function UserDashboard() {
       return matchesSearch && matchesName && matchesCity && matchesLocation;
     })
     .sort((a: Futsal, b: Futsal) => {
-      if (filterState.sortByRating) {
+      if (filterState.sortByRating === 'highest') {
         return (b.average_rating || 0) - (a.average_rating || 0);
+      }
+      if (filterState.sortByRating === 'lowest') {
+        return (a.average_rating || 0) - (b.average_rating || 0);
       }
       if (filterState.sortByPrice === 'low-to-high') {
         return a.price_per_hour - b.price_per_hour;
@@ -688,12 +691,13 @@ export default function UserDashboard() {
                         <div>
                           <label className="block text-sm font-semibold text-gray-800 mb-2">⭐ Sort by Rating</label>
                           <select
-                            value={filterState.sortByRating ? 'highest' : ''}
-                            onChange={(e) => dispatch({ type: 'SET_SORT_BY_RATING', payload: e.target.value === 'highest' })}
+                            value={filterState.sortByRating}
+                            onChange={(e) => dispatch({ type: 'SET_SORT_BY_RATING', payload: e.target.value as 'none' | 'highest' | 'lowest' })}
                             className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none focus:ring-2 focus:ring-green-400/50 focus:border-green-400/50 transition-all text-sm"
                           >
-                            <option value="">No Rating Sort</option>
+                            <option value="none">No Rating Sort</option>
                             <option value="highest">Highest Rating</option>
+                            <option value="lowest">Lowest Rating</option>
                           </select>
                         </div>
 

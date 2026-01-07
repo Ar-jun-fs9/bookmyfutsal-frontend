@@ -3,7 +3,7 @@ export interface FilterState {
   selectedName: string;
   selectedCity: string;
   selectedLocation: string;
-  sortByRating: boolean;
+  sortByRating: 'none' | 'highest' | 'lowest';
   sortByPrice: 'none' | 'low-to-high' | 'high-to-low';
   showFilters: boolean;
   bookingFilter: 'all' | 'past' | 'today' | 'future' | 'cancelled';
@@ -14,7 +14,7 @@ export type FilterAction =
   | { type: 'SET_SELECTED_NAME'; payload: string }
   | { type: 'SET_SELECTED_CITY'; payload: string }
   | { type: 'SET_SELECTED_LOCATION'; payload: string }
-  | { type: 'SET_SORT_BY_RATING'; payload: boolean }
+  | { type: 'SET_SORT_BY_RATING'; payload: 'none' | 'highest' | 'lowest' }
   | { type: 'SET_SORT_BY_PRICE'; payload: 'none' | 'low-to-high' | 'high-to-low' }
   | { type: 'SET_SHOW_FILTERS'; payload: boolean }
   | { type: 'SET_BOOKING_FILTER'; payload: 'all' | 'past' | 'today' | 'future' | 'cancelled' }
@@ -26,7 +26,7 @@ export const initialFilterState: FilterState = {
   selectedName: '',
   selectedCity: '',
   selectedLocation: '',
-  sortByRating: false,
+  sortByRating: 'none',
   sortByPrice: 'none',
   showFilters: false,
   bookingFilter: 'all',
@@ -57,7 +57,7 @@ export const filterReducer = (state: FilterState, action: FilterAction): FilterS
         selectedName: '',
         selectedCity: '',
         selectedLocation: '',
-        sortByRating: false,
+        sortByRating: 'none',
         sortByPrice: 'none',
       };
     case 'RESET':

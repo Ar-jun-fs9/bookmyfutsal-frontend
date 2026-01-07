@@ -27,7 +27,7 @@ interface FilterState {
   selectedName: string;
   selectedCity: string;
   selectedLocation: string;
-  sortByRating: boolean;
+  sortByRating: 'none' | 'highest' | 'lowest';
   sortByPrice: 'none' | 'low-to-high' | 'high-to-low';
   showFilters: boolean;
 }
@@ -37,7 +37,7 @@ const initialFilterState: FilterState = {
   selectedName: '',
   selectedCity: '',
   selectedLocation: '',
-  sortByRating: false,
+  sortByRating: 'none',
   sortByPrice: 'none',
   showFilters: false,
 };
@@ -60,8 +60,11 @@ export function useVenueFilters() {
         return matchesSearch && matchesName && matchesCity && matchesLocation;
       })
       .sort((a: Futsal, b: Futsal) => {
-        if (filterState.sortByRating) {
+        if (filterState.sortByRating === 'highest') {
           return (b.average_rating || 0) - (a.average_rating || 0);
+        }
+        if (filterState.sortByRating === 'lowest') {
+          return (a.average_rating || 0) - (b.average_rating || 0);
         }
         if (filterState.sortByPrice === 'low-to-high') {
           return a.price_per_hour - b.price_per_hour;
