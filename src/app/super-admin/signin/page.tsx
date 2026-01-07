@@ -37,9 +37,9 @@ export default function SuperAdminSignin() {
     return () => clearInterval(interval);
   }, [otpCountdown]);
 
-  // Auto-hide OTP error messages after 2 seconds
+  // Auto-hide forgot password error messages after 2 seconds
   useEffect(() => {
-    if (forgotError && forgotStep === 2) {
+    if (forgotError) {
       const timer = setTimeout(() => {
         setForgotError('');
       }, 2000);
