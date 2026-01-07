@@ -278,7 +278,7 @@ export default function SuperAdminSignin() {
                 <a href="/" className="text-gray-200 hover:text-green-400 font-semibold transition-all duration-300 px-3 py-2 rounded-lg hover:bg-green-900/50">Bookings</a>
                 <a href="/" className="text-gray-200 hover:text-green-400 font-semibold transition-all duration-300 px-3 py-2 rounded-lg hover:bg-green-900/50">About</a>
                 <a href="/" className="text-gray-200 hover:text-green-400 font-semibold transition-all duration-300 px-3 py-2 rounded-lg hover:bg-green-900/50">Contact</a>
-                <div className="flex flex-row space-x-3 pt-4 border-t border-green-500/20">
+                <div className="flex flex-row space-x-3 pt-4 border-t border-green-500/20 ml-2 mr-2">
                   <Link
                     href="/user/login"
                     className="flex-1 px-4 py-3 bg-linear-to-r from-blue-600 to-blue-700 text-white font-bold rounded-lg text-center shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 border border-blue-500/30"
