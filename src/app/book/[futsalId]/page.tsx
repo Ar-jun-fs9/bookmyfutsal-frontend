@@ -659,7 +659,7 @@ export default function BookFutsal() {
           <div className="flex justify-between items-center py-4">
             {/* Logo */}
             <div className="flex items-center space-x-3">
-              <div className="relative">
+              <div onClick={() => document.getElementById('hero')?.scrollIntoView({ behavior: 'smooth' })} className="relative cursor-pointer">
                 <img src="/logo/logo.png" alt="BookMyFutsal" className="h-12 w-12 rounded-lg shadow-lg ring-2 ring-green-400/50" />
                 <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-400 rounded-lg animate-pulse"></div>
               </div>
