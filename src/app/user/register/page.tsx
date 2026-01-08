@@ -26,6 +26,8 @@ export default function UserRegister() {
   const [userId, setUserId] = useState<number | null>(null);
   const [emailCountdown, setEmailCountdown] = useState(0);
   const [phoneCountdown, setPhoneCountdown] = useState(0);
+  const [initialTimeout, setInitialTimeout] = useState(0);
+  const [showIndividualResend, setShowIndividualResend] = useState(false);
   const [usernameErrors, setUsernameErrors] = useState<string[]>([]);
   const [passwordErrors, setPasswordErrors] = useState<string[]>([]);
   const [showPassword, setShowPassword] = useState(false);
@@ -121,6 +123,23 @@ export default function UserRegister() {
     };
   }, [emailCountdown, phoneCountdown]);
 
+  // Initial timeout countdown
+  useEffect(() => {
+    if (step === 2 && initialTimeout > 0 && !(otpData.email_otp && otpData.phone_otp)) {
+      const timer = setTimeout(() => setInitialTimeout(prev => prev - 1), 1000);
+      return () => clearTimeout(timer);
+    } else if (initialTimeout === 0 && !(otpData.email_otp && otpData.phone_otp)) {
+      setShowIndividualResend(true);
+    }
+  }, [initialTimeout, step, otpData]);
+
+  // Handle when both OTPs are entered
+  useEffect(() => {
+    if (otpData.email_otp && otpData.phone_otp) {
+      setShowIndividualResend(false);
+    }
+  }, [otpData]);
+
   // Auto-hide notifications after 7 seconds
   useEffect(() => {
     if (notification) {
@@ -161,6 +180,8 @@ export default function UserRegister() {
         setUserId(data.user_id);
         setEmailCountdown(60);
         setPhoneCountdown(60);
+        setInitialTimeout(60);
+        setShowIndividualResend(false);
         showNotification({ message: `Registration initiated! OTPs sent to ${formData.email} and ${formData.phone}. Email OTP: ${data.otps.email}, Phone OTP: ${data.otps.phone}`, type: 'info' });
         setStep(2);
       } else {
@@ -212,6 +233,68 @@ export default function UserRegister() {
         showNotification({ message: `OTPs resent! Email OTP: ${emailData.otp_code}, Phone OTP: ${phoneData.otp_code}`, type: 'info' });
       } else {
         setError('Failed to resend OTPs');
+      }
+    } catch (err) {
+      setError('Network error');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleResendEmailOTP = async () => {
+    setLoading(true);
+    setError('');
+
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/otp/generate`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          contact: formData.email,
+          otp_type: 'email',
+          user_id: userId
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setEmailCountdown(60);
+        showNotification({ message: `Email OTP resent: ${data.otp_code}`, type: 'info' });
+      } else {
+        setError('Failed to resend email OTP');
+      }
+    } catch (err) {
+      setError('Network error');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleResendPhoneOTP = async () => {
+    setLoading(true);
+    setError('');
+
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/otp/generate`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          contact: formData.phone,
+          otp_type: 'phone',
+          user_id: userId
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setPhoneCountdown(60);
+        showNotification({ message: `Phone OTP resent: ${data.otp_code}`, type: 'info' });
+      } else {
+        setError('Failed to resend phone OTP');
       }
     } catch (err) {
       setError('Network error');
@@ -710,10 +793,14 @@ export default function UserRegister() {
                               name="email_otp"
                               type="text"
                               required
+                              maxLength={6}
                               className="w-full px-4 py-2.5 pl-9 bg-white border border-gray-200 rounded-lg text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-400/50 focus:border-green-400/50 transition-all duration-300 font-medium text-sm"
                               placeholder="Enter email OTP"
                               value={otpData.email_otp}
-                              onChange={(e) => setOtpData({ ...otpData, email_otp: e.target.value })}
+                              onChange={(e) => {
+                                const value = e.target.value.replace(/\D/g, '').slice(0, 6);
+                                setOtpData({ ...otpData, email_otp: value });
+                              }}
                             />
                             <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-green-500">
                               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -725,6 +812,16 @@ export default function UserRegister() {
                             <p className="text-xs text-red-600 mt-1 px-3">
                               Resend OTP in: {Math.floor(emailCountdown / 60)}:{(emailCountdown % 60).toString().padStart(2, '0')}
                             </p>
+                          )}
+                          {showIndividualResend && (
+                            <button
+                              type="button"
+                              onClick={handleResendEmailOTP}
+                              disabled={loading}
+                              className="w-full mt-2 bg-linear-to-r from-green-500 to-green-600 text-white font-semibold py-3 px-3 rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none border border-blue-400/30 text-xs"
+                            >
+                              Resend Email OTP
+                            </button>
                           )}
                         </div>
 
@@ -738,10 +835,14 @@ export default function UserRegister() {
                               name="phone_otp"
                               type="text"
                               required
+                              maxLength={6}
                               className="w-full px-4 py-2.5 pl-9 bg-white border border-gray-200 rounded-lg text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-400/50 focus:border-green-400/50 transition-all duration-300 font-medium text-sm"
                               placeholder="Enter phone OTP"
                               value={otpData.phone_otp}
-                              onChange={(e) => setOtpData({ ...otpData, phone_otp: e.target.value })}
+                              onChange={(e) => {
+                                const value = e.target.value.replace(/\D/g, '').slice(0, 6);
+                                setOtpData({ ...otpData, phone_otp: value });
+                              }}
                             />
                             <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-green-500">
                               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -753,6 +854,16 @@ export default function UserRegister() {
                             <p className="text-xs text-red-600 mt-1 px-3">
                               Resend OTP in: {Math.floor(phoneCountdown / 60)}:{(phoneCountdown % 60).toString().padStart(2, '0')}
                             </p>
+                          )}
+                          {showIndividualResend && (
+                            <button
+                              type="button"
+                              onClick={handleResendPhoneOTP}
+                              disabled={loading}
+                              className="w-full mt-2 bg-linear-to-r from-green-500 to-green-600 text-white font-semibold py-3 px-3 rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none border border-blue-400/30 text-xs"
+                            >
+                              Resend Phone OTP
+                            </button>
                           )}
                         </div>
                       </div>
@@ -770,7 +881,7 @@ export default function UserRegister() {
                     )}
 
                     <div className="space-y-3">
-                      {emailCountdown > 0 || phoneCountdown > 0 ? (
+                      {!showIndividualResend && (
                         <button
                           type="submit"
                           disabled={loading || !otpData.email_otp || !otpData.phone_otp}
@@ -795,32 +906,6 @@ export default function UserRegister() {
                             )}
                           </span>
                         </button>
-                      ) : (
-                        <button
-                          type="button"
-                          onClick={handleResendOTP}
-                          disabled={loading}
-                          className="w-full bg-linear-to-r from-green-500 to-green-600 text-white font-semibold py-2.5 px-4 rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none border border-blue-400/30 text-sm"
-                        >
-                          <span className="flex items-center justify-center">
-                            {loading ? (
-                              <>
-                                <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                </svg>
-                                Resending...
-                              </>
-                            ) : (
-                              <>
-                                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                                </svg>
-                                Resend OTP
-                              </>
-                            )}
-                          </span>
-                        </button>
                       )}
                     </div>
                   </form>
@@ -835,6 +920,8 @@ export default function UserRegister() {
                         setOtpData({ email_otp: '', phone_otp: '' });
                         setEmailCountdown(0);
                         setPhoneCountdown(0);
+                        setInitialTimeout(0);
+                        setShowIndividualResend(false);
                       }}
                       className="text-green-600 hover:text-green-700 text-sm font-medium transition-colors duration-300"
                     >
