@@ -88,6 +88,7 @@ export default function UserDashboard() {
   const [detailsModal, setDetailsModal] = useState<{ isOpen: boolean, futsal: Futsal | null }>({ isOpen: false, futsal: null });
   const [confirmModal, setConfirmModal] = useState<{ isOpen: boolean, message: string, onConfirm: () => void }>({ isOpen: false, message: '', onConfirm: () => { } });
   const [successModal, setSuccessModal] = useState<{ isOpen: boolean, message: string }>({ isOpen: false, message: '' });
+  const [priceNotification, setPriceNotification] = useState<{ isOpen: boolean, message: string } | null>(null);
   const [deletedBookings, setDeletedBookings] = useState<number[]>([]);
   const [cancelledBookings, setCancelledBookings] = useState<any[]>([]);
   const [selectedBookings, setSelectedBookings] = useState<number[]>([]);
@@ -1930,6 +1931,7 @@ function RatingModal({ futsal, onClose, onRatingSubmitted, showNotification, set
           </div>
         </div>
       </div>
+
     </div>
   );
 }
@@ -2077,6 +2079,9 @@ function BookingModal({ futsal, user, onClose, onSuccess, setSuccessModal, setCo
   const [teamName, setTeamName] = useState('');
   const [esewaPhone, setEsewaPhone] = useState(user?.phone || '');
   const [loading, setLoading] = useState(false);
+  const [currentPrice, setCurrentPrice] = useState<{ normalPrice: number, specialPrice?: { price: number, message?: string }, effectivePrice: number } | null>(null);
+  const [priceNotification, setPriceNotification] = useState<{ isOpen: boolean, message: string } | null>(null);
+  const [specialPrices, setSpecialPrices] = useState<any[]>([]);
   const phone = user?.phone || '';
 
   // Load booking progress from sessionStorage on mount
@@ -2146,6 +2151,33 @@ function BookingModal({ futsal, user, onClose, onSuccess, setSuccessModal, setCo
       }
     })();
   }, [futsal, selectedDate, selectedShift, step]);
+
+  // Fetch price when date changes
+  useEffect(() => {
+    const fetchPrice = async () => {
+      if (futsal.futsal_id && selectedDate) {
+        try {
+          const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/special-prices/price/${futsal.futsal_id}/${selectedDate}`);
+          if (response.ok) {
+            const priceData = await response.json();
+            setCurrentPrice(priceData);
+
+            // Show notification if special price
+            if (priceData.specialPrice) {
+              const message = `Normal: Rs. ${priceData.normalPrice} → ${priceData.specialPrice.message || 'Special Price'}: Rs. ${priceData.specialPrice.price}`;
+              setPriceNotification({ isOpen: true, message });
+            } else {
+              setPriceNotification(null);
+            }
+          }
+        } catch (error) {
+          console.error('Error fetching price:', error);
+        }
+      }
+    };
+
+    fetchPrice();
+  }, [futsal.futsal_id, selectedDate]);
 
   // Check slot status before allowing selection
   const checkSlotStatus = async (slotId: number): Promise<string> => {
@@ -2552,6 +2584,19 @@ function BookingModal({ futsal, user, onClose, onSuccess, setSuccessModal, setCo
                           </svg>
                         </div>
                       </div>
+                      {currentPrice && (
+                        <div className="mt-3 p-3 bg-green-50 border border-green-200 rounded-lg">
+                          <p className="text-sm text-green-800 font-medium">
+                            {currentPrice.specialPrice ? (
+                              <>
+                                Normal: Rs. {currentPrice.normalPrice} → {currentPrice.specialPrice.message || 'Special'}: Rs. {currentPrice.effectivePrice}
+                              </>
+                            ) : (
+                              <>Price: Rs. {currentPrice.effectivePrice}/hour</>
+                            )}
+                          </p>
+                        </div>
+                      )}
                     </div>
 
                     {/* Action Buttons */}
