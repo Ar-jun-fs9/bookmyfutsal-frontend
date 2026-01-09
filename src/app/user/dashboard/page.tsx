@@ -12,6 +12,7 @@ import { filterReducer, initialFilterState } from '@/reducers/filterReducer';
 import { formatTime, formatBookingTimeRange, categorizeBooking, formatDate } from '@/utils/helpers';
 import { Notification } from '@/components/ui/Notification';
 import { useSpecialPrices } from '@/hooks/useSpecialPrices';
+import PriceNotificationModal from '@/components/modals/PriceNotificationModal';
 
 interface User {
   user_id: number;
@@ -43,21 +44,22 @@ interface Futsal {
 }
 
 interface Booking {
-  booking_id: number;
-  futsal_name: string;
-  location: string;
-  city: string;
-  booking_date: string;
-  time_slot: string;
-  number_of_players: number;
-  team_name?: string;
-  amount_paid: number;
-  payment_status: string;
-  formatted_date?: string;
-  update_count?: number;
-  created_at: string;
-  cancelled_by?: string;
-  cancelled_at?: string;
+   booking_id: number;
+   futsal_name: string;
+   location: string;
+   city: string;
+   booking_date: string;
+   time_slot: string;
+   number_of_players: number;
+   team_name?: string;
+   amount_paid: number;
+   total_amount: number;
+   payment_status: string;
+   formatted_date?: string;
+   update_count?: number;
+   created_at: string;
+   cancelled_by?: string;
+   cancelled_at?: string;
 }
 
 export default function UserDashboard() {
@@ -962,7 +964,7 @@ export default function UserDashboard() {
                       )}
                     </div>
                   </div>
-
+                  {/* Booking List */}
                   <div className="space-y-4">
                     {processedBookings
                       .filter((booking) => !deletedBookings.includes(booking.booking_id))
@@ -1005,7 +1007,8 @@ export default function UserDashboard() {
                                 })()}</p>
                                 <p><strong>Players:</strong> {booking.number_of_players}</p>
                                 {booking.team_name && <p><strong>Team:</strong> {booking.team_name}</p>}
-                                <p><strong>Status:</strong> {booking.payment_status}</p>
+                                <p><strong>Paid Amount:</strong> Rs. {booking.amount_paid}</p>
+                                <p><strong>Total Amount:</strong> Rs. {booking.total_amount}</p>
                                 {booking.cancelled_by && booking.cancelled_at && <p><strong>Cancelled on:</strong> {new Date(booking.cancelled_at).toLocaleDateString('en-CA')}, {new Date(booking.cancelled_at).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })}</p>}
                               </div>
                               <div className="flex flex-col items-end space-y-2">
@@ -1090,7 +1093,7 @@ export default function UserDashboard() {
               <BookingModal futsal={selectedFutsal} user={user} onClose={() => setSelectedFutsal(null)} onSuccess={() => {
                 setSelectedFutsal(null);
                 setShowBooking(false);
-              }} setSuccessModal={setSuccessModal} setConfirmModal={setConfirmModal} showNotification={showNotification} />
+              }} setSuccessModal={setSuccessModal} setConfirmModal={setConfirmModal} setPriceNotification={setPriceNotification} showNotification={showNotification} />
             )}
 
             {/* Update Booking Modal */}
@@ -1198,6 +1201,11 @@ export default function UserDashboard() {
 
       {/* Notification Component */}
       <Notification />
+
+      <PriceNotificationModal
+        priceNotification={priceNotification}
+        setPriceNotification={setPriceNotification}
+      />
     </div>
   );
 }
@@ -2068,7 +2076,8 @@ function EditUserForm({ user, onUpdate, onCancel, showNotification }: { user: Us
 }
 
 
-function BookingModal({ futsal, user, onClose, onSuccess, setSuccessModal, setConfirmModal, showNotification }: { futsal: Futsal, user: User | null, onClose: () => void, onSuccess: () => void, setSuccessModal: (modal: { isOpen: boolean, message: string }) => void, setConfirmModal: (modal: { isOpen: boolean, message: string, onConfirm: () => void }) => void, showNotification: (notification: { message: string, type: 'success' | 'info' }) => void }) {
+function BookingModal({ futsal, user, onClose, onSuccess, setSuccessModal, setConfirmModal, setPriceNotification, showNotification }: { futsal: Futsal, user: User | null, onClose: () => void, onSuccess: () => void, setSuccessModal: (modal: { isOpen: boolean, message: string }) => void, setConfirmModal: (modal: { isOpen: boolean, message: string, onConfirm: () => void }) => void, setPriceNotification: (notification: { isOpen: boolean, message: string } | null) => void, showNotification: (notification: { message: string, type: 'success' | 'info' }) => void }) {
+  const [priceNotification, setPriceNotificationLocal] = useState<{ isOpen: boolean, message: string } | null>(null);
   const [step, setStep] = useState(1);
   const [selectedDate, setSelectedDate] = useState('');
   const [selectedShift, setSelectedShift] = useState('');
@@ -2080,9 +2089,10 @@ function BookingModal({ futsal, user, onClose, onSuccess, setSuccessModal, setCo
   const [esewaPhone, setEsewaPhone] = useState(user?.phone || '');
   const [loading, setLoading] = useState(false);
   const [currentPrice, setCurrentPrice] = useState<{ normalPrice: number, specialPrice?: { price: number, message?: string }, effectivePrice: number } | null>(null);
-  const [priceNotification, setPriceNotification] = useState<{ isOpen: boolean, message: string } | null>(null);
   const [specialPrices, setSpecialPrices] = useState<any[]>([]);
   const phone = user?.phone || '';
+
+  // Remove local priceNotification state since it's now in main component
 
   // Load booking progress from sessionStorage on mount
   useEffect(() => {
