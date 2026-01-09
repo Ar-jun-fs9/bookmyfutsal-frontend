@@ -12,10 +12,28 @@ export default function BookingTracker() {
   const { showNotification } = useNotificationStore();
   const [confirmModal, setConfirmModal] = useState<{isOpen: boolean, message: string, onConfirm: () => void} | null>(null);
   const [isExpired, setIsExpired] = useState(false);
+  const [totalAmount, setTotalAmount] = useState<number | null>(null);
 
   useEffect(() => {
     setIsExpired(false);
   }, [trackingCode]);
+
+  useEffect(() => {
+    if (trackedBooking) {
+      const fetchPrice = async () => {
+        try {
+          const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/special-prices/price/${trackedBooking.futsal_id}/${trackedBooking.booking_date}`);
+          if (response.ok) {
+            const data = await response.json();
+            setTotalAmount(data.effectivePrice);
+          }
+        } catch (error) {
+          console.error('Error fetching price:', error);
+        }
+      };
+      fetchPrice();
+    }
+  }, [trackedBooking]);
 
   useEffect(() => {
     if (hasSearched && trackedBooking) {
@@ -329,6 +347,7 @@ export default function BookingTracker() {
               <p><strong>Players:</strong> {trackedBooking.number_of_players}</p>
               {trackedBooking.team_name && <p><strong>Team:</strong> {trackedBooking.team_name}</p>}
               <p><strong>Amount Paid:</strong> Rs. {trackedBooking.amount_paid}</p>
+              {totalAmount !== null && <p><strong>Total Amount:</strong> Rs. {totalAmount}</p>}
               <p><strong>Tracking Code:</strong> {trackedBooking.tracking_code}</p>
               <p><strong>Booked By:</strong> {trackedBooking.guest_name}</p>
               <p><strong>Phone:</strong> {trackedBooking.guest_phone}</p>

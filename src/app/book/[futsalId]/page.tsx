@@ -68,12 +68,12 @@ interface Slot {
 // Time formatting functions are now imported from helpers.ts
 
 export default function BookFutsal() {
-    const params = useParams();
-    const futsalId = params?.futsalId ? parseInt(params.futsalId as string, 10) : undefined;
-    const router = useRouter();
+  const params = useParams();
+  const futsalId = params?.futsalId ? parseInt(params.futsalId as string, 10) : undefined;
+  const router = useRouter();
 
-    // Create futsal-specific localStorage key to prevent state leakage between different futsals
-    const storageKey = futsalId ? `bookingProgress_${futsalId}` : 'bookingProgress';
+  // Create futsal-specific localStorage key to prevent state leakage between different futsals
+  const storageKey = futsalId ? `bookingProgress_${futsalId}` : 'bookingProgress';
 
   // Server state with React Query
   const { data: futsal, isLoading: futsalLoading } = useFutsal(Number(params.futsalId));
@@ -87,8 +87,9 @@ export default function BookFutsal() {
   // Simple UI state
   const summaryRef = useRef<HTMLDivElement>(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [currentPrice, setCurrentPrice] = useState<{normalPrice: number, specialPrice?: {price: number, message?: string}, effectivePrice: number} | null>(null);
-  const [priceNotification, setPriceNotification] = useState<{isOpen: boolean, message: string} | null>(null);
+  const [currentPrice, setCurrentPrice] = useState<{ normalPrice: number, specialPrice?: { price: number, message?: string }, effectivePrice: number } | null>(null);
+  const [priceNotification, setPriceNotification] = useState<{ isOpen: boolean, message: string } | null>(null);
+  const [specialPrices, setSpecialPrices] = useState<any[]>([]);
 
   // Derived state
   const availableShifts = bookingState.availableShifts;
@@ -350,7 +351,7 @@ export default function BookFutsal() {
   const [otpCountdown, setOtpCountdown] = useState(0);
   const [showOtpNote, setShowOtpNote] = useState(false);
   const [esewaPhone, setEsewaPhone] = useState('');
-  const [confirmModal, setConfirmModal] = useState<{isOpen: boolean, message: string, onConfirm: () => void} | null>(null);
+  const [confirmModal, setConfirmModal] = useState<{ isOpen: boolean, message: string, onConfirm: () => void } | null>(null);
 
   // Load booking progress from localStorage on mount
   useEffect(() => {
@@ -436,6 +437,24 @@ export default function BookFutsal() {
       refetchTimeSlots();
     }
   }, [futsalId, bookingState.selectedDate, bookingState.selectedShift, refetchTimeSlots]);
+
+  // Fetch special prices when in summary step
+  useEffect(() => {
+    if (bookingState.step === 7 && futsalId) {
+      const fetchSpecialPrices = async () => {
+        try {
+          const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/special-prices/${futsalId}`);
+          if (response.ok) {
+            const data = await response.json();
+            setSpecialPrices(data.specialPrices || []);
+          }
+        } catch (error) {
+          console.error('Error fetching special prices:', error);
+        }
+      };
+      fetchSpecialPrices();
+    }
+  }, [bookingState.step, futsalId]);
 
   // Set available slots when data is fetched
   useEffect(() => {
@@ -823,9 +842,8 @@ export default function BookFutsal() {
           {/* Desktop: Horizontal */}
           <div className="hidden sm:flex sm:flex-row items-center space-x-4">
             <div className="flex items-center">
-              <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold text-sm shadow-lg ${
-                bookingState.step >= 1 ? 'bg-linear-to-r from-green-500 to-green-600' : 'bg-gray-300'
-              }`}>
+              <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold text-sm shadow-lg ${bookingState.step >= 1 ? 'bg-linear-to-r from-green-500 to-green-600' : 'bg-gray-300'
+                }`}>
                 {bookingState.step > 1 ? (
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
@@ -838,9 +856,8 @@ export default function BookFutsal() {
             </div>
             <div className={`w-8 h-0.5 ${bookingState.step > 1 ? 'bg-linear-to-r from-green-500 to-green-600' : 'bg-gray-300'}`}></div>
             <div className="flex items-center">
-              <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold text-sm shadow-lg ${
-                bookingState.step >= 2 ? 'bg-linear-to-r from-green-500 to-green-600' : 'bg-gray-300'
-              }`}>
+              <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold text-sm shadow-lg ${bookingState.step >= 2 ? 'bg-linear-to-r from-green-500 to-green-600' : 'bg-gray-300'
+                }`}>
                 {bookingState.step > 2 ? (
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
@@ -855,9 +872,8 @@ export default function BookFutsal() {
             </div>
             <div className={`w-8 h-0.5 ${bookingState.step > 2 ? 'bg-linear-to-r from-green-500 to-green-600' : 'bg-gray-300'}`}></div>
             <div className="flex items-center">
-              <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold text-sm shadow-lg ${
-                bookingState.step >= 3 ? 'bg-linear-to-r from-green-500 to-green-600' : 'bg-gray-300'
-              }`}>
+              <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold text-sm shadow-lg ${bookingState.step >= 3 ? 'bg-linear-to-r from-green-500 to-green-600' : 'bg-gray-300'
+                }`}>
                 {bookingState.step > 3 ? (
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
@@ -872,9 +888,8 @@ export default function BookFutsal() {
             </div>
             <div className={`w-8 h-0.5 ${bookingState.step > 3 ? 'bg-linear-to-r from-green-500 to-green-600' : 'bg-gray-300'}`}></div>
             <div className="flex items-center">
-              <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold text-sm shadow-lg ${
-                bookingState.step >= 4 ? 'bg-linear-to-r from-green-500 to-green-600' : 'bg-gray-300'
-              }`}>
+              <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold text-sm shadow-lg ${bookingState.step >= 4 ? 'bg-linear-to-r from-green-500 to-green-600' : 'bg-gray-300'
+                }`}>
                 {bookingState.step > 4 ? (
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
@@ -889,9 +904,8 @@ export default function BookFutsal() {
             </div>
             <div className={`w-8 h-0.5 ${bookingState.step > 4 ? 'bg-linear-to-r from-green-500 to-green-600' : 'bg-gray-300'}`}></div>
             <div className="flex items-center">
-              <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold text-sm shadow-lg ${
-                bookingState.step >= 5 ? 'bg-linear-to-r from-green-500 to-green-600' : 'bg-gray-300'
-              }`}>
+              <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold text-sm shadow-lg ${bookingState.step >= 5 ? 'bg-linear-to-r from-green-500 to-green-600' : 'bg-gray-300'
+                }`}>
                 {bookingState.step > 5 ? (
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
@@ -906,9 +920,8 @@ export default function BookFutsal() {
             </div>
             <div className={`w-8 h-0.5 ${bookingState.step > 4 ? 'bg-linear-to-r from-green-500 to-green-600' : 'bg-gray-300'}`}></div>
             <div className="flex items-center">
-              <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold text-sm shadow-lg ${
-                bookingState.step >= 6 ? 'bg-linear-to-r from-green-500 to-green-600' : 'bg-gray-300'
-              }`}>
+              <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold text-sm shadow-lg ${bookingState.step >= 6 ? 'bg-linear-to-r from-green-500 to-green-600' : 'bg-gray-300'
+                }`}>
                 {bookingState.step > 6 ? (
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
@@ -923,9 +936,8 @@ export default function BookFutsal() {
             </div>
             <div className={`w-8 h-0.5 ${bookingState.step > 6 ? 'bg-linear-to-r from-green-500 to-green-600' : 'bg-gray-300'}`}></div>
             <div className="flex items-center">
-              <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold text-sm shadow-lg ${
-                bookingState.step >= 7 ? 'bg-linear-to-r from-green-500 to-green-600' : 'bg-gray-300'
-              }`}>
+              <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold text-sm shadow-lg ${bookingState.step >= 7 ? 'bg-linear-to-r from-green-500 to-green-600' : 'bg-gray-300'
+                }`}>
                 {bookingState.step > 7 ? (
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
@@ -956,7 +968,7 @@ export default function BookFutsal() {
                         isOpen: true,
                         message: 'Are you sure you want to cancel this booking?',
                         onConfirm: () => {
-                          setConfirmModal({ isOpen: false, message: '', onConfirm: () => {} });
+                          setConfirmModal({ isOpen: false, message: '', onConfirm: () => { } });
                           localStorage.removeItem(storageKey);
                           router.push("/");
                         }
@@ -991,7 +1003,7 @@ export default function BookFutsal() {
                   {/* Date Input */}
                   <div className="space-y-7">
                     <div className="relative">
-                      <label htmlFor="bookingDate"  className="block text-sm font-semibold text-gray-700 mb-2">
+                      <label htmlFor="bookingDate" className="block text-sm font-semibold text-gray-700 mb-2">
                         📅 Booking Date
                       </label>
                       <div className="relative">
@@ -1059,7 +1071,7 @@ export default function BookFutsal() {
                     </div>
                   </div>
 
-                  
+
                 </div>
               </div>
             </div>
@@ -1077,7 +1089,7 @@ export default function BookFutsal() {
                         isOpen: true,
                         message: 'Are you sure you want to cancel this booking?',
                         onConfirm: () => {
-                          setConfirmModal({ isOpen: false, message: '', onConfirm: () => {} });
+                          setConfirmModal({ isOpen: false, message: '', onConfirm: () => { } });
                           localStorage.removeItem(storageKey);
                           router.push("/");
                         }
@@ -1131,11 +1143,10 @@ export default function BookFutsal() {
                             const newShift = bookingState.selectedShift === shift ? '' : shift;
                             dispatch({ type: 'SET_SELECTED_SHIFT', payload: newShift });
                           }}
-                          className={`relative p-6 border-2 rounded-xl transition-all duration-300 transform hover:scale-105 ${
-                            bookingState.selectedShift === shift
+                          className={`relative p-6 border-2 rounded-xl transition-all duration-300 transform hover:scale-105 ${bookingState.selectedShift === shift
                               ? "bg-linear-to-br from-green-500 to-green-600 border-green-500 text-white shadow-lg"
                               : "bg-white border-gray-200 hover:border-green-300 hover:shadow-md"
-                          }`}
+                            }`}
                         >
                           {bookingState.selectedShift === shift && (
                             <div className="absolute top-2 right-2 w-6 h-6 bg-white rounded-full flex items-center justify-center">
@@ -1191,7 +1202,7 @@ export default function BookFutsal() {
                     </div>
                   </div>
 
-                
+
                 </div>
               </div>
             </div>
@@ -1209,7 +1220,7 @@ export default function BookFutsal() {
                         isOpen: true,
                         message: 'Are you sure you want to cancel this booking?',
                         onConfirm: () => {
-                          setConfirmModal({ isOpen: false, message: '', onConfirm: () => {} });
+                          setConfirmModal({ isOpen: false, message: '', onConfirm: () => { } });
                           // Release selected slots
                           bookingState.selectedSlotIds.forEach(id => releaseSlotReservation(id));
                           dispatch({ type: 'CLEAR_SELECTED_SLOTS' });
@@ -1285,22 +1296,21 @@ export default function BookFutsal() {
                             onClick={() => handleSlotClick(slot)}
                             disabled={
                               (slot.display_status === "booked" ||
-                              slot.display_status === "expired" ||
-                              slot.status === "disabled") && !bookingState.selectedSlotIds.includes(slot.slot_id)
+                                slot.display_status === "expired" ||
+                                slot.status === "disabled") && !bookingState.selectedSlotIds.includes(slot.slot_id)
                             }
-                            className={`relative p-4 border-2 rounded-xl text-center transition-all duration-300 transform hover:scale-105 ${
-                              bookingState.selectedSlotIds.includes(slot.slot_id)
+                            className={`relative p-4 border-2 rounded-xl text-center transition-all duration-300 transform hover:scale-105 ${bookingState.selectedSlotIds.includes(slot.slot_id)
                                 ? "bg-linear-to-br from-green-500 to-green-600 border-green-500 text-white shadow-lg"
                                 : slot.display_status === "booked"
-                                ? "bg-red-50 border-red-300 cursor-not-allowed opacity-60"
-                                : slot.display_status === "expired"
-                                ? "bg-yellow-50 border-yellow-300 cursor-not-allowed opacity-60"
-                                : slot.status === "disabled"
-                                ? "bg-gray-50 border-gray-300 cursor-not-allowed opacity-60"
-                                : slot.status === "pending"
-                                ? "bg-orange-50 border-orange-300 hover:border-green-300 hover:shadow-md"
-                                : "bg-white border-gray-200 hover:border-green-300 hover:shadow-md"
-                            }`}
+                                  ? "bg-red-50 border-red-300 cursor-not-allowed opacity-60"
+                                  : slot.display_status === "expired"
+                                    ? "bg-yellow-50 border-yellow-300 cursor-not-allowed opacity-60"
+                                    : slot.status === "disabled"
+                                      ? "bg-gray-50 border-gray-300 cursor-not-allowed opacity-60"
+                                      : slot.status === "pending"
+                                        ? "bg-orange-50 border-orange-300 hover:border-green-300 hover:shadow-md"
+                                        : "bg-white border-gray-200 hover:border-green-300 hover:shadow-md"
+                              }`}
                           >
                             {bookingState.selectedSlotIds.includes(slot.slot_id) && (
                               <div className="absolute top-1 right-2 w-4 h-4 bg-white rounded-lg flex items-center justify-center shadow-sm">
@@ -1309,14 +1319,13 @@ export default function BookFutsal() {
                                 </svg>
                               </div>
                             )}
-                            <div className={`font-bold text-sm mb-1 ${
-                              bookingState.selectedSlotIds.includes(slot.slot_id) ? 'text-white' :
-                              slot.display_status === "booked" ? 'text-red-600' :
-                                slot.display_status === "expired" ? 'text-yellow-600' :
-                                  slot.status === "disabled" ? 'text-gray-600' :
-                                    slot.status === "pending" ? 'text-orange-400' :
-                                      'text-gray-800'
-                            }`}>
+                            <div className={`font-bold text-sm mb-1 ${bookingState.selectedSlotIds.includes(slot.slot_id) ? 'text-white' :
+                                slot.display_status === "booked" ? 'text-red-600' :
+                                  slot.display_status === "expired" ? 'text-yellow-600' :
+                                    slot.status === "disabled" ? 'text-gray-600' :
+                                      slot.status === "pending" ? 'text-orange-400' :
+                                        'text-gray-800'
+                              }`}>
                               {(() => {
                                 const startHour = parseInt(slot.start_time.split(':')[0]);
                                 const endHour = parseInt(slot.end_time.split(':')[0]);
@@ -1327,25 +1336,24 @@ export default function BookFutsal() {
                                 return `${startDisplay}${startPeriod}-${endDisplay}${endPeriod}`;
                               })()}
                             </div>
-                            <div className={`text-sm ${
-                              bookingState.selectedSlotIds.includes(slot.slot_id) ? 'text-white' :
-                              slot.display_status === "booked" ? 'text-red-500' :
-                                slot.display_status === "expired" ? 'text-yellow-500' :
-                                  slot.status === "disabled" ? 'text-gray-500' :
-                                    slot.status === "pending" ? 'text-orange-600' :
-                                      'text-gray-600'
-                            }`}>
+                            <div className={`text-sm ${bookingState.selectedSlotIds.includes(slot.slot_id) ? 'text-white' :
+                                slot.display_status === "booked" ? 'text-red-500' :
+                                  slot.display_status === "expired" ? 'text-yellow-500' :
+                                    slot.status === "disabled" ? 'text-gray-500' :
+                                      slot.status === "pending" ? 'text-orange-600' :
+                                        'text-gray-600'
+                              }`}>
                               {bookingState.selectedSlotIds.includes(slot.slot_id)
                                 ? "✅ Selected"
                                 : slot.display_status === "booked"
-                                ? `👤 Booked`
-                                : slot.display_status === "expired"
-                                ? "⏰ Expired"
-                                : slot.status === "disabled"
-                                ? "🚫 Disabled"
-                                : slot.status === "pending"
-                                ? "⏳ In Process"
-                                : "✅ Available"}
+                                  ? `👤 Booked`
+                                  : slot.display_status === "expired"
+                                    ? "⏰ Expired"
+                                    : slot.status === "disabled"
+                                      ? "🚫 Disabled"
+                                      : slot.status === "pending"
+                                        ? "⏳ In Process"
+                                        : "✅ Available"}
                             </div>
                           </button>
                         ))}
@@ -1511,7 +1519,7 @@ export default function BookFutsal() {
                             </div>
                           </div>
                         </div>
-
+                        
                         {/* Action Buttons */}
                         <div className="flex flex-col sm:flex-row gap-4 pt-6">
                           <button
@@ -1565,7 +1573,7 @@ export default function BookFutsal() {
                     </div>
                   )}
 
-                 
+
                 </div>
               </div>
             </div>
@@ -1584,7 +1592,7 @@ export default function BookFutsal() {
                         isOpen: true,
                         message: 'Are you sure you want to cancel this booking?',
                         onConfirm: () => {
-                          setConfirmModal({ isOpen: false, message: '', onConfirm: () => {} });
+                          setConfirmModal({ isOpen: false, message: '', onConfirm: () => { } });
                           localStorage.removeItem(storageKey);
                           router.push("/");
                         }
@@ -1732,7 +1740,7 @@ export default function BookFutsal() {
                         isOpen: true,
                         message: 'Are you sure you want to cancel this booking?',
                         onConfirm: () => {
-                          setConfirmModal({ isOpen: false, message: '', onConfirm: () => {} });
+                          setConfirmModal({ isOpen: false, message: '', onConfirm: () => { } });
                           // Release selected slots
                           bookingState.selectedSlotIds.forEach(id => releaseSlotReservation(id));
                           dispatch({ type: 'CLEAR_SELECTED_SLOTS' });
@@ -1961,260 +1969,266 @@ export default function BookFutsal() {
           )}
 
           {/* Step 7: Summary */}
-          {bookingState.step === 7 && bookingState.booking && (
-            <div className="max-w-4xl mx-auto">
-              <div
-                ref={summaryRef}
-                className="relative bg-linear-to-br from-green-50 via-white to-blue-50 rounded-3xl shadow-2xl overflow-hidden border border-green-200/50 w-full"
-              >
-                {/* Background Pattern */}
-                <div className="absolute inset-0 opacity-5">
-                  <div className="absolute top-0 left-0 w-32 h-32 bg-green-400 rounded-lg -translate-x-16 -translate-y-16"></div>
-                  <div className="absolute top-0 right-0 w-24 h-24 bg-blue-400 rounded-lg translate-x-12 -translate-y-12"></div>
-                  <div className="absolute bottom-0 left-1/4 w-20 h-20 bg-green-300 rounded-lg"></div>
-                  <div className="absolute bottom-0 right-1/3 w-16 h-16 bg-blue-300 rounded-lg"></div>
-                </div>
+          {bookingState.step === 7 && bookingState.booking && (() => {
+            const bookingDate = bookingState.booking.booking_date;
+            const specialPriceForDate = specialPrices.find(sp => sp.special_date === bookingDate);
+            const rateToShow = specialPriceForDate ? specialPriceForDate.special_price : futsal.price_per_hour;
 
-                {/* Header Section */}
-                <div className="relative bg-linear-to-r from-green-600 via-green-700 to-blue-700 p-6 md:p-8 text-white">
-                  <div className="flex flex-col md:flex-row items-center justify-between">
-                    <div className="flex items-center space-x-4 mb-4 md:mb-0">
-                      <div className="relative">
-                        <img
-                          src="/logo/logo.png"
-                          alt="BookMyFutsal Logo"
-                          className="w-16 h-16 md:w-20 md:h-20 rounded-lg shadow-lg ring-4 ring-white/20"
-                        />
-                        <div className="absolute -top-1 -right-1 w-6 h-6 bg-green-400 rounded-lg animate-pulse"></div>
-                      </div>
-                      <div>
-                        <h1 className="text-2xl md:text-3xl font-bold">BookMyFutsal</h1>
-                        <p className="text-green-100 text-sm md:text-base">Premium Futsal Booking</p>
-                      </div>
-                    </div>
-                    <div className="text-center md:text-right">
-                      <div className="text-3xl md:text-4xl font-bold">🎉</div>
-                      <p className="text-green-100 font-medium">Booking Confirmed!</p>
-                    </div>
+            return (
+              <div className="max-w-4xl mx-auto">
+                <div
+                  ref={summaryRef}
+                  className="relative bg-linear-to-br from-green-50 via-white to-blue-50 rounded-3xl shadow-2xl overflow-hidden border border-green-200/50 w-full"
+                >
+                  {/* Background Pattern */}
+                  <div className="absolute inset-0 opacity-5">
+                    <div className="absolute top-0 left-0 w-32 h-32 bg-green-400 rounded-lg -translate-x-16 -translate-y-16"></div>
+                    <div className="absolute top-0 right-0 w-24 h-24 bg-blue-400 rounded-lg translate-x-12 -translate-y-12"></div>
+                    <div className="absolute bottom-0 left-1/4 w-20 h-20 bg-green-300 rounded-lg"></div>
+                    <div className="absolute bottom-0 right-1/3 w-16 h-16 bg-blue-300 rounded-lg"></div>
                   </div>
-                </div>
 
-                {/* Main Content */}
-                <div className="relative p-2 md:p-4">
-                  {/* Booking Details Grid */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-                    {/* Venue Details */}
-                    <div className="bg-white rounded-2xl p-6 shadow-lg border border-green-100">
-                      <div className="flex items-center mb-4">
-                        <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center mr-3">
-                          <span className="text-2xl">🏟️</span>
+                  {/* Header Section */}
+                  <div className="relative bg-linear-to-r from-green-600 via-green-700 to-blue-700 p-6 md:p-8 text-white">
+                    <div className="flex flex-col md:flex-row items-center justify-between">
+                      <div className="flex items-center space-x-4 mb-4 md:mb-0">
+                        <div className="relative">
+                          <img
+                            src="/logo/logo.png"
+                            alt="BookMyFutsal Logo"
+                            className="w-16 h-16 md:w-20 md:h-20 rounded-lg shadow-lg ring-4 ring-white/20"
+                          />
+                          <div className="absolute -top-1 -right-1 w-6 h-6 bg-green-400 rounded-lg animate-pulse"></div>
                         </div>
-                        <h3 className="text-lg font-bold text-gray-800">Venue Details</h3>
-                      </div>
-                      <div className="space-y-3">
-                        <div className="flex justify-between items-start">
-                          <span className="text-gray-600 font-medium">Futsal:</span>
-                          <span className="text-gray-800 font-semibold text-right ml-2">{bookingState.booking.futsal_name}</span>
-                        </div>
-                        <div className="flex justify-between items-start">
-                          <span className="text-gray-600 font-medium">Location:</span>
-                          <span className="text-gray-800 font-semibold text-right ml-2">{bookingState.booking.location}, {bookingState.booking.city}</span>
-                        </div>
-                        <div className="flex justify-between items-start">
-                          <span className="text-gray-600 font-medium">Contact:</span>
-                          <span className="text-gray-800 font-semibold text-right ml-2">{futsal?.admin_phone || "N/A"}</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Booking Details */}
-                    <div className="bg-white rounded-2xl p-6 shadow-lg border border-green-100">
-                      <div className="flex items-center mb-4">
-                        <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mr-3">
-                          <span className="text-2xl">📅</span>
-                        </div>
-                        <h3 className="text-lg font-bold text-gray-800">Booking Details</h3>
-                      </div>
-                      <div className="space-y-3">
-                        <div className="flex justify-between items-start">
-                          <span className="text-gray-600 font-medium">Playing Date:</span>
-                          <span className="text-gray-800 font-semibold text-right ml-2">{formatDate(bookingState.booking.booking_date)}</span>
-                        </div>
-                        <div className="flex justify-between items-start">
-                          <span className="text-gray-600 font-medium">Booked On:</span>
-                          <span className="text-gray-800 font-semibold text-right ml-2">{formatDate(bookingState.booking.created_at.split('T')[0])}</span>
-                        </div>
-                        <div className="flex justify-between items-start">
-                          <span className="text-gray-600 font-medium">Time:</span>
-                          <span className="text-gray-800 font-semibold text-right ml-2">{formatBookingTimeRange(bookingState.booking.time_slot)}</span>
-                        </div>
-                        <div className="flex justify-between items-start">
-                          <span className="text-gray-600 font-medium">Players:</span>
-                          <span className="text-gray-800 font-semibold text-right ml-2">{bookingState.booking.number_of_players}</span>
-                        </div>
-                        {booking.team_name && (
-                          <div className="flex justify-between items-start">
-                            <span className="text-gray-600 font-medium">Team:</span>
-                            <span className="text-gray-800 font-semibold text-right ml-2">{bookingState.booking.team_name}</span>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Payment Details */}
-                    <div className="bg-white rounded-2xl p-6 shadow-lg border border-green-100 md:col-span-1 lg:col-span-1">
-                      <div className="flex items-center mb-4">
-                        <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center mr-3">
-                          <span className="text-2xl">💰</span>
-                        </div>
-                        <h3 className="text-lg font-bold text-gray-800">Payment Details</h3>
-                      </div>
-                      <div className="space-y-3">
-                        <div className="flex justify-between items-start">
-                          <span className="text-gray-600 font-medium">Amount Paid:</span>
-                          <span className="text-green-600 font-bold text-lg text-right ml-2">Rs. {bookingState.booking.amount_paid}</span>
-                        </div>
-                        <div className="flex justify-between items-start">
-                          <span className="text-gray-600 font-medium">Rate/Hour:</span>
-                          <span className="text-gray-800 font-semibold text-right ml-2">Rs. {bookingState.booking.price_per_hour}</span>
-                        </div>
-                        <div className="flex justify-between items-start">
-                          <span className="text-gray-600 font-medium">Tracking Code:</span>
-                          <span className="text-gray-800 font-semibold text-right ml-2">{bookingState.booking.tracking_code}</span>
-                        </div>
-                        {!loggedInUser && (
-                          <>
-                            <div className="flex justify-between items-start">
-                              <span className="text-gray-600 font-medium">Booked By:</span>
-                              <span className="text-gray-800 font-semibold text-right ml-2">{bookingState.booking.guest_name}</span>
-                            </div>
-                            <div className="flex justify-between items-start">
-                              <span className="text-gray-600 font-medium">Phone:</span>
-                              <span className="text-gray-800 font-semibold text-right ml-2">{bookingState.booking.guest_phone}</span>
-                            </div>
-                          </>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-             
-                  {/* Important Information */}
-                  <div className="bg-linear-to-r from-yellow-50 to-orange-50 rounded-2xl p-6 mb-8 border border-yellow-200" >
-                    <h3 className="text-lg font-bold text-yellow-800 mb-4 flex items-center">
-                      <span className="text-2xl mr-2">📋</span>
-                      Important Information
-                    </h3>
-                    <div className="space-y-3 text-sm text-yellow-800">
-                      <div className="flex items-start">
-                        <span className="text-lg mr-3 mt-0.5">🕒</span>
                         <div>
-                          <strong>Reminder:</strong> Please arrive 15 minutes before your booking time.
-                          {!loggedInUser && booking.tracking_code && (
-                            <span> Use your tracking code to manage your booking.</span>
+                          <h1 className="text-2xl md:text-3xl font-bold">BookMyFutsal</h1>
+                          <p className="text-green-100 text-sm md:text-base">Premium Futsal Booking</p>
+                        </div>
+                      </div>
+                      <div className="text-center md:text-right">
+                        <div className="text-3xl md:text-4xl font-bold">🎉</div>
+                        <p className="text-green-100 font-medium">Booking Confirmed!</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Main Content */}
+                  <div className="relative p-2 md:p-4">
+                    {/* Booking Details Grid */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+                      {/* Venue Details */}
+                      <div className="bg-white rounded-2xl p-6 shadow-lg border border-green-100">
+                        <div className="flex items-center mb-4">
+                          <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center mr-3">
+                            <span className="text-2xl">🏟️</span>
+                          </div>
+                          <h3 className="text-lg font-bold text-gray-800">Venue Details</h3>
+                        </div>
+                        <div className="space-y-3">
+                          <div className="flex justify-between items-start">
+                            <span className="text-gray-600 font-medium">Futsal:</span>
+                            <span className="text-gray-800 font-semibold text-right ml-2">{bookingState.booking.futsal_name}</span>
+                          </div>
+                          <div className="flex justify-between items-start">
+                            <span className="text-gray-600 font-medium">Location:</span>
+                            <span className="text-gray-800 font-semibold text-right ml-2">{bookingState.booking.location}, {bookingState.booking.city}</span>
+                          </div>
+                          <div className="flex justify-between items-start">
+                            <span className="text-gray-600 font-medium">Contact:</span>
+                            <span className="text-gray-800 font-semibold text-right ml-2">{futsal?.admin_phone || "N/A"}</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Booking Details */}
+                      <div className="bg-white rounded-2xl p-6 shadow-lg border border-green-100">
+                        <div className="flex items-center mb-4">
+                          <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mr-3">
+                            <span className="text-2xl">📅</span>
+                          </div>
+                          <h3 className="text-lg font-bold text-gray-800">Booking Details</h3>
+                        </div>
+                        <div className="space-y-3">
+                          <div className="flex justify-between items-start">
+                            <span className="text-gray-600 font-medium">Playing Date:</span>
+                            <span className="text-gray-800 font-semibold text-right ml-2">{formatDate(bookingState.booking.booking_date)}</span>
+                          </div>
+                          <div className="flex justify-between items-start">
+                            <span className="text-gray-600 font-medium">Booked On:</span>
+                            <span className="text-gray-800 font-semibold text-right ml-2">{formatDate(bookingState.booking.created_at.split('T')[0])}</span>
+                          </div>
+                          <div className="flex justify-between items-start">
+                            <span className="text-gray-600 font-medium">Time:</span>
+                            <span className="text-gray-800 font-semibold text-right ml-2">{formatBookingTimeRange(bookingState.booking.time_slot)}</span>
+                          </div>
+                          <div className="flex justify-between items-start">
+                            <span className="text-gray-600 font-medium">Players:</span>
+                            <span className="text-gray-800 font-semibold text-right ml-2">{bookingState.booking.number_of_players}</span>
+                          </div>
+                          {booking.team_name && (
+                            <div className="flex justify-between items-start">
+                              <span className="text-gray-600 font-medium">Team:</span>
+                              <span className="text-gray-800 font-semibold text-right ml-2">{bookingState.booking.team_name}</span>
+                            </div>
                           )}
                         </div>
                       </div>
-                      <div className="flex items-start">
-                        <span className="text-lg mr-3 mt-0.5">⚠️</span>
-                        <div>
-                          <strong>Cancellation Policy:</strong> Non-refundable. Free cancellation allowed up to 2 hours before play.
+
+                      {/* Payment Details */}
+                      <div className="bg-white rounded-2xl p-6 shadow-lg border border-green-100 md:col-span-1 lg:col-span-1">
+                        <div className="flex items-center mb-4">
+                          <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center mr-3">
+                            <span className="text-2xl">💰</span>
+                          </div>
+                          <h3 className="text-lg font-bold text-gray-800">Payment Details</h3>
                         </div>
-                      </div>
-                      <div className="flex items-start">
-                        <span className="text-lg mr-3 mt-0.5">👤🔄</span>
-                        <div>
-                          <strong>Account Benefit:</strong> Create an account to reschedule bookings and make multiple bookings easily.
+                        <div className="space-y-3">
+                          <div className="flex justify-between items-start">
+                            <span className="text-gray-600 font-medium">Amount Paid:</span>
+                            <span className="text-green-600 font-bold text-lg text-right ml-2">Rs. {bookingState.booking.amount_paid}</span>
+                          </div>
+                          <div className="flex justify-between items-start">
+                            <span className="text-gray-600 font-medium">Rate/Hour:</span>
+                            <span className="text-gray-800 font-semibold text-right ml-2">Rs. {rateToShow}</span>
+                          </div>
+                          <div className="flex justify-between items-start">
+                            <span className="text-gray-600 font-medium">Tracking Code:</span>
+                            <span className="text-gray-800 font-semibold text-right ml-2">{bookingState.booking.tracking_code}</span>
+                          </div>
+                          {!loggedInUser && (
+                            <>
+                              <div className="flex justify-between items-start">
+                                <span className="text-gray-600 font-medium">Booked By:</span>
+                                <span className="text-gray-800 font-semibold text-right ml-2">{bookingState.booking.guest_name}</span>
+                              </div>
+                              <div className="flex justify-between items-start">
+                                <span className="text-gray-600 font-medium">Phone:</span>
+                                <span className="text-gray-800 font-semibold text-right ml-2">{bookingState.booking.guest_phone}</span>
+                              </div>
+                            </>
+                          )}
                         </div>
                       </div>
                     </div>
+
+                    {/* Important Information */}
+                    <div className="bg-linear-to-r from-yellow-50 to-orange-50 rounded-2xl p-6 mb-8 border border-yellow-200" >
+                      <h3 className="text-lg font-bold text-yellow-800 mb-4 flex items-center">
+                        <span className="text-2xl mr-2">📋</span>
+                        Important Information
+                      </h3>
+                      <div className="space-y-3 text-sm text-yellow-800">
+                        <div className="flex items-start">
+                          <span className="text-lg mr-3 mt-0.5">🕒</span>
+                          <div>
+                            <strong>Reminder:</strong> Please arrive 15 minutes before your booking time.
+                            {!loggedInUser && booking.tracking_code && (
+                              <span> Use your tracking code to manage your booking.</span>
+                            )}
+                          </div>
+                        </div>
+                        <div className="flex items-start">
+                          <span className="text-lg mr-3 mt-0.5">⚠️</span>
+                          <div>
+                            <strong>Cancellation Policy:</strong> Non-refundable. Free cancellation allowed up to 2 hours before play.
+                          </div>
+                        </div>
+                        <div className="flex items-start">
+                          <span className="text-lg mr-3 mt-0.5">👤🔄</span>
+                          <div>
+                            <strong>Account Benefit:</strong> Create an account to reschedule bookings and make multiple bookings easily.
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Thank You Message */}
+                    <div className="text-center bg-linear-to-r from-green-500 to-green-600 rounded-2xl p-6 text-white">
+                      <div className="text-4xl mb-4">😊</div>
+                      <h3 className="text-xl md:text-2xl font-bold mb-2">Thank You!</h3>
+                      <p className="text-green-100">
+                        Thank you for choosing <span className="font-bold text-white">{bookingState.booking.futsal_name}</span>!
+                        <br />
+                        We wish you an amazing futsal experience!
+                      </p>
+                    </div>
                   </div>
 
-                  {/* Thank You Message */}
-                  <div className="text-center bg-linear-to-r from-green-500 to-green-600 rounded-2xl p-6 text-white">
-                    <div className="text-4xl mb-4">😊</div>
-                    <h3 className="text-xl md:text-2xl font-bold mb-2">Thank You!</h3>
-                    <p className="text-green-100">
-                      Thank you for choosing <span className="font-bold text-white">{bookingState.booking.futsal_name}</span>!
-                      <br />
-                      We wish you an amazing futsal experience!
-                    </p>
+                  {/* Footer */}
+                  <div className="bg-gray-50 px-6 md:px-8 py-4 border-t border-gray-200">
+                    <div className="text-center text-sm text-gray-600">
+                      <p>Experience the future of sports booking • BookMyFutsal © 2026</p>
+                    </div>
                   </div>
                 </div>
 
-                {/* Footer */}
-                <div className="bg-gray-50 px-6 md:px-8 py-4 border-t border-gray-200">
-                  <div className="text-center text-sm text-gray-600">
-                    <p>Experience the future of sports booking • BookMyFutsal © 2026</p>
-                  </div>
-                </div>
-              </div>
+                {/* Action Buttons */}
+                <div className="mt-8 flex flex-wrap gap-4 justify-center png-hide">
+                  <button
+                    onClick={() => downloadAsImage('png')}
+                    className="bg-linear-to-r from-blue-500 to-blue-600 text-white font-semibold py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 border border-blue-400/30"
+                  >
+                    <span className="flex items-center">
+                      <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                      </svg>
+                      Download Receipt
+                    </span>
+                  </button>
 
-              {/* Action Buttons */}
-              <div className="mt-8 flex flex-wrap gap-4 justify-center png-hide">
-                <button
-                  onClick={() => downloadAsImage('png')}
-                  className="bg-linear-to-r from-blue-500 to-blue-600 text-white font-semibold py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 border border-blue-400/30"
-                >
-                  <span className="flex items-center">
-                    <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                    </svg>
-                    Download Receipt
-                  </span>
-                </button>
-
-                <button
-                  onClick={() => {
-                    setConfirmModal({
-                      isOpen: true,
-                      message: 'Are you sure you want to cancel this booking?',
-                      onConfirm: async () => {
-                        setConfirmModal({ isOpen: false, message: '', onConfirm: () => {} });
-                        if (bookingState.booking) {
-                          try {
-                            await fetch(
-                              `${process.env.NEXT_PUBLIC_API_URL}/api/bookings/cancel/${bookingState.booking.tracking_code}`,
-                              {
-                                method: "DELETE",
-                              }
-                            );
-                            showNotification({ message: "Booking cancelled Successfully", type: 'info' });
-                            localStorage.removeItem(storageKey);
-                            router.push("/");
-                          } catch (error) {
-                            showNotification({ message: "Error cancelling booking", type: 'info' });
+                  <button
+                    onClick={() => {
+                      setConfirmModal({
+                        isOpen: true,
+                        message: 'Are you sure you want to cancel this booking?',
+                        onConfirm: async () => {
+                          setConfirmModal({ isOpen: false, message: '', onConfirm: () => { } });
+                          if (bookingState.booking) {
+                            try {
+                              await fetch(
+                                `${process.env.NEXT_PUBLIC_API_URL}/api/bookings/cancel/${bookingState.booking.tracking_code}`,
+                                {
+                                  method: "DELETE",
+                                }
+                              );
+                              showNotification({ message: "Booking cancelled Successfully", type: 'info' });
+                              localStorage.removeItem(storageKey);
+                              router.push("/");
+                            } catch (error) {
+                              showNotification({ message: "Error cancelling booking", type: 'info' });
+                            }
                           }
                         }
-                      }
-                    });
-                  }}
-                  className="bg-linear-to-r from-red-500 to-red-600 text-white font-semibold py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 border border-red-400/30"
-                >
-                  <span className="flex items-center">
-                    <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                    Cancel Booking
-                  </span>
-                </button>
+                      });
+                    }}
+                    className="bg-linear-to-r from-red-500 to-red-600 text-white font-semibold py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 border border-red-400/30"
+                  >
+                    <span className="flex items-center">
+                      <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                      Cancel Booking
+                    </span>
+                  </button>
 
-                <button
-                  onClick={() => {
-                    localStorage.removeItem(storageKey);
-                    router.push("/");
-                  }}
-                  className="bg-linear-to-r from-green-500 to-green-600 text-white font-semibold py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 border border-green-400/30"
-                >
-                  <span className="flex items-center">
-                    <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-                    </svg>
-                    Back to Home
-                  </span>
-                </button>
+                  <button
+                    onClick={() => {
+                      localStorage.removeItem(storageKey);
+                      router.push("/");
+                    }}
+                    className="bg-linear-to-r from-green-500 to-green-600 text-white font-semibold py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 border border-green-400/30"
+                  >
+                    <span className="flex items-center">
+                      <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                      </svg>
+                      Back to Home
+                    </span>
+                  </button>
+                </div>
               </div>
-            </div>
-          )}
+            );
+          })()}
         </div>
       </main>
 
@@ -2256,7 +2270,7 @@ export default function BookFutsal() {
               <p className="text-sm text-gray-600 mb-6">{confirmModal.message}</p>
               <div className="flex gap-3">
                 <button
-                  onClick={() => setConfirmModal({ isOpen: false, message: '', onConfirm: () => {} })}
+                  onClick={() => setConfirmModal({ isOpen: false, message: '', onConfirm: () => { } })}
                   className="flex-1 bg-gray-200 text-gray-800 font-semibold py-2 px-4 rounded-lg hover:bg-gray-300 transition-all duration-300"
                 >
                   Cancel
@@ -2309,41 +2323,41 @@ export default function BookFutsal() {
               <p className="text-gray-300 mb-4">Your ultimate destination for booking premium futsal venues. Experience the thrill of the game with top-quality facilities.</p>
               <div className="flex space-x-4">
 
-              {/* Instagram */}
-              <a
-                href="https://www.instagram.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-gray-300 hover:text-pink-500 transition-colors duration-300"
-              >
-                <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M12 2.163c3.204 0 3.584.012 4.85.07 1.366.062 2.633.343 3.608 1.318.975.975 1.256 2.242 1.318 3.608.058 1.266.07 1.646.07 4.84s-.012 3.574-.07 4.84c-.062 1.366-.343 2.633-1.318 3.608-.975.975-2.242 1.256-3.608 1.318-1.266.058-1.646.07-4.85.07s-3.584-.012-4.85-.07c-1.366-.062-2.633-.343-3.608-1.318-.975-.975-1.256-2.242-1.318-3.608-.058-1.266-.07-1.646-.07-4.84s.012-3.574.07-4.84c.062-1.366.343-2.633 1.318-3.608C4.517 2.576 5.784 2.295 7.15 2.233 8.416 2.175 8.796 2.163 12 2.163zm0 3.675a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zm0 10.162a3.999 3.999 0 1 1 0-7.998 3.999 3.999 0 0 1 0 7.998zm6.406-11.845a1.44 1.44 0 1 1-2.88 0 1.44 1.44 0 0 1 2.88 0z" />
-                </svg>
-              </a>
-              {/* Facebook */}
-              <a
-                href="https://www.facebook.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-gray-300 hover:text-blue-600 transition-colors duration-300"
-              >
-                <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M22.675 0h-21.35C.597 0 0 .597 0 1.326v21.348C0 23.403.597 24 1.326 24H12.82v-9.294H9.692V11.01h3.128V8.309c0-3.1 1.893-4.788 4.659-4.788 1.325 0 2.463.099 2.795.143v3.24l-1.918.001c-1.504 0-1.796.715-1.796 1.763v2.312h3.587l-.467 3.696h-3.12V24h6.116C23.403 24 24 23.403 24 22.674V1.326C24 .597 23.403 0 22.675 0z" />
-                </svg>
-              </a>
+                {/* Instagram */}
+                <a
+                  href="https://www.instagram.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-gray-300 hover:text-pink-500 transition-colors duration-300"
+                >
+                  <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 2.163c3.204 0 3.584.012 4.85.07 1.366.062 2.633.343 3.608 1.318.975.975 1.256 2.242 1.318 3.608.058 1.266.07 1.646.07 4.84s-.012 3.574-.07 4.84c-.062 1.366-.343 2.633-1.318 3.608-.975.975-2.242 1.256-3.608 1.318-1.266.058-1.646.07-4.85.07s-3.584-.012-4.85-.07c-1.366-.062-2.633-.343-3.608-1.318-.975-.975-1.256-2.242-1.318-3.608-.058-1.266-.07-1.646-.07-4.84s.012-3.574.07-4.84c.062-1.366.343-2.633 1.318-3.608C4.517 2.576 5.784 2.295 7.15 2.233 8.416 2.175 8.796 2.163 12 2.163zm0 3.675a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zm0 10.162a3.999 3.999 0 1 1 0-7.998 3.999 3.999 0 0 1 0 7.998zm6.406-11.845a1.44 1.44 0 1 1-2.88 0 1.44 1.44 0 0 1 2.88 0z" />
+                  </svg>
+                </a>
+                {/* Facebook */}
+                <a
+                  href="https://www.facebook.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-gray-300 hover:text-blue-600 transition-colors duration-300"
+                >
+                  <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M22.675 0h-21.35C.597 0 0 .597 0 1.326v21.348C0 23.403.597 24 1.326 24H12.82v-9.294H9.692V11.01h3.128V8.309c0-3.1 1.893-4.788 4.659-4.788 1.325 0 2.463.099 2.795.143v3.24l-1.918.001c-1.504 0-1.796.715-1.796 1.763v2.312h3.587l-.467 3.696h-3.12V24h6.116C23.403 24 24 23.403 24 22.674V1.326C24 .597 23.403 0 22.675 0z" />
+                  </svg>
+                </a>
 
-              {/* YouTube */}
-              <a
-                href="https://www.youtube.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-gray-300 hover:text-red-600 transition-colors duration-300"
-              >
-                <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.376.505A3.016 3.016 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.376-.505a3.016 3.016 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
-                </svg>
-              </a>
-            </div>
+                {/* YouTube */}
+                <a
+                  href="https://www.youtube.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-gray-300 hover:text-red-600 transition-colors duration-300"
+                >
+                  <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.376.505A3.016 3.016 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.376-.505a3.016 3.016 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
+                  </svg>
+                </a>
+              </div>
             </div>
 
             {/* Quick Links and Support - Two columns on mobile */}
@@ -2356,7 +2370,7 @@ export default function BookFutsal() {
                   <li><Link href="/user/dashboard" className="text-gray-300 hover:text-white transition-colors duration-300">My Bookings</Link></li>
                   <li><Link href="/" className="text-gray-300 hover:text-white transition-colors duration-300">About</Link></li>
                   <li><Link href="/" className="text-gray-300 hover:text-white transition-colors duration-300">Contact</Link></li>
-                 
+
                 </ul>
               </div>
 
@@ -2398,41 +2412,41 @@ export default function BookFutsal() {
               <p className="text-gray-300 mb-4">Your ultimate destination for booking premium futsal venues. Experience the thrill of the game with top-quality facilities.</p>
               <div className="flex space-x-4">
 
-              {/* Instagram */}
-              <a
-                href="https://www.instagram.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-gray-300 hover:text-pink-500 transition-colors duration-300"
-              >
-                <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M12 2.163c3.204 0 3.584.012 4.85.07 1.366.062 2.633.343 3.608 1.318.975.975 1.256 2.242 1.318 3.608.058 1.266.07 1.646.07 4.84s-.012 3.574-.07 4.84c-.062 1.366-.343 2.633-1.318 3.608-.975.975-2.242 1.256-3.608 1.318-1.266.058-1.646.07-4.85.07s-3.584-.012-4.85-.07c-1.366-.062-2.633-.343-3.608-1.318-.975-.975-1.256-2.242-1.318-3.608-.058-1.266-.07-1.646-.07-4.84s.012-3.574.07-4.84c.062-1.366.343-2.633 1.318-3.608C4.517 2.576 5.784 2.295 7.15 2.233 8.416 2.175 8.796 2.163 12 2.163zm0 3.675a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zm0 10.162a3.999 3.999 0 1 1 0-7.998 3.999 3.999 0 0 1 0 7.998zm6.406-11.845a1.44 1.44 0 1 1-2.88 0 1.44 1.44 0 0 1 2.88 0z" />
-                </svg>
-              </a>
-              {/* Facebook */}
-              <a
-                href="https://www.facebook.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-gray-300 hover:text-blue-600 transition-colors duration-300"
-              >
-                <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M22.675 0h-21.35C.597 0 0 .597 0 1.326v21.348C0 23.403.597 24 1.326 24H12.82v-9.294H9.692V11.01h3.128V8.309c0-3.1 1.893-4.788 4.659-4.788 1.325 0 2.463.099 2.795.143v3.24l-1.918.001c-1.504 0-1.796.715-1.796 1.763v2.312h3.587l-.467 3.696h-3.12V24h6.116C23.403 24 24 23.403 24 22.674V1.326C24 .597 23.403 0 22.675 0z" />
-                </svg>
-              </a>
+                {/* Instagram */}
+                <a
+                  href="https://www.instagram.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-gray-300 hover:text-pink-500 transition-colors duration-300"
+                >
+                  <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 2.163c3.204 0 3.584.012 4.85.07 1.366.062 2.633.343 3.608 1.318.975.975 1.256 2.242 1.318 3.608.058 1.266.07 1.646.07 4.84s-.012 3.574-.07 4.84c-.062 1.366-.343 2.633-1.318 3.608-.975.975-2.242 1.256-3.608 1.318-1.266.058-1.646.07-4.85.07s-3.584-.012-4.85-.07c-1.366-.062-2.633-.343-3.608-1.318-.975-.975-1.256-2.242-1.318-3.608-.058-1.266-.07-1.646-.07-4.84s.012-3.574.07-4.84c.062-1.366.343-2.633 1.318-3.608C4.517 2.576 5.784 2.295 7.15 2.233 8.416 2.175 8.796 2.163 12 2.163zm0 3.675a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zm0 10.162a3.999 3.999 0 1 1 0-7.998 3.999 3.999 0 0 1 0 7.998zm6.406-11.845a1.44 1.44 0 1 1-2.88 0 1.44 1.44 0 0 1 2.88 0z" />
+                  </svg>
+                </a>
+                {/* Facebook */}
+                <a
+                  href="https://www.facebook.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-gray-300 hover:text-blue-600 transition-colors duration-300"
+                >
+                  <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M22.675 0h-21.35C.597 0 0 .597 0 1.326v21.348C0 23.403.597 24 1.326 24H12.82v-9.294H9.692V11.01h3.128V8.309c0-3.1 1.893-4.788 4.659-4.788 1.325 0 2.463.099 2.795.143v3.24l-1.918.001c-1.504 0-1.796.715-1.796 1.763v2.312h3.587l-.467 3.696h-3.12V24h6.116C23.403 24 24 23.403 24 22.674V1.326C24 .597 23.403 0 22.675 0z" />
+                  </svg>
+                </a>
 
-              {/* YouTube */}
-              <a
-                href="https://www.youtube.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-gray-300 hover:text-red-600 transition-colors duration-300"
-              >
-                <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.376.505A3.016 3.016 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.376-.505a3.016 3.016 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
-                </svg>
-              </a>
-            </div>
+                {/* YouTube */}
+                <a
+                  href="https://www.youtube.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-gray-300 hover:text-red-600 transition-colors duration-300"
+                >
+                  <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.376.505A3.016 3.016 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.376-.505a3.016 3.016 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
+                  </svg>
+                </a>
+              </div>
             </div>
 
             {/* Quick Links */}
@@ -2443,7 +2457,7 @@ export default function BookFutsal() {
                 <li><Link href="/user/dashboard" className="text-gray-300 hover:text-white transition-colors duration-300">My Bookings</Link></li>
                 <li><Link href="/" className="text-gray-300 hover:text-white transition-colors duration-300">About</Link></li>
                 <li><Link href="/" className="text-gray-300 hover:text-white transition-colors duration-300">Contact</Link></li>
-                
+
               </ul>
             </div>
 
