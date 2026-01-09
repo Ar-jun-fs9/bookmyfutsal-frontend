@@ -12,6 +12,7 @@ import { useTimeSlots, useFutsalSlotsForDate, useCloseAllSlotsForDate, useOpenAl
 import { useFutsalRatings } from '@/hooks/useRatings';
 import { filterReducer, initialFilterState } from '@/reducers/filterReducer';
 import { useSocketHandler } from '@/hooks/useSocketHandler';
+import { useSpecialPrices } from './hooks/useSpecialPrices';
 
 interface Admin {
   id: number;
@@ -121,6 +122,9 @@ export default function FutsalAdminDashboard() {
    const [showFutsalInfo, setShowFutsalInfo] = useState(false);
    const [showBookings, setShowBookings] = useState(false);
    const [showRatings, setShowRatings] = useState(false);
+   const [showSpecialPrices, setShowSpecialPrices] = useState(false);
+   const [creatingSpecialPrice, setCreatingSpecialPrice] = useState(false);
+   const [editingSpecialPrice, setEditingSpecialPrice] = useState<any | null>(null);
    const [bookingFilter, setBookingFilter] = useState<'all' | 'past' | 'today' | 'future' | 'cancelled'>('all');
    const [confirmModal, setConfirmModal] = useState<{ isOpen: boolean, message: string, onConfirm: () => void }>({ isOpen: false, message: '', onConfirm: () => { } });
    const [deletedBookings, setDeletedBookings] = useState<number[]>([]);
@@ -143,6 +147,7 @@ export default function FutsalAdminDashboard() {
    const openAllSlotsMutation = useOpenAllSlotsForDate();
    const updateSlotStatusMutation = useUpdateSlotStatus();
    const { data: ratingsData } = useFutsalRatings(futsal?.futsal_id);
+   const { specialPrices, loading: specialPricesLoading, createSpecialPrice, updateSpecialPrice, deleteSpecialPrice } = useSpecialPrices(futsal?.futsal_id);
 
    // Processed data
    const bookings = bookingsData?.bookings || [];
@@ -174,7 +179,7 @@ export default function FutsalAdminDashboard() {
 
   // Prevent background scrolling when modals are open
   useEffect(() => {
-    const hasModalOpen = editingBooking || editingRating || confirmModal.isOpen;
+    const hasModalOpen = editingBooking || editingRating || editingSpecialPrice || confirmModal.isOpen;
 
     if (hasModalOpen) {
       // Prevent layout shift by adding padding equal to scrollbar width
@@ -479,6 +484,22 @@ export default function FutsalAdminDashboard() {
   };
 
   // Ratings are now handled by React Query
+
+  const handleDeleteSpecialPrice = async (id: number) => {
+    setConfirmModal({
+      isOpen: true,
+      message: 'Are you sure you want to delete this special price?',
+      onConfirm: async () => {
+        setConfirmModal({ isOpen: false, message: '', onConfirm: () => {} });
+        const result = await deleteSpecialPrice(id);
+        if (result.success) {
+          showNotification({ message: 'Special price deleted successfully', type: 'success' });
+        } else {
+          showNotification({ message: result.error || 'Error deleting special price', type: 'info' });
+        }
+      }
+    });
+  };
 
   const handleUpdateRating = async (ratingId: number, rating: number, comment: string, users?: string, users_type?: string) => {
     try {
@@ -1156,6 +1177,91 @@ export default function FutsalAdminDashboard() {
                 </>
               )}
             </div>
+
+            {/* Special Prices Management */}
+            <div className="bg-white rounded-lg p-2">
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-xl font-semibold bg-linear-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">Special Prices Management</h3>
+                <div className="flex space-x-2">
+                  <button
+                    onClick={() => setShowSpecialPrices(!showSpecialPrices)}
+                    className="bg-linear-to-r from-yellow-500 to-yellow-600 text-white font-bold py-2 px-4 rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 border border-yellow-400/30 hover:border-yellow-400/50"
+                  >
+                    {showSpecialPrices ? 'Hide' : 'Show'}
+                  </button>
+                  {showSpecialPrices && (
+                    <button
+                      onClick={() => setCreatingSpecialPrice(!creatingSpecialPrice)}
+                      className="bg-linear-to-r from-green-600 to-green-700 text-white font-bold py-2 px-4 rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 border border-green-500/30 hover:border-green-400/50"
+                    >
+                      {creatingSpecialPrice ? 'Cancel' : 'Create'}
+                    </button>
+                  )}
+                </div>
+              </div>
+              {showSpecialPrices && (
+                <>
+                  {creatingSpecialPrice && futsal && (
+                    <div className="mb-6 relative bg-white rounded-2xl shadow-2xl overflow-hidden transform transition-all duration-500 hover:scale-[1.01]">
+                      {/* Gradient Background */}
+                      <div className="absolute inset-0 bg-linear-to-br from-yellow-50 via-white to-yellow-50 opacity-70"></div>
+
+                      {/* Content */}
+                      <div className="relative p-6 sm:p-8">
+                        <CreateSpecialPriceForm
+                          futsalId={futsal.futsal_id}
+                          onSuccess={() => setCreatingSpecialPrice(false)}
+                          setNotification={showNotification}
+                        />
+                      </div>
+                    </div>
+                  )}
+                  <div className="space-y-4">
+                    {specialPricesLoading ? (
+                      <p className="text-center text-gray-500">Loading special prices...</p>
+                    ) : specialPrices.length === 0 ? (
+                      <p className="text-center text-gray-500">No special prices set for this futsal.</p>
+                    ) : (
+                      specialPrices.map((price) => (
+                        <div key={price.special_price_id} className="border rounded p-4">
+                          {editingSpecialPrice?.special_price_id === price.special_price_id ? (
+                            <EditSpecialPriceForm
+                              price={price}
+                              onUpdate={() => setEditingSpecialPrice(null)}
+                              onCancel={() => setEditingSpecialPrice(null)}
+                              setNotification={showNotification}
+                            />
+                          ) : (
+                            <div className="flex justify-between items-start">
+                              <div className="flex-1">
+                                <h4 className="font-bold">{futsal?.name}</h4>
+                                <p>Date: {new Date(price.special_date).toLocaleDateString()}</p>
+                                <p>Price: Rs. {price.special_price}</p>
+                                {price.message && <p>Message: {price.message}</p>}
+                              </div>
+                              <div className="flex space-x-2">
+                                <button
+                                  onClick={() => setEditingSpecialPrice(price)}
+                                  className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded"
+                                >
+                                  Edit
+                                </button>
+                                <button
+                                  onClick={() => handleDeleteSpecialPrice(price.special_price_id)}
+                                  className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded"
+                                >
+                                  Delete
+                                </button>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </>
+              )}
+            </div>
           </div>
         </div>
       </main>
@@ -1245,6 +1351,261 @@ export default function FutsalAdminDashboard() {
         </div>
       )}
     </div>
+  );
+}
+
+// Create Special Price Form Component
+function CreateSpecialPriceForm({ futsalId, onSuccess, setNotification }: { futsalId: number, onSuccess: () => void, setNotification: (notification: { message: string, type: 'success' | 'info' }) => void }) {
+  const { createSpecialPrice } = useSpecialPrices(futsalId);
+  const [formData, setFormData] = useState({
+    special_dates: [] as string[],
+    special_price: '',
+    message: ''
+  });
+  const [currentDate, setCurrentDate] = useState('');
+
+  const addDate = () => {
+    if (currentDate && !formData.special_dates.includes(currentDate)) {
+      setFormData({
+        ...formData,
+        special_dates: [...formData.special_dates, currentDate].sort()
+      });
+      setCurrentDate('');
+    }
+  };
+
+  const removeDate = (dateToRemove: string) => {
+    setFormData({
+      ...formData,
+      special_dates: formData.special_dates.filter(date => date !== dateToRemove)
+    });
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (formData.special_dates.length === 0) {
+      setNotification({ message: 'Please select at least one date', type: 'info' });
+      return;
+    }
+
+    const result = await createSpecialPrice({
+      futsal_id: futsalId,
+      special_dates: formData.special_dates,
+      special_price: parseFloat(formData.special_price),
+      message: formData.message || undefined
+    });
+
+    if (result.success) {
+      setNotification({ message: 'Special prices created successfully', type: 'success' });
+      onSuccess();
+    } else {
+      setNotification({ message: result.error || 'Error creating special prices', type: 'info' });
+    }
+  };
+
+  return (
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="text-center mb-6">
+        <div className="inline-flex items-center justify-center w-12 h-12 sm:w-14 sm:h-14 bg-linear-to-br from-yellow-500 to-yellow-600 rounded-lg mb-3 shadow-lg">
+          <svg className="w-6 h-6 sm:w-7 sm:h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
+          </svg>
+        </div>
+        <h3 className="text-xl sm:text-2xl font-bold bg-linear-to-r from-yellow-600 to-yellow-700 bg-clip-text text-transparent mb-2">
+          Create Special Price
+        </h3>
+        <p className="text-gray-600 text-sm">
+          Set a special price for a specific date
+        </p>
+      </div>
+
+      <form onSubmit={handleSubmit} className="space-y-5">
+        <div className="relative">
+          <label htmlFor="specialPrice" className="block text-sm font-semibold text-gray-700 mb-2">
+            💰 Special Price (Rs.)
+          </label>
+          <div className="relative">
+            <input
+              id="specialPrice"
+              type="number"
+              step="0.01"
+              value={formData.special_price}
+              onChange={(e) => setFormData({ ...formData, special_price: e.target.value })}
+              placeholder="Enter price"
+              required
+              className="w-full px-4 py-3 pl-12 bg-white border border-gray-200 rounded-lg text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-400/50 focus:border-yellow-400/50 transition-all duration-300 font-medium text-sm"
+            />
+            <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-yellow-500">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        {/* Date Selection */}
+        <div className="space-y-3">
+          <label className="block text-sm font-semibold text-gray-700 mb-2">
+            📅 Special Dates
+          </label>
+          <div className="flex gap-2">
+            <input
+              type="date"
+              value={currentDate}
+              onChange={(e) => setCurrentDate(e.target.value)}
+              min={new Date().toISOString().split('T')[0]}
+              className="flex-1 px-4 py-3 bg-white border border-gray-200 rounded-lg text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-400/50 focus:border-yellow-400/50 transition-all duration-300 font-medium text-sm"
+            />
+            <button
+              type="button"
+              onClick={addDate}
+              disabled={!currentDate}
+              className="px-4 py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300"
+            >
+              Add Date
+            </button>
+          </div>
+
+          {/* Selected Dates */}
+          {formData.special_dates.length > 0 && (
+            <div className="space-y-2">
+              <p className="text-sm text-gray-600">Selected Dates ({formData.special_dates.length}):</p>
+              <div className="flex flex-wrap gap-2">
+                {formData.special_dates.map((date) => (
+                  <span
+                    key={date}
+                    className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-blue-100 text-blue-800"
+                  >
+                    {new Date(date).toISOString().split('T')[0].split('-').reverse().join('-')}
+                    <button
+                      type="button"
+                      onClick={() => removeDate(date)}
+                      className="ml-2 text-blue-600 hover:text-blue-800"
+                    >
+                      ×
+                    </button>
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+
+        <div className="relative">
+          <label htmlFor="message" className="block text-sm font-semibold text-gray-700 mb-2">
+            💬 Message (Optional)
+          </label>
+          <div className="relative">
+            <textarea
+              id="message"
+              placeholder="Add a message explaining the special price..."
+              value={formData.message}
+              onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+              className="w-full px-4 py-3 pl-12 bg-white border border-gray-200 rounded-lg text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-400/50 focus:border-yellow-400/50 transition-all duration-300 font-medium text-sm"
+              rows={3}
+              maxLength={200}
+            />
+            <div className="absolute left-4 top-4 text-yellow-500">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+              </svg>
+            </div>
+          </div>
+          <div className="text-right text-xs text-gray-500 mt-1">
+            {formData.message.length}/200
+          </div>
+        </div>
+
+        {/* Action Buttons */}
+        <div className="flex flex-col sm:flex-row gap-3 pt-4">
+          <button
+            type="submit"
+            disabled={formData.special_dates.length === 0}
+            className="flex-1 bg-linear-to-r from-yellow-500 to-yellow-600 text-white font-semibold py-3 px-6 rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 border border-yellow-400/30 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+          >
+            <span className="flex items-center justify-center">
+              <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+              </svg>
+              Create Special Price{formData.special_dates.length > 1 ? 's' : ''}
+            </span>
+          </button>
+          <button
+            type="button"
+            onClick={onSuccess}
+            className="flex-1 sm:flex-none bg-linear-to-r from-gray-500 to-gray-600 text-white font-semibold py-3 px-6 rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 border border-gray-400/30"
+          >
+            <span className="flex items-center justify-center">
+              <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+              Cancel
+            </span>
+          </button>
+        </div>
+      </form>
+    </div>
+  );
+}
+
+// Edit Special Price Form Component
+function EditSpecialPriceForm({ price, onUpdate, onCancel, setNotification }: { price: any, onUpdate: () => void, onCancel: () => void, setNotification: (notification: { message: string, type: 'success' | 'info' }) => void }) {
+  const { updateSpecialPrice } = useSpecialPrices(price.futsal_id);
+  const [formData, setFormData] = useState({
+    special_price: price.special_price.toString(),
+    message: price.message || ''
+  });
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const result = await updateSpecialPrice(price.special_price_id, {
+      special_price: parseFloat(formData.special_price),
+      message: formData.message || undefined
+    });
+
+    if (result.success) {
+      setNotification({ message: 'Special price updated successfully', type: 'success' });
+      onUpdate();
+    } else {
+      setNotification({ message: result.error || 'Error updating special price', type: 'info' });
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="border rounded p-4 mb-4 bg-yellow-50">
+      <h4 className="font-bold mb-4">Edit Special Price</h4>
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Price</label>
+          <input
+            type="number"
+            step="0.01"
+            value={formData.special_price}
+            onChange={(e) => setFormData({ ...formData, special_price: e.target.value })}
+            className="w-full px-3 py-2 border border-gray-300 rounded"
+            required
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Message (Optional)</label>
+          <input
+            type="text"
+            value={formData.message}
+            onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+            className="w-full px-3 py-2 border border-gray-300 rounded"
+          />
+        </div>
+      </div>
+      <div className="flex justify-end mt-4 space-x-2">
+        <button type="button" onClick={onCancel} className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded">
+          Cancel
+        </button>
+        <button type="submit" className="bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-2 rounded">
+          Update
+        </button>
+      </div>
+    </form>
   );
 }
 

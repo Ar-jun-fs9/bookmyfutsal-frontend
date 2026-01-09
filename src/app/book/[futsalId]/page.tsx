@@ -87,6 +87,8 @@ export default function BookFutsal() {
   // Simple UI state
   const summaryRef = useRef<HTMLDivElement>(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [currentPrice, setCurrentPrice] = useState<{normalPrice: number, specialPrice?: {price: number, message?: string}, effectivePrice: number} | null>(null);
+  const [priceNotification, setPriceNotification] = useState<{isOpen: boolean, message: string} | null>(null);
 
   // Derived state
   const availableShifts = bookingState.availableShifts;
@@ -358,6 +360,33 @@ export default function BookFutsal() {
       dispatch({ type: 'LOAD_PROGRESS', payload: data });
     }
   }, [storageKey]);
+
+  // Fetch price when date changes
+  useEffect(() => {
+    const fetchPrice = async () => {
+      if (futsalId && bookingState.selectedDate) {
+        try {
+          const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/special-prices/price/${futsalId}/${bookingState.selectedDate}`);
+          if (response.ok) {
+            const priceData = await response.json();
+            setCurrentPrice(priceData);
+
+            // Show notification if special price
+            if (priceData.specialPrice) {
+              const message = `Normal: Rs. ${priceData.normalPrice} → ${priceData.specialPrice.message || 'Special Price'}: Rs. ${priceData.specialPrice.price}`;
+              setPriceNotification({ isOpen: true, message });
+            } else {
+              setPriceNotification(null);
+            }
+          }
+        } catch (error) {
+          console.error('Error fetching price:', error);
+        }
+      }
+    };
+
+    fetchPrice();
+  }, [futsalId, bookingState.selectedDate]);
 
   // Save booking progress to localStorage whenever state changes
   useEffect(() => {
@@ -981,6 +1010,19 @@ export default function BookFutsal() {
                           </svg>
                         </div>
                       </div>
+                      {currentPrice && (
+                        <div className="mt-3 p-3 bg-green-50 border border-green-200 rounded-lg">
+                          <p className="text-sm text-green-800 font-medium">
+                            {currentPrice.specialPrice ? (
+                              <>
+                                Normal: Rs. {currentPrice.normalPrice} → {currentPrice.specialPrice.message || 'Special'}: Rs. {currentPrice.effectivePrice}
+                              </>
+                            ) : (
+                              <>Price: Rs. {currentPrice.effectivePrice}/hour</>
+                            )}
+                          </p>
+                        </div>
+                      )}
                     </div>
 
                     {/* Action Buttons */}
@@ -1821,7 +1863,7 @@ export default function BookFutsal() {
                             tracking_code: generateTrackingCode(),
                             guest_name: bookingState.name,
                             guest_phone: bookingState.phone,
-                            price_per_hour: futsal.price_per_hour,
+                            price_per_hour: currentPrice?.effectivePrice || futsal.price_per_hour,
                           });
 
                           if (bookingResponse) {
@@ -2228,6 +2270,29 @@ export default function BookFutsal() {
                   Confirm
                 </button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Price Notification Modal */}
+      {priceNotification?.isOpen && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="max-w-sm w-full bg-white rounded-2xl shadow-2xl border p-6 transform transition-all duration-300 border-blue-200">
+            <div className="text-center">
+              <div className="inline-flex items-center justify-center w-12 h-12 rounded-lg mb-4 bg-blue-100">
+                <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">Special Price Alert</h3>
+              <p className="text-sm text-gray-600 mb-6">{priceNotification.message}</p>
+              <button
+                onClick={() => setPriceNotification(null)}
+                className="w-full bg-blue-500 text-white font-semibold py-2 px-4 rounded-lg hover:bg-blue-600 transition-all duration-300"
+              >
+                OK
+              </button>
             </div>
           </div>
         </div>

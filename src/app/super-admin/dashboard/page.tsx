@@ -14,6 +14,7 @@ import { BookingSection } from './components/BookingSection';
 import { RatingSection } from './components/RatingSection';
 import { FeedbackSection } from './components/FeedbackSection';
 import { SlotSection } from './components/SlotSection';
+import { SpecialPriceSection } from './components/SpecialPriceSection';
 import { CreateFutsalForm } from './components/forms/CreateFutsalForm';
 import { CreateFutsalAdminForm } from './components/forms/CreateFutsalAdminForm';
 import { ConfirmModal } from './components/modals/ConfirmModal';
@@ -40,6 +41,7 @@ export default function SuperAdminDashboard() {
   const [showAdmins, setShowAdmins] = useState(false);
   const [showBlockedUsers, setShowBlockedUsers] = useState(false);
   const [showUsers, setShowUsers] = useState(false);
+  const [showSpecialPrices, setShowSpecialPrices] = useState(false);
   const [notification, setNotification] = useState<{ message: string, type: 'success' | 'info' } | null>(null);
   const [confirmModal, setConfirmModal] = useState<{ isOpen: boolean, message: string, onConfirm: () => void }>({ isOpen: false, message: '', onConfirm: () => {} });
   const router = useRouter();
@@ -145,6 +147,12 @@ export default function SuperAdminDashboard() {
               >
                 {showFeedbacks ? 'Hide' : 'Feedback & Bugs'}
               </button>
+              <button
+                onClick={() => setShowSpecialPrices(!showSpecialPrices)}
+                className="bg-linear-to-r from-yellow-500 to-yellow-600 text-white font-bold py-3 px-4 rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 border border-yellow-400/30 hover:border-yellow-400/50 text-sm sm:text-base"
+              >
+                {showSpecialPrices ? 'Hide' : 'Special Prices'}
+              </button>
             </div>
             {showCreateFutsal && <CreateFutsalForm onSuccess={() => {}} setNotification={setNotification} />}
             {showCreateAdmin && <CreateFutsalAdminForm futsals={futsals} superAdminId={user?.id || 0} setNotification={setNotification} onSuccess={fetchFutsalAdmins} />}
@@ -156,6 +164,7 @@ export default function SuperAdminDashboard() {
             <BookingSection isVisible={showBookings} onToggle={() => setShowBookings(!showBookings)} />
             <RatingSection isVisible={showRatings} onToggle={() => setShowRatings(!showRatings)} />
             <FeedbackSection isVisible={showFeedbacks} onToggle={() => setShowFeedbacks(!showFeedbacks)} />
+            <SpecialPriceSection isVisible={showSpecialPrices} onToggle={() => setShowSpecialPrices(!showSpecialPrices)} />
 
           </div>
         </div>

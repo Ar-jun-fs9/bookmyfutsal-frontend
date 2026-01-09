@@ -218,7 +218,10 @@ const VenueCard = memo(function VenueCard({ futsal, index }: VenueCardProps) {
           {futsal.location}, {futsal.city}
         </p>
         <div className="flex items-center justify-between mb-3">
-          <span className="text-2xl font-bold text-green-600">Rs. {futsal.price_per_hour}/hour</span>
+          <div>
+            <span className="text-2xl font-bold text-green-600">Rs. {futsal.price_per_hour}/hour</span>
+            <p className="text-sm text-gray-500">Normal Days Price</p>
+          </div>
         </div>
         {formattedTimeRange && (
           <p className="text-sm text-gray-600 mb-2 flex items-center">

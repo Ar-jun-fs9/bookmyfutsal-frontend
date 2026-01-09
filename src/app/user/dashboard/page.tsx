@@ -11,6 +11,7 @@ import { useSocketHandler } from '@/hooks/useSocketHandler';
 import { filterReducer, initialFilterState } from '@/reducers/filterReducer';
 import { formatTime, formatBookingTimeRange, categorizeBooking, formatDate } from '@/utils/helpers';
 import { Notification } from '@/components/ui/Notification';
+import { useSpecialPrices } from '@/hooks/useSpecialPrices';
 
 interface User {
   user_id: number;
@@ -793,9 +794,10 @@ export default function UserDashboard() {
                               {futsal.location}, {futsal.city}
                             </p>
                             <div className="flex items-center justify-between mb-3">
-                              <span className="text-2xl font-bold text-green-600">Rs. {futsal.price_per_hour}/hour</span>
+                              <span className="text-2xl font-bold text-green-600">Rs. {futsal.price_per_hour}.00/hour</span>
 
                             </div>
+                            <p className="text-sm text-gray-600">Normal Days Price</p>
                             {futsal.opening_hours && futsal.closing_hours && (
                               <p className="text-sm text-gray-600 mb-2 flex items-center">
                                 <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
@@ -1201,6 +1203,8 @@ export default function UserDashboard() {
 
 // Details Modal Component
 function DetailsModal({ futsal, onClose }: { futsal: Futsal, onClose: () => void }) {
+  const { data: specialPrices = [] } = useSpecialPrices(futsal.futsal_id);
+
   const formatTime = (timeString: string): string => {
     const [hours, minutes] = timeString.split(':').map(Number);
     const period = hours >= 12 ? 'PM' : 'AM';
@@ -1242,7 +1246,12 @@ function DetailsModal({ futsal, onClose }: { futsal: Futsal, onClose: () => void
                 <div className="space-y-2">
                   <p><strong>Name:</strong> {futsal.name}</p>
                   <p><strong>Location:</strong> {futsal.location}, {futsal.city}</p>
-                  <p><strong>Price per Hour:</strong> Rs. {futsal.price_per_hour}</p>
+                  <div>
+                    <h5 className="font-semibold mb-2">Pricing</h5>
+                    <p>Normal Days Price</p>
+                    <p>Rs. {futsal.price_per_hour}.00/hour</p>
+                    <p>No special prices set</p>
+                  </div>
                   {futsal.game_format && <p><strong>Game Format:</strong> {futsal.game_format}</p>}
                   {futsal.opening_hours && futsal.closing_hours && (
                     <p><strong>Operating Hours:</strong> {formatTime(futsal.opening_hours)} - {formatTime(futsal.closing_hours)}</p>

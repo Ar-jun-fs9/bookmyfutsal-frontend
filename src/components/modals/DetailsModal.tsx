@@ -1,22 +1,36 @@
+import { useState, useEffect } from 'react';
+
 interface Futsal {
-  futsal_id: number;
-  name: string;
-  location: string;
-  city: string;
-  images?: string[];
-  video?: string;
-  price_per_hour: number;
-  latitude?: number;
-  longitude?: number;
-  admin_phone?: string;
-  opening_hours?: string;
-  closing_hours?: string;
-  description?: string;
-  average_rating?: number;
-  total_ratings?: number;
-  game_format?: string;
-  facilities?: string[];
-}
+   futsal_id: number;
+   name: string;
+   location: string;
+   city: string;
+   images?: string[];
+   video?: string;
+   price_per_hour: number;
+   latitude?: number;
+   longitude?: number;
+   admin_phone?: string;
+   opening_hours?: string;
+   closing_hours?: string;
+   description?: string;
+   average_rating?: number;
+   total_ratings?: number;
+   game_format?: string;
+   facilities?: string[];
+ }
+
+interface SpecialPrice {
+   special_price_id: number;
+   futsal_id: number;
+   special_date: string;
+   special_price: number;
+   message?: string;
+   created_by: string;
+   created_at: string;
+   updated_at?: string;
+   futsal_name: string;
+ }
 
 interface DetailsModalProps {
   futsal: Futsal;
@@ -24,12 +38,39 @@ interface DetailsModalProps {
 }
 
 export default function DetailsModal({ futsal, onClose }: DetailsModalProps) {
-  const formatTime = (timeString: string): string => {
-    const [hours, minutes] = timeString.split(':').map(Number);
-    const period = hours >= 12 ? 'PM' : 'AM';
-    const displayHours = hours === 0 ? 12 : hours > 12 ? hours - 12 : hours;
-    return `${displayHours}:${minutes.toString().padStart(2, '0')} ${period}`;
-  };
+   const [specialPrices, setSpecialPrices] = useState<SpecialPrice[]>([]);
+   const [loadingSpecialPrices, setLoadingSpecialPrices] = useState(false);
+
+   useEffect(() => {
+     const fetchSpecialPrices = async () => {
+       setLoadingSpecialPrices(true);
+       try {
+         const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/special-prices/${futsal.futsal_id}`);
+         if (response.ok) {
+           const data = await response.json();
+           setSpecialPrices(data.specialPrices || []);
+         }
+       } catch (error) {
+         console.error('Error fetching special prices:', error);
+       } finally {
+         setLoadingSpecialPrices(false);
+       }
+     };
+
+     fetchSpecialPrices();
+   }, [futsal.futsal_id]);
+
+   const formatTime = (timeString: string): string => {
+     const [hours, minutes] = timeString.split(':').map(Number);
+     const period = hours >= 12 ? 'PM' : 'AM';
+     const displayHours = hours === 0 ? 12 : hours > 12 ? hours - 12 : hours;
+     return `${displayHours}:${minutes.toString().padStart(2, '0')} ${period}`;
+   };
+
+   const formatDate = (dateString: string): string => {
+     const date = new Date(dateString);
+     return date.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+   };
 
   return (
     <div className="fixed inset-0 backdrop-blur-sm bg-black/20 flex items-center justify-center z-50 p-4">
@@ -65,12 +106,38 @@ export default function DetailsModal({ futsal, onClose }: DetailsModalProps) {
                 <div className="space-y-2">
                   <p><strong>Name:</strong> {futsal.name}</p>
                   <p><strong>Location:</strong> {futsal.location}, {futsal.city}</p>
-                  <p><strong>Price per Hour:</strong> Rs. {futsal.price_per_hour}</p>
                   {futsal.game_format && <p><strong>Game Format:</strong> {futsal.game_format}</p>}
                   {futsal.opening_hours && futsal.closing_hours && (
                     <p><strong>Operating Hours:</strong> {formatTime(futsal.opening_hours)} - {formatTime(futsal.closing_hours)}</p>
                   )}
                   {futsal.admin_phone && <p><strong>Contact:</strong> {futsal.admin_phone}</p>}
+                </div>
+              </div>
+
+              {/* Price Section */}
+              <div>
+                <h4 className="text-lg font-semibold mb-3">Pricing</h4>
+                <div className="space-y-3">
+                  <div className="bg-green-50 p-3 rounded-lg border border-green-200">
+                    <p className="text-green-800 font-medium">Normal Days Price</p>
+                    <p className="text-2xl font-bold text-green-600">Rs. {futsal.price_per_hour}/hour</p>
+                  </div>
+                  {loadingSpecialPrices ? (
+                    <p className="text-gray-500">Loading special prices...</p>
+                  ) : specialPrices.length > 0 ? (
+                    <div className="space-y-2">
+                      <p className="font-medium text-gray-700">Special Prices:</p>
+                      {specialPrices.map((sp) => (
+                        <div key={sp.special_price_id} className="bg-yellow-50 p-3 rounded-lg border border-yellow-200">
+                          <p className="text-yellow-800 font-medium">{formatDate(sp.special_date)}</p>
+                          <p className="text-xl font-bold text-yellow-600">Rs. {sp.special_price}/hour</p>
+                          {sp.message && <p className="text-sm text-yellow-700 mt-1">{sp.message}</p>}
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-gray-500">No special prices set</p>
+                  )}
                 </div>
               </div>
 
