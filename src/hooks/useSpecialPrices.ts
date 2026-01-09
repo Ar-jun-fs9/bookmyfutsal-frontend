@@ -15,9 +15,10 @@ export const useSpecialPrices = (futsalId?: number) => {
     queryKey: ['special-prices', futsalId],
     queryFn: async () => {
       if (!futsalId) return [];
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/special-prices/futsal/${futsalId}`);
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/special-prices/${futsalId}`);
       if (!response.ok) throw new Error('Failed to fetch special prices');
-      return response.json() as Promise<SpecialPrice[]>;
+      const data = await response.json();
+      return data.specialPrices || [];
     },
     enabled: !!futsalId,
   });

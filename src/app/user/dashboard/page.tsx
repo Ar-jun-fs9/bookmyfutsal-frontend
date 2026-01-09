@@ -1203,13 +1203,18 @@ export default function UserDashboard() {
 
 // Details Modal Component
 function DetailsModal({ futsal, onClose }: { futsal: Futsal, onClose: () => void }) {
-  const { data: specialPrices = [] } = useSpecialPrices(futsal.futsal_id);
+  const { data: specialPrices = [], isLoading: loadingSpecialPrices } = useSpecialPrices(futsal.futsal_id);
 
   const formatTime = (timeString: string): string => {
     const [hours, minutes] = timeString.split(':').map(Number);
     const period = hours >= 12 ? 'PM' : 'AM';
     const displayHours = hours === 0 ? 12 : hours > 12 ? hours - 12 : hours;
     return `${displayHours}${period}`;
+  };
+
+  const formatDate = (dateString: string): string => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
   };
 
   return (
@@ -1246,12 +1251,6 @@ function DetailsModal({ futsal, onClose }: { futsal: Futsal, onClose: () => void
                 <div className="space-y-2">
                   <p><strong>Name:</strong> {futsal.name}</p>
                   <p><strong>Location:</strong> {futsal.location}, {futsal.city}</p>
-                  <div>
-                    <h5 className="font-semibold mb-2">Pricing</h5>
-                    <p>Normal Days Price</p>
-                    <p>Rs. {futsal.price_per_hour}.00/hour</p>
-                    <p>No special prices set</p>
-                  </div>
                   {futsal.game_format && <p><strong>Game Format:</strong> {futsal.game_format}</p>}
                   {futsal.opening_hours && futsal.closing_hours && (
                     <p><strong>Operating Hours:</strong> {formatTime(futsal.opening_hours)} - {formatTime(futsal.closing_hours)}</p>
@@ -1260,6 +1259,35 @@ function DetailsModal({ futsal, onClose }: { futsal: Futsal, onClose: () => void
                 </div>
               </div>
 
+              {/* Price Section */}
+              <div>
+                <h4 className="text-lg font-semibold mb-3">Pricing</h4>
+                <div className="space-y-3">
+                  <div className="bg-green-50 p-3 rounded-lg border border-green-200">
+                    <p className="text-green-800 font-medium">Normal Days Price</p>
+                    <p className="text-2xl font-bold text-green-600">Rs. {futsal.price_per_hour}/hour</p>
+                  </div>
+                  {loadingSpecialPrices ? (
+                    <p className="text-gray-500">Loading special prices...</p>
+                  ) : specialPrices.length > 0 ? (
+                    <div className="space-y-2">
+                      <p className="font-medium text-gray-700">Special Prices:</p>
+                      {specialPrices.map((sp: any) => (
+                        <div key={sp.special_price_id} className="bg-yellow-50 p-3 rounded-lg border border-yellow-200">
+                          <p className="text-yellow-800 font-medium">{formatDate(sp.special_date)}</p>
+                          <p className="text-xl font-bold text-yellow-600">Rs. {sp.special_price}/hour</p>
+                          {sp.message && <p className="text-sm text-yellow-700 mt-1">{sp.message}</p>}
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-gray-500">No special prices set</p>
+                  )}
+                </div>
+              </div>
+            </div>
+            
+            {/* Facilities */}
               <div>
                 <h4 className="text-lg font-semibold mb-3">Facilities</h4>
                 {futsal.facilities && futsal.facilities.length > 0 ? (
@@ -1324,7 +1352,7 @@ function DetailsModal({ futsal, onClose }: { futsal: Futsal, onClose: () => void
           </div>
         </div>
       </div>
-    </div>
+    
   );
 }
 
