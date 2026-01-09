@@ -45,6 +45,7 @@ interface Futsal {
 
 interface Booking {
    booking_id: number;
+   futsal_id: number;
    futsal_name: string;
    location: string;
    city: string;
@@ -82,7 +83,7 @@ export default function UserDashboard() {
   const [editing, setEditing] = useState(false);
   const [showBooking, setShowBooking] = useState(false);
   const [selectedFutsal, setSelectedFutsal] = useState<Futsal | null>(null);
-  const [updatingBooking, setUpdatingBooking] = useState<any | null>(null);
+  const [updatingBooking, setUpdatingBooking] = useState<Booking | null>(null);
   const [currentImageIndexes, setCurrentImageIndexes] = useState<{ [key: number]: number }>({});
   const [videoModal, setVideoModal] = useState<{ isOpen: boolean, futsal: Futsal | null }>({ isOpen: false, futsal: null });
   const [ratingModal, setRatingModal] = useState<{ isOpen: boolean, futsal: Futsal | null }>({ isOpen: false, futsal: null });
@@ -92,7 +93,7 @@ export default function UserDashboard() {
   const [successModal, setSuccessModal] = useState<{ isOpen: boolean, message: string }>({ isOpen: false, message: '' });
   const [priceNotification, setPriceNotification] = useState<{ isOpen: boolean, message: string } | null>(null);
   const [deletedBookings, setDeletedBookings] = useState<number[]>([]);
-  const [cancelledBookings, setCancelledBookings] = useState<any[]>([]);
+  const [cancelledBookings, setCancelledBookings] = useState<Booking[]>([]);
   const [selectedBookings, setSelectedBookings] = useState<number[]>([]);
   const [selectAll, setSelectAll] = useState(false);
   const [showCheckboxes, setShowCheckboxes] = useState(false);
@@ -101,7 +102,7 @@ export default function UserDashboard() {
   const [availableSlots, setAvailableSlots] = useState<any[]>([]);
   const [otpCode, setOtpCode] = useState('');
   const [loggedInUser, setLoggedInUser] = useState<User | null>(null);
-  const [booking, setBooking] = useState<any | null>(null);
+  const [booking, setBooking] = useState<Booking | null>(null);
   const scrollPositionRef = useRef<number>(0);
 
   // Socket handling
@@ -168,9 +169,9 @@ export default function UserDashboard() {
   }, [detailsModal.isOpen, videoModal.isOpen, ratingModal.isOpen, confirmModal.isOpen, successModal.isOpen, selectedFutsal, updatingBooking]);
 
   // Process bookings data with local cancelled bookings
-  const processedBookings = bookingsData?.bookings ? (() => {
+  const processedBookings: Booking[] = bookingsData?.bookings ? (() => {
 
-    let mergedBookings = [...bookingsData.bookings];
+    let mergedBookings: Booking[] = [...(bookingsData.bookings as Booking[])];
     let updatedCancelledList = [...cancelledBookings];
 
     mergedBookings = mergedBookings.map(booking => {
@@ -314,8 +315,8 @@ export default function UserDashboard() {
   const handleSelectAll = (checked: boolean) => {
     if (checked) {
       const visibleBookings = processedBookings
-        .filter((b: any) => !deletedBookings.includes(b.booking_id))
-        .filter((booking: any) => {
+        .filter((b: Booking) => !deletedBookings.includes(b.booking_id))
+        .filter((booking: Booking) => {
           if (filterState.bookingFilter === 'all') return true;
           if (filterState.bookingFilter === 'cancelled') return booking.cancelled_by;
           const category = categorizeBooking(booking);
@@ -332,8 +333,8 @@ export default function UserDashboard() {
     }
   };
 
-  const handleUpdateBooking = (booking: any) => {
-    if (booking.update_count >= 2) {
+  const handleUpdateBooking = (booking: Booking) => {
+    if ((booking.update_count || 0) >= 2) {
       setConfirmModal({
         isOpen: true,
         message: 'You have reached the maximum update limit of 2 times for this booking.',
@@ -3205,7 +3206,7 @@ function BookingModal({ futsal, user, onClose, onSuccess, setSuccessModal, setCo
   );
 }
 
-function UpdateBookingModal({ booking, onClose, onSuccess, setSuccessModal, showNotification }: { booking: any, onClose: () => void, onSuccess: () => void, setSuccessModal: (modal: { isOpen: boolean, message: string }) => void, showNotification: (notification: { message: string, type: 'success' | 'info' }) => void }) {
+function UpdateBookingModal({ booking, onClose, onSuccess, setSuccessModal, showNotification }: { booking: Booking, onClose: () => void, onSuccess: () => void, setSuccessModal: (modal: { isOpen: boolean, message: string }) => void, showNotification: (notification: { message: string, type: 'success' | 'info' }) => void }) {
   const formatTime = (timeString: string): string => {
     const [hours, minutes] = timeString.split(':').map(Number);
     const period = hours >= 12 ? 'PM' : 'AM';
