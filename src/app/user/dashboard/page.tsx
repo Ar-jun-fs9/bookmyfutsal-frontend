@@ -2351,7 +2351,7 @@ function BookingModal({ futsal, user, onClose, onSuccess, setSuccessModal, setCo
           body: JSON.stringify({
             user_id: user?.user_id,
             slot_id: slotId,
-            number_of_players: Number(numberOfPlayers) || 5,
+            number_of_players: Number(numberOfPlayers) || 10,
             team_name: teamName,
             payment_status: 'paid',
             amount_paid: 100,
