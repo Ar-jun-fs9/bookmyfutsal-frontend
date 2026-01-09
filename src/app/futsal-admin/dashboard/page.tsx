@@ -1235,7 +1235,12 @@ export default function FutsalAdminDashboard() {
                             <div className="flex justify-between items-start">
                               <div className="flex-1">
                                 <h4 className="font-bold">{futsal?.name}</h4>
-                                <p>Date: {new Date(price.special_date).toLocaleDateString()}</p>
+                                <p>Type: {price.type === 'date' ? 'Date-specific' : 'Recurring'}</p>
+                                {price.type === 'date' ? (
+                                  <p>Date: {new Date(price.special_date!).toLocaleDateString()}</p>
+                                ) : (
+                                  <p>Days: {price.recurring_days!.join(', ')}</p>
+                                )}
                                 <p>Price: Rs. {price.special_price}</p>
                                 {price.message && <p>Message: {price.message}</p>}
                               </div>
@@ -1358,7 +1363,9 @@ export default function FutsalAdminDashboard() {
 function CreateSpecialPriceForm({ futsalId, onSuccess, setNotification }: { futsalId: number, onSuccess: () => void, setNotification: (notification: { message: string, type: 'success' | 'info' }) => void }) {
   const { createSpecialPrice } = useSpecialPrices(futsalId);
   const [formData, setFormData] = useState({
+    type: 'date' as 'date' | 'recurring',
     special_dates: [] as string[],
+    recurring_days: [] as string[],
     special_price: '',
     message: ''
   });
@@ -1381,25 +1388,48 @@ function CreateSpecialPriceForm({ futsalId, onSuccess, setNotification }: { futs
     });
   };
 
+  const handleTypeChange = (type: 'date' | 'recurring') => {
+    setFormData({
+      ...formData,
+      type,
+      special_dates: [],
+      recurring_days: []
+    });
+  };
+
+  const toggleDay = (day: string) => {
+    setFormData({
+      ...formData,
+      recurring_days: formData.recurring_days.includes(day)
+        ? formData.recurring_days.filter(d => d !== day)
+        : [...formData.recurring_days, day]
+    });
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (formData.special_dates.length === 0) {
+    if (formData.type === 'date' && formData.special_dates.length === 0) {
       setNotification({ message: 'Please select at least one date', type: 'info' });
+      return;
+    }
+    if (formData.type === 'recurring' && formData.recurring_days.length === 0) {
+      setNotification({ message: 'Please select at least one day', type: 'info' });
       return;
     }
 
     const result = await createSpecialPrice({
       futsal_id: futsalId,
-      special_dates: formData.special_dates,
+      type: formData.type,
+      ...(formData.type === 'date' ? { special_dates: formData.special_dates } : { recurring_days: formData.recurring_days }),
       special_price: parseFloat(formData.special_price),
       message: formData.message || undefined
     });
 
     if (result.success) {
-      setNotification({ message: 'Special prices created successfully', type: 'success' });
+      setNotification({ message: `${formData.type === 'date' ? 'Special prices' : 'Recurring special price'} created successfully`, type: 'success' });
       onSuccess();
     } else {
-      setNotification({ message: result.error || 'Error creating special prices', type: 'info' });
+      setNotification({ message: result.error || 'Error creating special price', type: 'info' });
     }
   };
 
@@ -1421,6 +1451,33 @@ function CreateSpecialPriceForm({ futsalId, onSuccess, setNotification }: { futs
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-5">
+        {/* Type Selection */}
+        <div className="space-y-3">
+          <label className="block text-sm font-semibold text-gray-700 mb-2">Type</label>
+          <div className="flex gap-4">
+            <label className="flex items-center">
+              <input
+                type="radio"
+                value="date"
+                checked={formData.type === 'date'}
+                onChange={() => handleTypeChange('date')}
+                className="mr-2"
+              />
+              Date-specific
+            </label>
+            <label className="flex items-center">
+              <input
+                type="radio"
+                value="recurring"
+                checked={formData.type === 'recurring'}
+                onChange={() => handleTypeChange('recurring')}
+                className="mr-2"
+              />
+              Recurring
+            </label>
+          </div>
+        </div>
+
         <div className="relative">
           <label htmlFor="specialPrice" className="block text-sm font-semibold text-gray-700 mb-2">
             💰 Special Price (Rs.)

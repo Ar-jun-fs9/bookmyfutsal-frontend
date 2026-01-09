@@ -13,7 +13,9 @@ interface SpecialPriceSectionProps {
 interface SpecialPrice {
   special_price_id: number;
   futsal_id: number;
-  special_date: string;
+  type: 'date' | 'recurring';
+  special_date?: string;
+  recurring_days?: string[];
   special_price: number;
   message?: string;
   created_by: string;
@@ -181,7 +183,12 @@ export function SpecialPriceSection({ isVisible, onToggle }: SpecialPriceSection
                       />
                     )}
                     <h4 className="font-bold">{price.futsal_name}</h4>
-                    <p>Date: {new Date(price.special_date).toLocaleDateString()}</p>
+                    <p>Type: {price.type === 'date' ? 'Date-specific' : 'Recurring'}</p>
+                    {price.type === 'date' ? (
+                      <p>Date: {new Date(price.special_date!).toLocaleDateString()}</p>
+                    ) : (
+                      <p>Days: {price.recurring_days!.join(', ')}</p>
+                    )}
                     <p>Price: Rs. {price.special_price}</p>
                     {price.message && <p>Message: {price.message}</p>}
                   </div>
@@ -229,7 +236,9 @@ function CreateSpecialPriceForm({ futsals, onSuccess, setNotification }: any) {
   const { createSpecialPrice } = useSpecialPrices();
   const [formData, setFormData] = useState({
     futsal_id: '',
+    type: 'date' as 'date' | 'recurring',
     special_dates: [] as string[],
+    recurring_days: [] as string[],
     special_price: '',
     message: ''
   });
@@ -254,24 +263,47 @@ function CreateSpecialPriceForm({ futsals, onSuccess, setNotification }: any) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (formData.special_dates.length === 0) {
+    if (formData.type === 'date' && formData.special_dates.length === 0) {
       setNotification({ message: 'Please select at least one date', type: 'info' });
+      return;
+    }
+    if (formData.type === 'recurring' && formData.recurring_days.length === 0) {
+      setNotification({ message: 'Please select at least one day', type: 'info' });
       return;
     }
 
     const result = await createSpecialPrice({
       futsal_id: parseInt(formData.futsal_id),
-      special_dates: formData.special_dates,
+      type: formData.type,
+      ...(formData.type === 'date' ? { special_dates: formData.special_dates } : { recurring_days: formData.recurring_days }),
       special_price: parseFloat(formData.special_price),
       message: formData.message || undefined
     });
 
     if (result.success) {
-      setNotification({ message: 'Special prices created successfully', type: 'success' });
+      setNotification({ message: `${formData.type === 'date' ? 'Special prices' : 'Recurring special price'} created successfully`, type: 'success' });
       onSuccess();
     } else {
-      setNotification({ message: result.error || 'Error creating special prices', type: 'info' });
+      setNotification({ message: result.error || 'Error creating special price', type: 'info' });
     }
+  };
+
+  const handleTypeChange = (type: 'date' | 'recurring') => {
+    setFormData({
+      ...formData,
+      type,
+      special_dates: [],
+      recurring_days: []
+    });
+  };
+
+  const toggleDay = (day: string) => {
+    setFormData({
+      ...formData,
+      recurring_days: formData.recurring_days.includes(day)
+        ? formData.recurring_days.filter(d => d !== day)
+        : [...formData.recurring_days, day]
+    });
   };
 
   return (
@@ -307,51 +339,119 @@ function CreateSpecialPriceForm({ futsals, onSuccess, setNotification }: any) {
         </div>
       </div>
 
-      {/* Date Selection */}
-      <div className="space-y-3">
-        <label className="block text-sm font-medium text-gray-700 mb-1">Special Dates</label>
-        <div className="flex gap-2">
-          <input
-            type="date"
-            value={currentDate}
-            onChange={(e) => setCurrentDate(e.target.value)}
-            min={new Date().toISOString().split('T')[0]}
-            className="flex-1 px-3 py-2 border border-gray-300 rounded"
-          />
-          <button
-            type="button"
-            onClick={addDate}
-            disabled={!currentDate}
-            className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            Add Date
-          </button>
+      {/* Type Selection */}
+      <div className="mt-4">
+        <label className="block text-sm font-medium text-gray-700 mb-2">Type</label>
+        <div className="flex gap-4">
+          <label className="flex items-center">
+            <input
+              type="radio"
+              value="date"
+              checked={formData.type === 'date'}
+              onChange={() => handleTypeChange('date')}
+              className="mr-2"
+            />
+            Date-specific
+          </label>
+          <label className="flex items-center">
+            <input
+              type="radio"
+              value="recurring"
+              checked={formData.type === 'recurring'}
+              onChange={() => handleTypeChange('recurring')}
+              className="mr-2"
+            />
+            Recurring
+          </label>
         </div>
-
-        {/* Selected Dates */}
-        {formData.special_dates.length > 0 && (
-          <div className="space-y-2">
-            <p className="text-sm text-gray-600">Selected Dates ({formData.special_dates.length}):</p>
-            <div className="flex flex-wrap gap-2">
-              {formData.special_dates.map((date) => (
-                <span
-                  key={date}
-                  className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-blue-100 text-blue-800"
-                >
-                  {new Date(date).toISOString().split('T')[0].split('-').reverse().join('-')}
-                  <button
-                    type="button"
-                    onClick={() => removeDate(date)}
-                    className="ml-2 text-blue-600 hover:text-blue-800"
-                  >
-                    ×
-                  </button>
-                </span>
-              ))}
-            </div>
-          </div>
-        )}
       </div>
+
+      {/* Conditional Selection */}
+      {formData.type === 'date' ? (
+        <div className="space-y-3">
+          <label className="block text-sm font-medium text-gray-700 mb-1">Special Dates</label>
+          <div className="flex gap-2">
+            <input
+              type="date"
+              value={currentDate}
+              onChange={(e) => setCurrentDate(e.target.value)}
+              min={new Date().toISOString().split('T')[0]}
+              className="flex-1 px-3 py-2 border border-gray-300 rounded"
+            />
+            <button
+              type="button"
+              onClick={addDate}
+              disabled={!currentDate}
+              className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Add Date
+            </button>
+          </div>
+
+          {/* Selected Dates */}
+          {formData.special_dates.length > 0 && (
+            <div className="space-y-2">
+              <p className="text-sm text-gray-600">Selected Dates ({formData.special_dates.length}):</p>
+              <div className="flex flex-wrap gap-2">
+                {formData.special_dates.map((date) => (
+                  <span
+                    key={date}
+                    className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-blue-100 text-blue-800"
+                  >
+                    {new Date(date).toISOString().split('T')[0].split('-').reverse().join('-')}
+                    <button
+                      type="button"
+                      onClick={() => removeDate(date)}
+                      className="ml-2 text-blue-600 hover:text-blue-800"
+                    >
+                      ×
+                    </button>
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      ) : (
+        <div className="space-y-3">
+          <label className="block text-sm font-medium text-gray-700 mb-1">Recurring Days</label>
+          <div className="grid grid-cols-7 gap-2">
+            {['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].map((day) => (
+              <label key={day} className="flex items-center">
+                <input
+                  type="checkbox"
+                  checked={formData.recurring_days.includes(day.toLowerCase())}
+                  onChange={() => toggleDay(day.toLowerCase())}
+                  className="mr-2"
+                />
+                {day.slice(0, 3)}
+              </label>
+            ))}
+          </div>
+          {formData.recurring_days.length > 0 && (
+            <div className="space-y-2">
+              <p className="text-sm text-gray-600">Selected Days ({formData.recurring_days.length}):</p>
+              <div className="flex flex-wrap gap-2">
+                {formData.recurring_days.map((day) => (
+                  <span
+                    key={day}
+                    className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-green-100 text-green-800"
+                  >
+                    {day.charAt(0).toUpperCase() + day.slice(1)}
+                    <button
+                      type="button"
+                      onClick={() => toggleDay(day)}
+                      className="ml-2 text-green-600 hover:text-green-800"
+                    >
+                      ×
+                    </button>
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
 
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">Message (Optional)</label>
@@ -365,10 +465,10 @@ function CreateSpecialPriceForm({ futsals, onSuccess, setNotification }: any) {
       <div className="flex justify-end mt-4">
         <button
           type="submit"
-          disabled={formData.special_dates.length === 0}
+          disabled={(formData.type === 'date' && formData.special_dates.length === 0) || (formData.type === 'recurring' && formData.recurring_days.length === 0)}
           className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          Create Special Price{formData.special_dates.length > 1 ? 's' : ''}
+          Create {formData.type === 'date' ? 'Special Price' : 'Recurring Special Price'}
         </button>
       </div>
     </form>
