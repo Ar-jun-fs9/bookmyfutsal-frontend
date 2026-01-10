@@ -2595,7 +2595,7 @@ function BookingModal({ futsal, user, onClose, onSuccess, setSuccessModal, setCo
                           </svg>
                         </div>
                       </div>
-                      {currentPrice && (
+                      {/* {currentPrice && (
                         <div className="mt-3 p-3 bg-green-50 border border-green-200 rounded-lg">
                           <p className="text-sm text-green-800 font-medium">
                             {currentPrice.specialPrice ? (
@@ -2607,7 +2607,7 @@ function BookingModal({ futsal, user, onClose, onSuccess, setSuccessModal, setCo
                             )}
                           </p>
                         </div>
-                      )}
+                      )} */}
                     </div>
 
                     {/* Action Buttons */}

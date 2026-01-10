@@ -1023,7 +1023,7 @@ export default function BookFutsal() {
                           </svg>
                         </div>
                       </div>
-                      {currentPrice && (
+                      {/* {currentPrice && (
                         <div className="mt-3 p-3 bg-green-50 border border-green-200 rounded-lg">
                           <p className="text-sm text-green-800 font-medium">
                             {currentPrice.specialPrice ? (
@@ -1035,7 +1035,7 @@ export default function BookFutsal() {
                             )}
                           </p>
                         </div>
-                      )}
+                      )} */}
                     </div>
 
                     {/* Action Buttons */}
@@ -1972,8 +1972,18 @@ export default function BookFutsal() {
           {/* Step 7: Summary */}
           {bookingState.step === 7 && bookingState.booking && (() => {
             const bookingDate = bookingState.booking.booking_date;
-            const specialPriceForDate = specialPrices.find(sp => sp.special_date === bookingDate);
-            const rateToShow = specialPriceForDate ? specialPriceForDate.special_price : futsal.price_per_hour;
+            const dayOfWeek = new Date(bookingDate).toLocaleString('en-US', { weekday: 'long' }).toLowerCase();
+
+            // Check for date-specific special price first
+            const dateSpecial = specialPrices.find(sp => sp.type === 'date' && sp.special_date === bookingDate);
+
+            // If no date-specific, check for recurring special price
+            const recurringSpecial = !dateSpecial ? specialPrices.find(sp =>
+              sp.type === 'recurring' && sp.recurring_days && sp.recurring_days.includes(dayOfWeek)
+            ) : null;
+
+            const applicableSpecial = dateSpecial || recurringSpecial;
+            const rateToShow = applicableSpecial ? applicableSpecial.special_price : futsal.price_per_hour;
 
             return (
               <div className="max-w-4xl mx-auto">
