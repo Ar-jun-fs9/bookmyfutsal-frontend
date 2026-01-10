@@ -2093,7 +2093,7 @@ function BookingModal({ futsal, user, onClose, onSuccess, setSuccessModal, setCo
   const [specialPrices, setSpecialPrices] = useState<any[]>([]);
   const phone = user?.phone || '';
 
-  console.log('BookingModal - Initial state:', { step, selectedDate, futsalId: futsal.futsal_id, booking: null });
+  // console.log('BookingModal - Initial state:', { step, selectedDate, futsalId: futsal.futsal_id, booking: null });
 
   // Remove local priceNotification state since it's now in main component
 
@@ -3229,7 +3229,7 @@ function UpdateBookingModal({ booking, onClose, onSuccess, setSuccessModal, show
 
   // Get futsal_id from the booking, with fallback fetch if missing
   const [futsalId, setFutsalId] = useState<number | undefined>(booking.futsal_id);
-  console.log('UpdateBookingModal - Initial state:', { step, selectedDate, futsalId, booking });
+  // console.log('UpdateBookingModal - Initial state:', { step, selectedDate, futsalId, booking });
 
   // Fallback: if futsalId is undefined, fetch the booking details to get it
   useEffect(() => {
@@ -3299,41 +3299,52 @@ function UpdateBookingModal({ booking, onClose, onSuccess, setSuccessModal, show
 
   // Handle slot selection with reservation
   const handleSlotClick = async (slot: any) => {
-    if (slot.display_status !== 'available') return;
+    if (slot.display_status !== 'available' && !selectedSlotIds.includes(slot.slot_id)) return;
 
     try {
-      // Try to reserve the slot
-      const reserveResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/time-slots/${slot.slot_id}/reserve`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' }
-      });
-
-      const reserveData = await reserveResponse.json();
-
-      if (reserveResponse.ok) {
-        // Reservation successful
-        setSelectedSlotIds([slot.slot_id]);
+      const isSelected = selectedSlotIds.includes(slot.slot_id);
+      if (isSelected) {
+        // Deselect: release reservation
+        await releaseSlotReservation(slot.slot_id);
+        setSelectedSlotIds([]);
+        // Update local state to available
+        setAvailableSlots(prev => prev.map(s => s.slot_id === slot.slot_id ? { ...s, display_status: 'available', status: 'available' } : s));
       } else {
-        // Reservation failed
-        if (reserveData.status === 'pending') {
-          showNotification({ message: "Slot is already chosen and in process of booking. Please choose another one.", type: 'info' });
-        } else if (reserveData.status === 'booked') {
-          showNotification({ message: "Slot already booked. Please choose another slot.", type: 'info' });
-        } else if (reserveData.status === 'disabled') {
-          showNotification({ message: "Slot is disabled. Please choose another slot.", type: 'info' });
-        } else {
-          showNotification({ message: reserveData.message || 'Unable to reserve slot. Please try again.', type: 'info' });
-        }
+        // Select: reserve slot
+        const reserveResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/time-slots/${slot.slot_id}/reserve`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' }
+        });
 
-        // Refresh slots to show updated status
-        try {
-          const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/time-slots/futsal/${futsalId}/date/${selectedDate}/shift/${selectedShift}`);
-          if (response.ok) {
-            const data = await response.json();
-            setAvailableSlots(data.slots);
+        const reserveData = await reserveResponse.json();
+
+        if (reserveResponse.ok) {
+          // Reservation successful
+          setSelectedSlotIds([slot.slot_id]);
+          // Update local to pending
+          setAvailableSlots(prev => prev.map(s => s.slot_id === slot.slot_id ? { ...s, display_status: 'pending' } : s));
+        } else {
+          // Reservation failed
+          if (reserveData.status === 'pending') {
+            showNotification({ message: "Slot is already chosen and in process of booking. Please choose another one.", type: 'info' });
+          } else if (reserveData.status === 'booked') {
+            showNotification({ message: "Slot already booked. Please choose another slot.", type: 'info' });
+          } else if (reserveData.status === 'disabled') {
+            showNotification({ message: "Slot is disabled. Please choose another slot.", type: 'info' });
+          } else {
+            showNotification({ message: reserveData.message || 'Unable to reserve slot. Please try again.', type: 'info' });
           }
-        } catch (error) {
-          console.error('Error refreshing slots:', error);
+
+          // Refresh slots to show updated status
+          try {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/time-slots/futsal/${futsalId}/date/${selectedDate}/shift/${selectedShift}`);
+            if (response.ok) {
+              const data = await response.json();
+              setAvailableSlots(data.slots);
+            }
+          } catch (error) {
+            console.error('Error refreshing slots:', error);
+          }
         }
       }
     } catch (error) {
@@ -3446,9 +3457,9 @@ function UpdateBookingModal({ booking, onClose, onSuccess, setSuccessModal, show
         {/* <div className="absolute inset-0 bg-linear-to-br from-green-50 via-white to-blue-50 opacity-50"></div> */}
 
         {/* Content */}
-        <div className="relative p-8">
+        <div className="relative p-2 sm:p-8">
           {/* Header */}
-          <div className="text-center mb-8">
+          <div className="text-center mb-2 sm:mb-8">
             <div className="inline-flex items-center justify-center w-16 h-16 bg-linear-to-br from-green-500 to-green-600 rounded-lg mb-4 shadow-lg">
               <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -3580,7 +3591,18 @@ function UpdateBookingModal({ booking, onClose, onSuccess, setSuccessModal, show
                       {availableShifts.map((shift) => (
                         <button
                           key={shift}
-                          onClick={() => setSelectedShift(shift)}
+                          onClick={() => {
+                            const newShift = selectedShift === shift ? '' : shift;
+                            setSelectedShift(newShift);
+                            if (newShift === '') {
+                              // If deselecting, release any selected slots and clear
+                              if (selectedSlotIds.length > 0) {
+                                selectedSlotIds.forEach(slotId => releaseSlotReservation(slotId));
+                              }
+                              setSelectedSlotIds([]);
+                              setAvailableSlots([]);
+                            }
+                          }}
                           className={`relative p-6 border-2 rounded-xl transition-all duration-300 transform hover:scale-105 ${selectedShift === shift
                             ? "bg-linear-to-br from-green-500 to-green-600 border-green-500 text-white shadow-lg"
                             : "bg-white border-gray-200 hover:border-green-300 hover:shadow-md"
