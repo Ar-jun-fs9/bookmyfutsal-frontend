@@ -1101,7 +1101,7 @@ export default function UserDashboard() {
             {updatingBooking && (
               <UpdateBookingModal booking={updatingBooking} onClose={() => setUpdatingBooking(null)} onSuccess={() => {
                 setUpdatingBooking(null);
-              }} setSuccessModal={setSuccessModal} showNotification={showNotification} />
+              }} setSuccessModal={setSuccessModal} showNotification={showNotification} setPriceNotification={setPriceNotification} />
             )}
           </div>
         </div>
@@ -3208,7 +3208,7 @@ function BookingModal({ futsal, user, onClose, onSuccess, setSuccessModal, setCo
   );
 }
 
-function UpdateBookingModal({ booking, onClose, onSuccess, setSuccessModal, showNotification }: { booking: Booking, onClose: () => void, onSuccess: () => void, setSuccessModal: (modal: { isOpen: boolean, message: string }) => void, showNotification: (notification: { message: string, type: 'success' | 'info' }) => void }) {
+function UpdateBookingModal({ booking, onClose, onSuccess, setSuccessModal, showNotification, setPriceNotification }: { booking: Booking, onClose: () => void, onSuccess: () => void, setSuccessModal: (modal: { isOpen: boolean, message: string }) => void, showNotification: (notification: { message: string, type: 'success' | 'info' }) => void, setPriceNotification: (notification: { isOpen: boolean, message: string } | null) => void }) {
   const formatTime = (timeString: string): string => {
     const [hours, minutes] = timeString.split(':').map(Number);
     const period = hours >= 12 ? 'PM' : 'AM';
@@ -3248,6 +3248,32 @@ function UpdateBookingModal({ booking, onClose, onSuccess, setSuccessModal, show
       fetchBooking();
     }
   }, [futsalId, booking.booking_id]);
+
+  // Fetch price when date changes
+  useEffect(() => {
+    const fetchPrice = async () => {
+      if (futsalId && selectedDate) {
+        try {
+          const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/special-prices/price/${futsalId}/${selectedDate}`);
+          if (response.ok) {
+            const priceData = await response.json();
+
+            // Show notification if special price
+            if (priceData.specialPrice) {
+              const message = `Normal: Rs. ${priceData.normalPrice} → ${priceData.specialPrice.message || 'Special Price'}: Rs. ${priceData.specialPrice.price}`;
+              setPriceNotification({ isOpen: true, message });
+            } else {
+              setPriceNotification(null);
+            }
+          }
+        } catch (error) {
+          console.error('Error fetching price:', error);
+        }
+      }
+    };
+
+    fetchPrice();
+  }, [futsalId, selectedDate, setPriceNotification]);
 
   useEffect(() => {
     const fetchFutsal = async () => {
