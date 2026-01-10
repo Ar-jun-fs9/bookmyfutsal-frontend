@@ -1417,11 +1417,17 @@ function CreateSpecialPriceForm({ futsalId, onSuccess, setNotification }: { futs
       return;
     }
 
+    const price = parseFloat(formData.special_price);
+    if (isNaN(price) || price <= 0) {
+      setNotification({ message: 'Please enter a valid positive price', type: 'info' });
+      return;
+    }
+
     const result = await createSpecialPrice({
       futsal_id: futsalId,
       type: formData.type,
       ...(formData.type === 'date' ? { special_dates: formData.special_dates } : { recurring_days: formData.recurring_days }),
-      special_price: parseFloat(formData.special_price),
+      special_price: price,
       message: formData.message || undefined
     });
 
@@ -1502,52 +1508,100 @@ function CreateSpecialPriceForm({ futsalId, onSuccess, setNotification }: { futs
         </div>
 
         {/* Date Selection */}
-        <div className="space-y-3">
-          <label className="block text-sm font-semibold text-gray-700 mb-2">
-            📅 Special Dates
-          </label>
-          <div className="flex gap-2">
-            <input
-              type="date"
-              value={currentDate}
-              onChange={(e) => setCurrentDate(e.target.value)}
-              min={new Date().toISOString().split('T')[0]}
-              className="flex-1 px-4 py-3 bg-white border border-gray-200 rounded-lg text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-400/50 focus:border-yellow-400/50 transition-all duration-300 font-medium text-sm"
-            />
-            <button
-              type="button"
-              onClick={addDate}
-              disabled={!currentDate}
-              className="px-4 py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300"
-            >
-              Add Date
-            </button>
-          </div>
-
-          {/* Selected Dates */}
-          {formData.special_dates.length > 0 && (
-            <div className="space-y-2">
-              <p className="text-sm text-gray-600">Selected Dates ({formData.special_dates.length}):</p>
-              <div className="flex flex-wrap gap-2">
-                {formData.special_dates.map((date) => (
-                  <span
-                    key={date}
-                    className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-blue-100 text-blue-800"
-                  >
-                    {new Date(date).toISOString().split('T')[0].split('-').reverse().join('-')}
-                    <button
-                      type="button"
-                      onClick={() => removeDate(date)}
-                      className="ml-2 text-blue-600 hover:text-blue-800"
-                    >
-                      ×
-                    </button>
-                  </span>
-                ))}
-              </div>
+        {formData.type === 'date' && (
+          <div className="space-y-3">
+            <label className="block text-sm font-semibold text-gray-700 mb-2">
+              📅 Special Dates
+            </label>
+            <div className="flex gap-2">
+              <input
+                type="date"
+                value={currentDate}
+                onChange={(e) => setCurrentDate(e.target.value)}
+                min={new Date().toISOString().split('T')[0]}
+                className="flex-1 px-4 py-3 bg-white border border-gray-200 rounded-lg text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-400/50 focus:border-yellow-400/50 transition-all duration-300 font-medium text-sm"
+              />
+              <button
+                type="button"
+                onClick={addDate}
+                disabled={!currentDate}
+                className="px-4 py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300"
+              >
+                Add Date
+              </button>
             </div>
-          )}
-        </div>
+
+            {/* Selected Dates */}
+            {formData.special_dates.length > 0 && (
+              <div className="space-y-2">
+                <p className="text-sm text-gray-600">Selected Dates ({formData.special_dates.length}):</p>
+                <div className="flex flex-wrap gap-2">
+                  {formData.special_dates.map((date) => (
+                    <span
+                      key={date}
+                      className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-blue-100 text-blue-800"
+                    >
+                      {new Date(date).toISOString().split('T')[0].split('-').reverse().join('-')}
+                      <button
+                        type="button"
+                        onClick={() => removeDate(date)}
+                        className="ml-2 text-blue-600 hover:text-blue-800"
+                      >
+                        ×
+                      </button>
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Recurring Days Selection */}
+        {formData.type === 'recurring' && (
+          <div className="space-y-3">
+            <label className="block text-sm font-semibold text-gray-700 mb-2">
+              📅 Recurring Days
+            </label>
+            <div className="grid grid-cols-2 gap-3">
+              {['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'].map((day) => (
+                <label key={day} className="flex items-center p-3 border-2 rounded-lg cursor-pointer transition-all duration-300 hover:border-yellow-400">
+                  <input
+                    type="checkbox"
+                    checked={formData.recurring_days.includes(day)}
+                    onChange={() => toggleDay(day)}
+                    className="mr-3 text-yellow-600 focus:ring-yellow-500"
+                  />
+                  <span className="text-sm font-medium text-gray-700 capitalize">{day}</span>
+                </label>
+              ))}
+            </div>
+
+            {/* Selected Days */}
+            {formData.recurring_days.length > 0 && (
+              <div className="space-y-2">
+                <p className="text-sm text-gray-600">Selected Days ({formData.recurring_days.length}):</p>
+                <div className="flex flex-wrap gap-2">
+                  {formData.recurring_days.map((day) => (
+                    <span
+                      key={day}
+                      className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-green-100 text-green-800 capitalize"
+                    >
+                      {day}
+                      <button
+                        type="button"
+                        onClick={() => toggleDay(day)}
+                        className="ml-2 text-green-600 hover:text-green-800"
+                      >
+                        ×
+                      </button>
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
 
         <div className="relative">
           <label htmlFor="message" className="block text-sm font-semibold text-gray-700 mb-2">
@@ -1578,14 +1632,14 @@ function CreateSpecialPriceForm({ futsalId, onSuccess, setNotification }: { futs
         <div className="flex flex-col sm:flex-row gap-3 pt-4">
           <button
             type="submit"
-            disabled={formData.special_dates.length === 0}
+            disabled={(formData.type === 'date' && formData.special_dates.length === 0) || (formData.type === 'recurring' && formData.recurring_days.length === 0)}
             className="flex-1 bg-linear-to-r from-yellow-500 to-yellow-600 text-white font-semibold py-3 px-6 rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 border border-yellow-400/30 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
           >
             <span className="flex items-center justify-center">
               <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
               </svg>
-              Create Special Price{formData.special_dates.length > 1 ? 's' : ''}
+              Create {formData.type === 'date' ? 'Special Price' : 'Recurring Special Price'}{formData.type === 'date' && formData.special_dates.length > 1 ? 's' : ''}
             </span>
           </button>
           <button
