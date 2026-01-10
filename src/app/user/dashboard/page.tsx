@@ -3227,6 +3227,7 @@ function UpdateBookingModal({ booking, onClose, onSuccess, setSuccessModal, show
 
   // Get futsal_id from the booking
   const futsalId = booking.futsal_id;
+  console.log('UpdateBookingModal - Initial state:', { step, selectedDate, futsalId, booking });
 
   useEffect(() => {
     const fetchFutsal = async () => {
