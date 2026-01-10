@@ -3227,9 +3227,27 @@ function UpdateBookingModal({ booking, onClose, onSuccess, setSuccessModal, show
   const [teamName, setTeamName] = useState(booking.team_name || '');
   const [loading, setLoading] = useState(false);
 
-  // Get futsal_id from the booking
-  const futsalId = booking.futsal_id;
+  // Get futsal_id from the booking, with fallback fetch if missing
+  const [futsalId, setFutsalId] = useState<number | undefined>(booking.futsal_id);
   console.log('UpdateBookingModal - Initial state:', { step, selectedDate, futsalId, booking });
+
+  // Fallback: if futsalId is undefined, fetch the booking details to get it
+  useEffect(() => {
+    if (!futsalId && booking.booking_id) {
+      const fetchBooking = async () => {
+        try {
+          const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/bookings/${booking.booking_id}`);
+          if (response.ok) {
+            const data = await response.json();
+            setFutsalId(data.booking.futsal_id);
+          }
+        } catch (error) {
+          console.error('Error fetching booking for futsalId:', error);
+        }
+      };
+      fetchBooking();
+    }
+  }, [futsalId, booking.booking_id]);
 
   useEffect(() => {
     const fetchFutsal = async () => {
