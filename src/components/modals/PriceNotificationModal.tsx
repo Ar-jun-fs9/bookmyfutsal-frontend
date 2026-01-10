@@ -23,7 +23,7 @@ export default function PriceNotificationModal({
               <p className="text-sm text-gray-600 mb-6">{priceNotification.message}</p>
               <button
                 onClick={() => setPriceNotification(null)}
-                className="w-full bg-blue-500 text-white font-semibold py-2 px-4 rounded-lg hover:bg-blue-600 transition-all duration-300"
+                className="w-full bg-green-500 text-white font-semibold py-2 px-4 rounded-lg hover:bg-green-600 transition-all duration-300"
               >
                 OK
               </button>
