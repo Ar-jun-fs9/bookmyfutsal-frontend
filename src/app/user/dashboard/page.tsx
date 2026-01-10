@@ -2093,6 +2093,8 @@ function BookingModal({ futsal, user, onClose, onSuccess, setSuccessModal, setCo
   const [specialPrices, setSpecialPrices] = useState<any[]>([]);
   const phone = user?.phone || '';
 
+  console.log('BookingModal - Initial state:', { step, selectedDate, futsalId: futsal.futsal_id, booking: null });
+
   // Remove local priceNotification state since it's now in main component
 
   // Load booking progress from sessionStorage on mount
