@@ -1245,7 +1245,7 @@ export default function FutsalAdminDashboard() {
                                 <h4 className="font-bold">{futsal?.name}</h4>
                                 <p>Type: {price.type === 'date' ? 'Date-specific' : 'Recurring'}</p>
                                 {price.type === 'date' ? (
-                                  <p>Date: {new Date(price.special_date!).toLocaleDateString()}</p>
+                                  <p>Date: {new Date(price.special_date!).toISOString().split('T')[0]}</p>
                                 ) : (
                                   <p>Days: {price.recurring_days!.join(', ')}</p>
                                 )}
