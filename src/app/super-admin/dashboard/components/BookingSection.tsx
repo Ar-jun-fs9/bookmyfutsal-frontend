@@ -267,7 +267,7 @@ export function BookingSection({ isVisible, onToggle }: BookingSectionProps) {
                   <p><strong>Time:</strong> {formatTimeRange(booking.time_slot)}</p>
                   <p><strong>Players:</strong> {booking.number_of_players}</p>
                   {booking.team_name && <p><strong>Team:</strong> {booking.team_name}</p>}
-                  <p><strong>Status:</strong> {booking.payment_status}</p>
+                  <p><strong>Advance:</strong> {booking.payment_status}</p>
                   {booking.cancelled_by && booking.cancelled_at && <p><strong>Cancelled on:</strong> {new Date(booking.cancelled_at).toLocaleDateString('en-CA')}, {new Date(booking.cancelled_at).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })}</p>}
                   {booking.last_updated_by && (
                     <p><strong>Last Updated By:</strong> {booking.last_updated_by}</p>

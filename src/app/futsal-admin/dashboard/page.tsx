@@ -948,7 +948,7 @@ export default function FutsalAdminDashboard() {
                                 <p><strong>Time:</strong> {formatTimeRange(b.time_slot)}</p>
                                 <p><strong>Players:</strong> {b.number_of_players}</p>
                                 {b.team_name && <p><strong>Team:</strong> {b.team_name}</p>}
-                                <p><strong>Status:</strong> {b.payment_status}</p>
+                                <p><strong>Advance:</strong> {b.payment_status}</p>
                                 {b.cancelled_by && b.cancelled_at && <p><strong>Cancelled on:</strong> {new Date(b.cancelled_at).toLocaleDateString('en-CA')}, {new Date(b.cancelled_at).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })}</p>}
 
                                 {b.last_updated_by && (
