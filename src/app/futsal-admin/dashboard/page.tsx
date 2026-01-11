@@ -168,6 +168,9 @@ export default function FutsalAdminDashboard() {
        );
      });
 
+  // Use socket handler for real-time updates
+  useSocketHandler();
+
   useEffect(() => {
     if (hydrated) {
       if (role !== 'futsal_admin') {
