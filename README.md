@@ -62,8 +62,8 @@ BookMyFutsal is a comprehensive web platform for booking futsal venues in Nepal.
 │   ├── 📄 next.config.ts                 # Next.js configuration settings
 │   ├── 📄 package-lock.json              # NPM lock file for exact dependency versions
 │   ├── 📄 package.json                   # NPM package configuration and dependencies
+│   ├── 📄 postcss.config.mjs             # PostCSS configuration for CSS processing
 │   ├── 📄 README.md                      # Project documentation (this file)
-│   ├── 📄 tsconfig.json                  # TypeScript configuration
 │   ├── 📁 .next/                         # Next.js build output directory (generated)
 │   ├── 📁 hero/                          # Hero section static images
 │   │   └── 🖼️ hero_section.jpg           # Main hero background image
@@ -87,10 +87,12 @@ BookMyFutsal is a comprehensive web platform for booking futsal venues in Nepal.
 │       │   │   └── 📁 [futsalId]/        # Dynamic route for specific futsal booking
 │       │   │       └── 📄 page.tsx       # Futsal booking page
 │       │   ├── 📁 futsal-admin/          # Futsal admin section
-│       │   │   ├── 📁 dashboard/         # Futsal admin dashboard
-│       │   │   │   └── 📄 page.tsx       # Futsal admin dashboard page
-│       │   │   └── 📁 signin/            # Futsal admin authentication
-│       │   │       └── 📄 page.tsx       # Futsal admin signin page
+│       │   ├── 📁 dashboard/         # Futsal admin dashboard
+│       │   │   ├── 📄 page.tsx       # Futsal admin dashboard page
+│       │   │   └── 📁 hooks/         # Custom React hooks
+│       │   │       └── 📄 useSpecialPrices.ts # Hook for special prices data
+│       │   └── 📁 signin/            # Futsal admin authentication
+│       │   │   └── 📄 page.tsx       # Futsal admin signin page
 │       │   ├── 📁 super-admin/           # Super admin section
 │       │   │   ├── 📁 dashboard/         # Super admin dashboard
 │       │   │   │   ├── 📄 page.tsx       # Super admin dashboard page
@@ -103,9 +105,10 @@ BookMyFutsal is a comprehensive web platform for booking futsal venues in Nepal.
 │       │   │   │   │   ├── 📄 FeedbackSection.tsx       # Feedback and bugs section
 │       │   │   │   │   ├── 📄 FutsalSection.tsx         # Futsals management section
 │       │   │   │   │   ├── 📄 RatingSection.tsx         # Ratings management section
-│       │   │   │   │   ├── 📄 SlotSection.tsx           # Time slots management section
-│       │   │   │   │   ├── 📄 UserSection.tsx           # Users management section
-│       │   │   │   │   ├── 📁 forms/                    # Form components
+│       │   │   │   ├── 📄 SlotSection.tsx           # Time slots management section
+│       │   │   │   ├── 📄 SpecialPriceSection.tsx   # Special prices management section
+│       │   │   │   ├── 📄 UserSection.tsx           # Users management section
+│       │   │   │   ├── 📁 forms/                    # Form components
 │       │   │   │   │   │   ├── 📄 CreateFutsalAdminForm.tsx  # Form to create futsal admin
 │       │   │   │   │   │   ├── 📄 CreateFutsalForm.tsx       # Form to create futsal
 │       │   │   │   │   │   ├── 📄 CreateRatingForm.tsx       # Form to create rating
@@ -177,7 +180,8 @@ BookMyFutsal is a comprehensive web platform for booking futsal venues in Nepal.
 │       │   ├── 📄 useTestimonials.ts                         # Hook for testimonials data
 │       │   ├── 📄 useTimeSlots.ts                            # Hook for time slots data
 │       │   ├── 📄 useVenueCarousel.ts                        # Hook for venue carousel logic
-│       │   └── 📄 useVenueFilters.ts                         # Hook for venue filtering
+│       ├── 📄 useVenueFilters.ts                         # Hook for venue filtering
+│       └── 📄 useSpecialPrices.ts                             # Hook for special prices data
 │       ├── 📁 reducers/                                      # Redux-style reducers
 │       │   ├── 📄 bookingReducer.ts                          # Reducer for booking state
 │       │   ├── 📄 filterReducer.ts                           # Reducer for filter state
