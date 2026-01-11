@@ -126,6 +126,7 @@ export default function FutsalAdminDashboard() {
    const [creatingSpecialPrice, setCreatingSpecialPrice] = useState(false);
    const [editingSpecialPrice, setEditingSpecialPrice] = useState<any | null>(null);
    const [bookingFilter, setBookingFilter] = useState<'all' | 'past' | 'today' | 'future' | 'cancelled'>('all');
+   const [searchTerm, setSearchTerm] = useState('');
    const [confirmModal, setConfirmModal] = useState<{ isOpen: boolean, message: string, onConfirm: () => void }>({ isOpen: false, message: '', onConfirm: () => { } });
    const [deletedBookings, setDeletedBookings] = useState<number[]>([]);
    const [selectedBookings, setSelectedBookings] = useState<number[]>([]);
@@ -153,6 +154,19 @@ export default function FutsalAdminDashboard() {
    const bookings = bookingsData?.bookings || [];
    const slots = slotsData?.slots || [];
    const ratings = ratingsData || [];
+
+   // Filtered bookings for display and counts
+   const filteredBookings = bookings
+     .filter((b: any) => !deletedBookings.includes(b.booking_id))
+     .filter((b: any) => {
+       if (!searchTerm) return true;
+       const searchLower = searchTerm.toLowerCase();
+       return (
+         b.first_name?.toLowerCase().includes(searchLower) ||
+         b.user_phone?.includes(searchTerm) ||
+         b.team_name?.toLowerCase().includes(searchLower)
+       );
+     });
 
   useEffect(() => {
     if (hydrated) {
@@ -466,8 +480,7 @@ export default function FutsalAdminDashboard() {
 
   const handleSelectAll = (checked: boolean) => {
     if (checked) {
-      const visibleBookings = bookings
-        .filter((booking: any) => !deletedBookings.includes(booking.booking_id))
+      const visibleBookings = filteredBookings
         .filter((booking: any) => {
           const category = categorizeBooking(booking);
           return bookingFilter === 'all' || (bookingFilter === 'cancelled' ? !!booking.cancelled_by : category === bookingFilter);
@@ -836,11 +849,11 @@ export default function FutsalAdminDashboard() {
                   <div className="mb-4">
                     <div className="grid grid-cols-2 gap-3 mb-4 sm:flex sm:flex-wrap sm:gap-3">
                       {[
-                        { key: 'all', label: `All Bookings (${bookings.filter((b: any) => !deletedBookings.includes(b.booking_id)).length})`, icon: '📋' },
-                        { key: 'past', label: `Past Bookings (${bookings.filter((b: any) => !deletedBookings.includes(b.booking_id) && categorizeBooking(b) === 'past').length})`, icon: '⏰' },
-                        { key: 'today', label: `Today Bookings (${bookings.filter((b: any) => !deletedBookings.includes(b.booking_id) && categorizeBooking(b) === 'today').length})`, icon: '📅' },
-                        { key: 'future', label: `Future Bookings (${bookings.filter((b: any) => !deletedBookings.includes(b.booking_id) && categorizeBooking(b) === 'future').length})`, icon: '🔮' },
-                        { key: 'cancelled', label: `Cancelled Bookings (${bookings.filter((b: any) => !deletedBookings.includes(b.booking_id) && b.cancelled_by).length})`, icon: '❌' }
+                        { key: 'all', label: `All Bookings (${filteredBookings.length})`, icon: '📋' },
+                        { key: 'past', label: `Past Bookings (${filteredBookings.filter((b: any) => categorizeBooking(b) === 'past').length})`, icon: '⏰' },
+                        { key: 'today', label: `Today Bookings (${filteredBookings.filter((b: any) => categorizeBooking(b) === 'today').length})`, icon: '📅' },
+                        { key: 'future', label: `Future Bookings (${filteredBookings.filter((b: any) => categorizeBooking(b) === 'future').length})`, icon: '🔮' },
+                        { key: 'cancelled', label: `Cancelled Bookings (${filteredBookings.filter((b: any) => b.cancelled_by).length})`, icon: '❌' }
                       ].map((filter: any) => (
                         <button
                           key={filter.key}
@@ -891,16 +904,12 @@ export default function FutsalAdminDashboard() {
                     <input
                       type="text"
                       placeholder="Search by name, phone, or team name..."
-                      onChange={(e) => {
-                        // Note: Client-side filtering, no need to refetch
-                        // The filtering is done in the render
-                      }}
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
                       className="w-full p-2 border border-gray-400 rounded resize-none focus:outline-none focus:ring-0 focus:border-gray-900 focus:border pr-10"
                     />
                     <button
-                      onClick={() => {
-                        // Note: Clear search, but since filtering is client-side, no action needed
-                      }}
+                      onClick={() => setSearchTerm('')}
                       className="absolute right-2 to p-2 text-gray-500 hover:text-gray-700"
                       title="Clear search"
                     >
@@ -908,8 +917,7 @@ export default function FutsalAdminDashboard() {
                     </button>
                   </div>
                   <div className="space-y-4">
-                    {bookings
-                      .filter((b: any) => !deletedBookings.includes(b.booking_id))
+                    {filteredBookings
                       .filter((b: any) => {
                         const category = categorizeBooking(b);
                         return bookingFilter === 'all' || (bookingFilter === 'cancelled' ? !!b.cancelled_by : category === bookingFilter);
