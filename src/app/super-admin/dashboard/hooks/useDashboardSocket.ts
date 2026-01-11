@@ -20,9 +20,6 @@ interface SocketCallbacks {
   onRatingCreated?: (data: any) => void;
   onRatingUpdated?: (data: any) => void;
   onRatingDeleted?: (data: any) => void;
-  onSpecialPriceCreated?: (data: any) => void;
-  onSpecialPriceUpdated?: (data: any) => void;
-  onSpecialPriceDeleted?: (data: any) => void;
 }
 
 export function useDashboardSocket(callbacks: SocketCallbacks) {
@@ -97,17 +94,6 @@ export function useDashboardSocket(callbacks: SocketCallbacks) {
       socket.on('ratingDeleted', callbacks.onRatingDeleted);
     }
 
-    // Special price events
-    if (callbacks.onSpecialPriceCreated) {
-      socket.on('specialPriceCreated', callbacks.onSpecialPriceCreated);
-    }
-    if (callbacks.onSpecialPriceUpdated) {
-      socket.on('specialPriceUpdated', callbacks.onSpecialPriceUpdated);
-    }
-    if (callbacks.onSpecialPriceDeleted) {
-      socket.on('specialPriceDeleted', callbacks.onSpecialPriceDeleted);
-    }
-
     // Cleanup function
     return () => {
       if (callbacks.onSlotStatusUpdate) {
@@ -163,15 +149,6 @@ export function useDashboardSocket(callbacks: SocketCallbacks) {
       }
       if (callbacks.onRatingDeleted) {
         socket.off('ratingDeleted', callbacks.onRatingDeleted);
-      }
-      if (callbacks.onSpecialPriceCreated) {
-        socket.off('specialPriceCreated', callbacks.onSpecialPriceCreated);
-      }
-      if (callbacks.onSpecialPriceUpdated) {
-        socket.off('specialPriceUpdated', callbacks.onSpecialPriceUpdated);
-      }
-      if (callbacks.onSpecialPriceDeleted) {
-        socket.off('specialPriceDeleted', callbacks.onSpecialPriceDeleted);
       }
     };
   }, [socket, callbacks]);

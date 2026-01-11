@@ -53,23 +53,8 @@ export const useSocketHandler = () => {
     };
 
     const handleSlotStatusUpdated = (data: any) => {
-
+      
       queryClient.invalidateQueries({ queryKey: ['time-slots'] });
-    };
-
-    const handleSpecialPriceCreated = (data: any) => {
-
-      queryClient.invalidateQueries({ queryKey: ['special-prices'], exact: false });
-    };
-
-    const handleSpecialPriceUpdated = (data: any) => {
-
-      queryClient.invalidateQueries({ queryKey: ['special-prices'], exact: false });
-    };
-
-    const handleSpecialPriceDeleted = (data: any) => {
-
-      queryClient.invalidateQueries({ queryKey: ['special-prices'], exact: false });
     };
 
     // Register event listeners
@@ -77,9 +62,6 @@ export const useSocketHandler = () => {
     socket.on('bookingCreated', handleBookingCreated);
     socket.on('bookingDeleted', handleBookingDeleted);
     socket.on('slotStatusUpdated', handleSlotStatusUpdated);
-    socket.on('specialPriceCreated', handleSpecialPriceCreated);
-    socket.on('specialPriceUpdated', handleSpecialPriceUpdated);
-    socket.on('specialPriceDeleted', handleSpecialPriceDeleted);
 
     // Cleanup
     return () => {
@@ -87,9 +69,6 @@ export const useSocketHandler = () => {
       socket.off('bookingCreated', handleBookingCreated);
       socket.off('bookingDeleted', handleBookingDeleted);
       socket.off('slotStatusUpdated', handleSlotStatusUpdated);
-      socket.off('specialPriceCreated', handleSpecialPriceCreated);
-      socket.off('specialPriceUpdated', handleSpecialPriceUpdated);
-      socket.off('specialPriceDeleted', handleSpecialPriceDeleted);
     };
   }, [socket, isConnected, queryClient, user]);
 };
