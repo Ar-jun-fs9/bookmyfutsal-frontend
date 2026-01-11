@@ -21,16 +21,18 @@ interface Futsal {
  }
 
 interface SpecialPrice {
-   special_price_id: number;
-   futsal_id: number;
-   special_date: string;
-   special_price: number;
-   message?: string;
-   created_by: string;
-   created_at: string;
-   updated_at?: string;
-   futsal_name: string;
- }
+    special_price_id: number;
+    futsal_id: number;
+    type: string;
+    special_date: string | null;
+    recurring_days: string[] | null;
+    special_price: number;
+    message?: string;
+    created_by: string;
+    created_at: string;
+    updated_at?: string;
+    futsal_name: string;
+  }
 
 interface DetailsModalProps {
   futsal: Futsal;
@@ -127,13 +129,22 @@ export default function DetailsModal({ futsal, onClose }: DetailsModalProps) {
                   ) : specialPrices.length > 0 ? (
                     <div className="space-y-2">
                       <p className="font-medium text-gray-700">Special Prices:</p>
-                      {specialPrices.map((sp) => (
-                        <div key={sp.special_price_id} className="bg-yellow-50 p-3 rounded-lg border border-yellow-200">
-                          <p className="text-yellow-800 font-medium">{formatDate(sp.special_date)}</p>
-                          <p className="text-xl font-bold text-yellow-600">Rs. {sp.special_price}/hour</p>
-                          {sp.message && <p className="text-sm text-yellow-700 mt-1">{sp.message}</p>}
-                        </div>
-                      ))}
+                      {specialPrices.map((sp) => {
+                        let displayText = '';
+                        if (sp.type === 'date' && sp.special_date) {
+                          displayText = formatDate(sp.special_date);
+                        } else if (sp.type === 'recurring' && sp.recurring_days) {
+                          const days = Array.isArray(sp.recurring_days) ? sp.recurring_days : JSON.parse(sp.recurring_days) as string[];
+                          displayText = days.map((day: string) => day.charAt(0).toUpperCase() + day.slice(1)).join(', ');
+                        }
+                        return (
+                          <div key={sp.special_price_id} className="bg-yellow-50 p-3 rounded-lg border border-yellow-200">
+                            <p className="text-yellow-800 font-medium">{displayText}</p>
+                            <p className="text-xl font-bold text-yellow-600">Rs. {sp.special_price}/hour</p>
+                            {sp.message && <p className="text-sm text-yellow-700 mt-1">{sp.message}</p>}
+                          </div>
+                        );
+                      })}
                     </div>
                   ) : (
                     <p className="text-gray-500">No special prices set</p>
