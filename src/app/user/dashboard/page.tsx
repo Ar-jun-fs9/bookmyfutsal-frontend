@@ -1282,7 +1282,7 @@ function DetailsModal({ futsal, onClose }: { futsal: Futsal, onClose: () => void
                   ) : specialPrices.length > 0 ? (
                     <div className="space-y-2">
                       <p className="font-medium text-gray-700">Special Prices:</p>
-                      {specialPrices.map((sp: any) => (
+                      {specialPrices.filter((sp: any) => sp.type === 'date').map((sp: any) => (
                         <div key={sp.special_price_id} className="bg-yellow-50 p-3 rounded-lg border border-yellow-200">
                           <p className="text-yellow-800 font-medium">{formatDate(sp.special_date)}</p>
                           <p className="text-xl font-bold text-yellow-600">Rs. {sp.special_price}/hour</p>
