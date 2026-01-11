@@ -99,10 +99,10 @@ export default function UserDashboard() {
   const [showCheckboxes, setShowCheckboxes] = useState(false);
   const [showAllFutsals, setShowAllFutsals] = useState(false);
   const [availableShifts, setAvailableShifts] = useState<string[]>([]);
-  const [availableSlots, setAvailableSlots] = useState<any[]>([]);
-  const [otpCode, setOtpCode] = useState('');
-  const [loggedInUser, setLoggedInUser] = useState<User | null>(null);
-  const [booking, setBooking] = useState<Booking | null>(null);
+  // const [availableSlots, setAvailableSlots] = useState<any[]>([]);
+  // const [otpCode, setOtpCode] = useState('');
+  // const [loggedInUser, setLoggedInUser] = useState<User | null>(null);
+  // const [booking, setBooking] = useState<Booking | null>(null);
   const scrollPositionRef = useRef<number>(0);
 
   // Socket handling

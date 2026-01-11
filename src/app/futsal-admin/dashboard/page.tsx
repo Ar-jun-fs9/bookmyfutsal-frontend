@@ -11,7 +11,7 @@ import { useBookings, useFutsalBookings } from '@/hooks/useBookings';
 import { useTimeSlots, useFutsalSlotsForDate, useCloseAllSlotsForDate, useOpenAllSlotsForDate, useUpdateSlotStatus } from '@/hooks/useTimeSlots';
 import { useFutsalRatings } from '@/hooks/useRatings';
 import { filterReducer, initialFilterState } from '@/reducers/filterReducer';
-import { useSocketHandler } from '@/hooks/useSocketHandler';
+// import { useSocketHandler } from '@/hooks/useSocketHandler';
 import { useSpecialPrices } from './hooks/useSpecialPrices';
 
 interface Admin {

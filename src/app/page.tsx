@@ -4,14 +4,14 @@ import { useEffect, useState, useRef, useReducer } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
-import html2canvas from 'html2canvas';
+// import html2canvas from 'html2canvas';
 import { useFutsals } from '@/hooks/useFutsals';
 import { useTrackBooking } from '@/hooks/useBookings';
 import { useNotificationStore } from '@/stores/notificationStore';
 import { useFutsalStore } from '@/stores/futsalStore';
 import { useModalStore } from '@/stores/modalStore';
 import { filterReducer, initialFilterState } from '@/reducers/filterReducer';
-import { filterFutsals, formatDate, formatTimeRange, formatBookingTimeRange, calculateDistance } from '@/utils/helpers';
+// import { filterFutsals, formatDate, formatTimeRange, formatBookingTimeRange, calculateDistance } from '@/utils/helpers';
 import { Notification } from '@/components/ui/Notification';
 
 // Dynamic imports for code splitting
@@ -110,8 +110,8 @@ export default function RootPage() {
    const { data: trackedBooking, refetch: refetchBooking } = useTrackBooking(trackingCode, hasSearched);
    const [currentImageIndexes, setCurrentImageIndexes] = useState<{ [key: number]: number }>({});
    const [currentCarouselIndex, setCurrentCarouselIndex] = useState(0);
-   const [showAllFutsals, setShowAllFutsals] = useState(false);
-   const [currentTestimonialIndex, setCurrentTestimonialIndex] = useState(0);
+  //  const [showAllFutsals, setShowAllFutsals] = useState(false);
+  //  const [currentTestimonialIndex, setCurrentTestimonialIndex] = useState(0);
    const [testimonialsPerPage, setTestimonialsPerPage] = useState(3);
    const [filterState, dispatch] = useReducer(filterReducer, initialFilterState);
    const summaryRef = useRef<HTMLDivElement>(null);
