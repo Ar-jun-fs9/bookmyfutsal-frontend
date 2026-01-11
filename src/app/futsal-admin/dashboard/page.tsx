@@ -1204,7 +1204,7 @@ export default function FutsalAdminDashboard() {
                   {creatingSpecialPrice && futsal && (
                     <div className="mb-6 relative bg-white rounded-2xl shadow-2xl overflow-hidden transform transition-all duration-500 hover:scale-[1.01]">
                       {/* Gradient Background */}
-                      <div className="absolute inset-0 bg-linear-to-br from-yellow-50 via-white to-yellow-50 opacity-70"></div>
+                      <div className="absolute inset-0 bg-linear-to-br from-green-50 via-white to-green-50 opacity-70"></div>
 
                       {/* Content */}
                       <div className="relative p-6 sm:p-8">
@@ -1443,12 +1443,12 @@ function CreateSpecialPriceForm({ futsalId, onSuccess, setNotification }: { futs
     <div className="space-y-6">
       {/* Header */}
       <div className="text-center mb-6">
-        <div className="inline-flex items-center justify-center w-12 h-12 sm:w-14 sm:h-14 bg-linear-to-br from-yellow-500 to-yellow-600 rounded-lg mb-3 shadow-lg">
+        <div className="inline-flex items-center justify-center w-12 h-12 sm:w-14 sm:h-14 bg-linear-to-br from-green-500 to-green-600 rounded-lg mb-3 shadow-lg">
           <svg className="w-6 h-6 sm:w-7 sm:h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
           </svg>
         </div>
-        <h3 className="text-xl sm:text-2xl font-bold bg-linear-to-r from-yellow-600 to-yellow-700 bg-clip-text text-transparent mb-2">
+        <h3 className="text-xl sm:text-2xl font-bold bg-linear-to-r from-green-600 to-green-700 bg-clip-text text-transparent mb-2">
           Create Special Price
         </h3>
         <p className="text-gray-600 text-sm">
@@ -1497,9 +1497,9 @@ function CreateSpecialPriceForm({ futsalId, onSuccess, setNotification }: { futs
               onChange={(e) => setFormData({ ...formData, special_price: e.target.value })}
               placeholder="Enter price"
               required
-              className="w-full px-4 py-3 pl-12 bg-white border border-gray-200 rounded-lg text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-400/50 focus:border-yellow-400/50 transition-all duration-300 font-medium text-sm"
+              className="w-full px-4 py-3 pl-12 bg-white border border-gray-200 rounded-lg text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-400/50 focus:border-green-400/50 transition-all duration-300 font-medium text-sm"
             />
-            <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-yellow-500">
+            <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-green-500">
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
               </svg>
@@ -1519,7 +1519,7 @@ function CreateSpecialPriceForm({ futsalId, onSuccess, setNotification }: { futs
                 value={currentDate}
                 onChange={(e) => setCurrentDate(e.target.value)}
                 min={new Date().toISOString().split('T')[0]}
-                className="flex-1 px-4 py-3 bg-white border border-gray-200 rounded-lg text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-400/50 focus:border-yellow-400/50 transition-all duration-300 font-medium text-sm"
+                className="flex-1 px-4 py-3 bg-white border border-gray-200 rounded-lg text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-400/50 focus:border-green-400/50 transition-all duration-300 font-medium text-sm"
               />
               <button
                 type="button"
@@ -1565,12 +1565,12 @@ function CreateSpecialPriceForm({ futsalId, onSuccess, setNotification }: { futs
             </label>
             <div className="grid grid-cols-2 gap-3">
               {['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'].map((day) => (
-                <label key={day} className="flex items-center p-3 border-2 rounded-lg cursor-pointer transition-all duration-300 hover:border-yellow-400">
+                <label key={day} className="flex items-center p-3 border-2 rounded-lg cursor-pointer transition-all duration-300 hover:border-green-400">
                   <input
                     type="checkbox"
                     checked={formData.recurring_days.includes(day)}
                     onChange={() => toggleDay(day)}
-                    className="mr-3 text-yellow-600 focus:ring-yellow-500"
+                    className="mr-3 text-green-600 focus:ring-green-500"
                   />
                   <span className="text-sm font-medium text-gray-700 capitalize">{day}</span>
                 </label>
@@ -1613,11 +1613,11 @@ function CreateSpecialPriceForm({ futsalId, onSuccess, setNotification }: { futs
               placeholder="Add a message explaining the special price..."
               value={formData.message}
               onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-              className="w-full px-4 py-3 pl-12 bg-white border border-gray-200 rounded-lg text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-400/50 focus:border-yellow-400/50 transition-all duration-300 font-medium text-sm"
+              className="w-full px-4 py-3 pl-12 bg-white border border-gray-200 rounded-lg text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-400/50 focus:border-green-400/50 transition-all duration-300 font-medium text-sm"
               rows={3}
               maxLength={200}
             />
-            <div className="absolute left-4 top-4 text-yellow-500">
+            <div className="absolute left-4 top-4 text-green-500">
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
               </svg>
@@ -1633,7 +1633,7 @@ function CreateSpecialPriceForm({ futsalId, onSuccess, setNotification }: { futs
           <button
             type="submit"
             disabled={(formData.type === 'date' && formData.special_dates.length === 0) || (formData.type === 'recurring' && formData.recurring_days.length === 0)}
-            className="flex-1 bg-linear-to-r from-yellow-500 to-yellow-600 text-white font-semibold py-3 px-6 rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 border border-yellow-400/30 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+            className="flex-1 bg-linear-to-r from-green-500 to-green-600 text-white font-semibold py-3 px-6 rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 border border-green-400/30 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
           >
             <span className="flex items-center justify-center">
               <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1684,7 +1684,7 @@ function EditSpecialPriceForm({ price, onUpdate, onCancel, setNotification }: { 
   };
 
   return (
-    <form onSubmit={handleSubmit} className="border rounded p-4 mb-4 bg-yellow-50">
+    <form onSubmit={handleSubmit} className="border rounded p-4 mb-4 bg-green-50">
       <h4 className="font-bold mb-4">Edit Special Price</h4>
       <div className="grid grid-cols-2 gap-4">
         <div>
@@ -1712,7 +1712,7 @@ function EditSpecialPriceForm({ price, onUpdate, onCancel, setNotification }: { 
         <button type="button" onClick={onCancel} className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded">
           Cancel
         </button>
-        <button type="submit" className="bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-2 rounded">
+        <button type="submit" className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded">
           Update
         </button>
       </div>
