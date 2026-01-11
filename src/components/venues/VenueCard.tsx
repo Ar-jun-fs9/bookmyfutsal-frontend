@@ -30,44 +30,44 @@ interface VenueCardProps {
 }
 
 const VenueCard = memo(function VenueCard({ futsal, index }: VenueCardProps) {
-   const router = useRouter();
-   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-   const { showNotification } = useNotificationStore();
-   const {
-     setVideoModal,
-     setRatingModal,
-     setDetailsModal,
-     setLocationModal,
-   } = useModalStore();
+  const router = useRouter();
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const { showNotification } = useNotificationStore();
+  const {
+    setVideoModal,
+    setRatingModal,
+    setDetailsModal,
+    setLocationModal,
+  } = useModalStore();
 
-   const images = useMemo(() => futsal.images || [], [futsal.images]);
+  const images = useMemo(() => futsal.images || [], [futsal.images]);
 
-   const formattedTimeRange = useMemo(() => {
-     if (futsal.opening_hours && futsal.closing_hours) {
-       return formatTimeRange(futsal.opening_hours, futsal.closing_hours);
-     }
-     return null;
-   }, [futsal.opening_hours, futsal.closing_hours]);
+  const formattedTimeRange = useMemo(() => {
+    if (futsal.opening_hours && futsal.closing_hours) {
+      return formatTimeRange(futsal.opening_hours, futsal.closing_hours);
+    }
+    return null;
+  }, [futsal.opening_hours, futsal.closing_hours]);
 
-   const facilitiesToShow = useMemo(() => {
-     return futsal.facilities?.slice(0, 3) || [];
-   }, [futsal.facilities]);
+  const facilitiesToShow = useMemo(() => {
+    return futsal.facilities?.slice(0, 3) || [];
+  }, [futsal.facilities]);
 
-   const hasMoreFacilities = useMemo(() => {
-     return (futsal.facilities?.length || 0) > 3;
-   }, [futsal.facilities]);
+  const hasMoreFacilities = useMemo(() => {
+    return (futsal.facilities?.length || 0) > 3;
+  }, [futsal.facilities]);
 
-   const extraFacilitiesCount = useMemo(() => {
-     return Math.max(0, (futsal.facilities?.length || 0) - 3);
-   }, [futsal.facilities]);
+  const extraFacilitiesCount = useMemo(() => {
+    return Math.max(0, (futsal.facilities?.length || 0) - 3);
+  }, [futsal.facilities]);
 
-   const handlePrevImage = useCallback(() => {
-     setCurrentImageIndex(prev => prev > 0 ? prev - 1 : images.length - 1);
-   }, [images.length]);
+  const handlePrevImage = useCallback(() => {
+    setCurrentImageIndex(prev => prev > 0 ? prev - 1 : images.length - 1);
+  }, [images.length]);
 
-   const handleNextImage = useCallback(() => {
-     setCurrentImageIndex(prev => prev < images.length - 1 ? prev + 1 : 0);
-   }, [images.length]);
+  const handleNextImage = useCallback(() => {
+    setCurrentImageIndex(prev => prev < images.length - 1 ? prev + 1 : 0);
+  }, [images.length]);
 
   const handleCheckLocation = useCallback(() => {
     if (!futsal.latitude || !futsal.longitude) {
@@ -218,10 +218,11 @@ const VenueCard = memo(function VenueCard({ futsal, index }: VenueCardProps) {
           {futsal.location}, {futsal.city}
         </p>
         <div className="flex items-center justify-between mb-3">
-          <div>
-            <span className="text-2xl font-bold text-green-600">Rs. {futsal.price_per_hour}/hour</span>
-            <p className="text-sm text-gray-500">Normal Days Price</p>
-          </div>
+          <span className="text-2xl font-bold text-green-600">
+            Rs. {futsal.price_per_hour}
+            <span className="ml-1 text-xl font-medium">/hr</span>
+          </span>
+          <p className="text-sm  text-green-700 bg-green-50 px-1.5 rounded-full">Normal Days Price</p>
         </div>
         {formattedTimeRange && (
           <p className="text-sm text-gray-600 mb-2 flex items-center">

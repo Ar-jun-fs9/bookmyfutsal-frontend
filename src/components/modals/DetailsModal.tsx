@@ -122,7 +122,7 @@ export default function DetailsModal({ futsal, onClose }: DetailsModalProps) {
                 <div className="space-y-3">
                   <div className="bg-green-50 p-3 rounded-lg border border-green-200">
                     <p className="text-green-800 font-medium">Normal Days Price</p>
-                    <p className="text-2xl font-bold text-green-600">Rs. {futsal.price_per_hour}/hour</p>
+                    <p className="text-2xl font-bold text-green-600">Rs. {futsal.price_per_hour}/hr</p>
                   </div>
                   {loadingSpecialPrices ? (
                     <p className="text-gray-500">Loading special prices...</p>
@@ -140,7 +140,7 @@ export default function DetailsModal({ futsal, onClose }: DetailsModalProps) {
                         return (
                           <div key={sp.special_price_id} className="bg-yellow-50 p-3 rounded-lg border border-yellow-200">
                             <p className="text-yellow-800 font-medium">{displayText}</p>
-                            <p className="text-xl font-bold text-yellow-600">Rs. {sp.special_price}/hour</p>
+                            <p className="text-xl font-bold text-yellow-600">Rs. {sp.special_price}/hr</p>
                             {sp.message && <p className="text-sm text-yellow-700 mt-1">{sp.message}</p>}
                           </div>
                         );

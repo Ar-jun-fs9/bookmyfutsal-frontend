@@ -315,7 +315,7 @@ function CreateSpecialPriceForm({ futsals, onSuccess, setNotification }: any) {
           <select
             value={formData.futsal_id}
             onChange={(e) => setFormData({ ...formData, futsal_id: e.target.value })}
-            className="w-full px-3 py-2 border border-gray-300 rounded"
+            className="w-full p-2 border border-gray-300 rounded resize-none focus:outline-none focus:ring-0 focus:border-gray-900"
             required
           >
             <option value="">Select Futsal</option>
@@ -333,7 +333,7 @@ function CreateSpecialPriceForm({ futsals, onSuccess, setNotification }: any) {
             step="0.01"
             value={formData.special_price}
             onChange={(e) => setFormData({ ...formData, special_price: e.target.value })}
-            className="w-full px-3 py-2 border border-gray-300 rounded"
+            className="w-full p-2 border border-gray-300 rounded resize-none focus:outline-none focus:ring-0 focus:border-gray-900"
             required
           />
         </div>
@@ -376,7 +376,7 @@ function CreateSpecialPriceForm({ futsals, onSuccess, setNotification }: any) {
               value={currentDate}
               onChange={(e) => setCurrentDate(e.target.value)}
               min={new Date().toISOString().split('T')[0]}
-              className="flex-1 px-3 py-2 border border-gray-300 rounded"
+              className="flex-1 px-3 py-2  border border-gray-300 rounded resize-none focus:outline-none focus:ring-0 focus:border-gray-900"
             />
             <button
               type="button"
@@ -459,7 +459,7 @@ function CreateSpecialPriceForm({ futsals, onSuccess, setNotification }: any) {
           type="text"
           value={formData.message}
           onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-          className="w-full px-3 py-2 border border-gray-300 rounded"
+          className="w-full p-2 border border-gray-300 rounded resize-none focus:outline-none focus:ring-0 focus:border-gray-900"
         />
       </div>
       <div className="flex justify-end mt-4">
@@ -509,7 +509,7 @@ function EditSpecialPriceForm({ price, onUpdate, onCancel, setNotification }: an
             step="0.01"
             value={formData.special_price}
             onChange={(e) => setFormData({ ...formData, special_price: e.target.value })}
-            className="w-full px-3 py-2 border border-gray-300 rounded"
+            className="w-full p-2 border border-gray-300 rounded resize-none focus:outline-none focus:ring-0 focus:border-gray-900"
             required
           />
         </div>
@@ -519,7 +519,7 @@ function EditSpecialPriceForm({ price, onUpdate, onCancel, setNotification }: an
             type="text"
             value={formData.message}
             onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-            className="w-full px-3 py-2 border border-gray-300 rounded"
+            className="w-full p-2 border border-gray-300 rounded resize-none focus:outline-none focus:ring-0 focus:border-gray-900"
           />
         </div>
       </div>

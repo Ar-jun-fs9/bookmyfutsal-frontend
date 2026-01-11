@@ -1702,7 +1702,7 @@ function EditSpecialPriceForm({ price, onUpdate, onCancel, setNotification }: { 
             step="0.01"
             value={formData.special_price}
             onChange={(e) => setFormData({ ...formData, special_price: e.target.value })}
-            className="w-full px-3 py-2 border border-gray-300 rounded"
+            className="w-full p-2 border border-gray-300 rounded resize-none focus:outline-none focus:ring-0 focus:border-gray-900"
             required
           />
         </div>
@@ -1712,7 +1712,7 @@ function EditSpecialPriceForm({ price, onUpdate, onCancel, setNotification }: { 
             type="text"
             value={formData.message}
             onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-            className="w-full px-3 py-2 border border-gray-300 rounded"
+            className="w-full p-2 border border-gray-300 rounded resize-none focus:outline-none focus:ring-0 focus:border-gray-900"
           />
         </div>
       </div>
