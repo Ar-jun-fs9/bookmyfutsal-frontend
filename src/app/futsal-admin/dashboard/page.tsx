@@ -651,7 +651,7 @@ export default function FutsalAdminDashboard() {
                 <div className="flex space-x-2">
                   <button
                     onClick={() => setShowFutsalInfo(!showFutsalInfo)}
-                    className="bg-linear-to-r from-blue-600 to-blue-700 text-white font-bold py-2 px-4 rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 border border-blue-500/30 hover:border-blue-400/50"
+                    className="bg-linear-to-r from-green-600 to-green-700 text-white font-bold py-2 px-4 rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 border border-green-500/30 hover:border-green-400/50"
                   >
                     {showFutsalInfo ? 'Hide' : 'Show'}
                   </button>
@@ -1028,7 +1028,7 @@ export default function FutsalAdminDashboard() {
                 <div className="flex space-x-2">
                   <button
                     onClick={() => setShowRatings(!showRatings)}
-                    className="bg-linear-to-r from-blue-600 to-blue-700 text-white font-bold py-2 px-4 rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 border border-blue-500/30 hover:border-blue-400/50"
+                    className="bg-linear-to-r from-green-600 to-green-700 text-white font-bold py-2 px-4 rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 border border-green-500/30 hover:border-green-400/50"
                   >
                     {showRatings ? 'Hide' : 'Show'}
                   </button>
@@ -1185,7 +1185,7 @@ export default function FutsalAdminDashboard() {
                 <div className="flex space-x-2">
                   <button
                     onClick={() => setShowSpecialPrices(!showSpecialPrices)}
-                    className="bg-linear-to-r from-yellow-500 to-yellow-600 text-white font-bold py-2 px-4 rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 border border-yellow-400/30 hover:border-yellow-400/50"
+                    className="bg-linear-to-r from-green-500 to-green-600 text-white font-bold py-2 px-4 rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 border border-green-500/30 hover:border-green-400/50"
                   >
                     {showSpecialPrices ? 'Hide' : 'Show'}
                   </button>
