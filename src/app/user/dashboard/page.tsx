@@ -1273,7 +1273,7 @@ function DetailsModal({ futsal, onClose }: { futsal: Futsal, onClose: () => void
               </div>
 
               {/* Price Section */}
-              <div>
+              {/* <div>
                 <h4 className="text-lg font-semibold mb-3">Pricing</h4>
                 <div className="space-y-3">
                   <div className="bg-green-50 p-3 rounded-lg border border-green-200">
@@ -1292,6 +1292,73 @@ function DetailsModal({ futsal, onClose }: { futsal: Futsal, onClose: () => void
                           {sp.message && <p className="text-sm text-yellow-700 mt-1">{sp.message}</p>}
                         </div>
                       ))}
+                    </div>
+                  ) : (
+                    <p className="text-gray-500">No special prices set</p>
+                  )}
+                </div>
+              </div> */}
+              <div>
+                <h4 className="text-lg font-semibold mb-3">Pricing</h4>
+
+                <div className="space-y-3">
+                  {/* Normal Price */}
+                  <div className="bg-green-50 p-3 rounded-lg border border-green-200">
+                    <p className="text-green-800 font-semibold">Normal Days Price</p>
+                    <p className="text-2xl font-bold text-green-600">
+                      Rs. {futsal.price_per_hour}
+                      <span className="ml-1 text-xl font-medium">/hr</span>
+                    </p>
+                  </div>
+
+                  {/* Special Prices */}
+                  {loadingSpecialPrices ? (
+                    <p className="text-gray-500">Loading special prices...</p>
+                  ) : specialPrices.length > 0 ? (
+                    <div className="space-y-2">
+                      <p className="font-semibold text-gray-700">Special Prices:</p>
+
+                      {specialPrices.map((sp: any) => {
+                        let title = '';
+
+                        // Date-based special price
+                        if (sp.type === 'date' && sp.special_date) {
+                          title = formatDate(sp.special_date);
+                        }
+
+                        // Recurring-days special price
+                        if (sp.type === 'recurring' && sp.recurring_days) {
+                          const days = Array.isArray(sp.recurring_days)
+                            ? sp.recurring_days
+                            : JSON.parse(sp.recurring_days);
+
+                          title = days
+                            .map((day: string) =>
+                              day.charAt(0).toUpperCase() + day.slice(1)
+                            )
+                            .join(', ');
+                        }
+
+                        return (
+                          <div
+                            key={sp.special_price_id}
+                            className="bg-yellow-50 p-3 rounded-lg border border-yellow-200"
+                          >
+                            <p className="text-yellow-800 font-semibold">{title}</p>
+
+                            <p className="text-xl font-bold text-yellow-600">
+                              Rs. {sp.special_price}
+                              <span className="ml-1 text-lg font-medium">/hr</span>
+                            </p>
+
+                            {sp.message && (
+                              <p className="text-sm text-yellow-700 mt-1">
+                                {sp.message}
+                              </p>
+                            )}
+                          </div>
+                        );
+                      })}
                     </div>
                   ) : (
                     <p className="text-gray-500">No special prices set</p>
