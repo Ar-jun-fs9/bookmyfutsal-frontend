@@ -27,6 +27,7 @@ interface VirtualizedVenueGridProps {
   futsals: Futsal[];
   containerWidth?: number;
   containerHeight?: number;
+  futsalSpecialPrices?: {[key: number]: any[]};
 }
 
 const ITEM_WIDTH = 320; // Width of each venue card
@@ -36,7 +37,7 @@ const ROW_GAP = 24; // Gap between rows
 
 // Memoized cell renderer for better performance
 const VenueCell = memo(({ columnIndex, rowIndex, style, data }: any) => {
-  const { futsals, columnCount } = data;
+  const { futsals, columnCount, futsalSpecialPrices } = data;
   const index = rowIndex * columnCount + columnIndex;
 
   if (index >= futsals.length) {
@@ -53,7 +54,7 @@ const VenueCell = memo(({ columnIndex, rowIndex, style, data }: any) => {
         boxSizing: 'border-box',
       }}
     >
-      <VenueCard futsal={futsal} index={index} />
+      <VenueCard futsal={futsal} index={index} specialPrices={futsalSpecialPrices[futsal.futsal_id] || []} />
     </div>
   );
 }, areEqual);
@@ -63,7 +64,8 @@ VenueCell.displayName = 'VenueCell';
 const VirtualizedVenueGrid = memo(function VirtualizedVenueGrid({
   futsals,
   containerWidth = 1200,
-  containerHeight = 800
+  containerHeight = 800,
+  futsalSpecialPrices = {}
 }: VirtualizedVenueGridProps) {
   // Calculate grid dimensions
   const columnCount = useMemo(() => {
@@ -92,7 +94,8 @@ const VirtualizedVenueGrid = memo(function VirtualizedVenueGrid({
   const itemData = useMemo(() => ({
     futsals,
     columnCount,
-  }), [futsals, columnCount]);
+    futsalSpecialPrices,
+  }), [futsals, columnCount, futsalSpecialPrices]);
 
   const handleItemsRendered = useCallback(({
     visibleRowStartIndex,

@@ -27,9 +27,10 @@ interface Futsal {
 interface VenueCardProps {
   futsal: Futsal;
   index: number;
+  specialPrices?: any[];
 }
 
-const VenueCard = memo(function VenueCard({ futsal, index }: VenueCardProps) {
+const VenueCard = memo(function VenueCard({ futsal, index, specialPrices = [] }: VenueCardProps) {
   const router = useRouter();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const { showNotification } = useNotificationStore();
@@ -288,12 +289,17 @@ const VenueCard = memo(function VenueCard({ futsal, index }: VenueCardProps) {
           </button>
           <button
             onClick={handleDetailsModal}
-            className="bg-white border-2 border-gray-200 text-gray-700 p-2 rounded-lg hover:bg-gray-50 hover:border-gray-300 transition-all duration-300"
+            className="bg-white border-2 border-gray-200 text-gray-700 p-2 rounded-lg hover:bg-gray-50 hover:border-gray-300 transition-all duration-300 relative"
             title="Details"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
+            {specialPrices.some(sp => sp.is_offer) && (
+              <span className="absolute -top-5 left-1/2 transform -translate-x-1/2 text-[10px] text-red-600 font-bold animate-pulse bg-white px-0.5 rounded pointer-events-none whitespace-nowrap">
+                special offer
+              </span>
+            )}
           </button>
           {futsal.video && (
             <button

@@ -2,6 +2,7 @@ import { useVenueFilters } from '@/hooks/useVenueFilters';
 import { useState, useEffect, useMemo } from 'react';
 import VenueCard from './VenueCard';
 import VirtualizedVenueGrid from './VirtualizedVenueGrid';
+import { useFutsals } from '@/hooks/useFutsals';
 
 interface Futsal {
   futsal_id: number;
@@ -24,19 +25,21 @@ interface Futsal {
 }
 
 export default function VenueGrid() {
-   const {
-     filterState,
-     updateFilter,
-     clearFilters,
-     filteredFutsals,
-     uniqueNames,
-     uniqueCities,
-     uniqueLocations,
-     showAllFutsals,
-     toggleShowAll,
-   } = useVenueFilters();
+    const {
+      filterState,
+      updateFilter,
+      clearFilters,
+      filteredFutsals,
+      uniqueNames,
+      uniqueCities,
+      uniqueLocations,
+      showAllFutsals,
+      toggleShowAll,
+    } = useVenueFilters();
 
-   const [containerDimensions, setContainerDimensions] = useState({ width: 1200, height: 800 });
+    const { data: futsals = [] } = useFutsals();
+    const [futsalSpecialPrices, setFutsalSpecialPrices] = useState<{[key: number]: any[]}>({});
+    const [containerDimensions, setContainerDimensions] = useState({ width: 1200, height: 800 });
 
    // Determine if we should use virtual scrolling
    const shouldUseVirtualization = useMemo(() => {
@@ -65,6 +68,29 @@ export default function VenueGrid() {
      window.addEventListener('resize', updateDimensions);
      return () => window.removeEventListener('resize', updateDimensions);
    }, []);
+
+   // Fetch special prices for all futsals
+   useEffect(() => {
+     const fetchSpecialPrices = async () => {
+       const prices: {[key: number]: any[]} = {};
+       for (const futsal of futsals) {
+         try {
+           const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/special-prices/${futsal.futsal_id}`);
+           if (response.ok) {
+             const data = await response.json();
+             prices[futsal.futsal_id] = data.specialPrices || [];
+           }
+         } catch (error) {
+           console.error('Error fetching special prices for futsal', futsal.futsal_id, error);
+         }
+       }
+       setFutsalSpecialPrices(prices);
+     };
+
+     if (futsals.length > 0) {
+       fetchSpecialPrices();
+     }
+   }, [futsals]);
 
   return (
     <main id="venues" className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-16">
@@ -195,11 +221,12 @@ export default function VenueGrid() {
           futsals={displayVenues}
           containerWidth={containerDimensions.width}
           containerHeight={containerDimensions.height}
+          futsalSpecialPrices={futsalSpecialPrices}
         />
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {displayVenues.map((futsal: Futsal, index: number) => (
-            <VenueCard key={futsal.futsal_id} futsal={futsal} index={index} />
+            <VenueCard key={futsal.futsal_id} futsal={futsal} index={index} specialPrices={futsalSpecialPrices[futsal.futsal_id] || []} />
           ))}
         </div>
       )}

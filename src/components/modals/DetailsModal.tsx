@@ -157,7 +157,7 @@ export default function DetailsModal({ futsal, onClose }: DetailsModalProps) {
                           <div key={sp.special_price_id} className="bg-yellow-50 p-3 rounded-lg border border-yellow-200">
                             <p className="text-xl font-bold text-yellow-600">
                               Rs. {sp.special_price}/hr
-                              {sp.is_offer && <span className="ml-2 text-red-600 font-bold animate-pulse">OFFER</span>}
+                              {sp.is_offer && <span className="ml-2 text-red-600 font-bold animate-pulse">special offer </span>}
                               <span className="text-sm text-yellow-700"> ({details})</span>
                             </p>
                             {sp.message && <p className="text-sm text-yellow-700 mt-1">{sp.message}</p>}
