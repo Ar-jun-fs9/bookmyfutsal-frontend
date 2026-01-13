@@ -1319,36 +1319,35 @@ function DetailsModal({ futsal, onClose }: { futsal: Futsal, onClose: () => void
                       <p className="font-semibold text-gray-700">Special Prices:</p>
 
                       {specialPrices.map((sp: any) => {
-                        let title = '';
-
-                        // Date-based special price
+                        let details = '';
                         if (sp.type === 'date' && sp.special_date) {
-                          title = formatDate(sp.special_date);
-                        }
-
-                        // Recurring-days special price
-                        if (sp.type === 'recurring' && sp.recurring_days) {
+                          const date = new Date(sp.special_date);
+                          details = date.toISOString().split('T')[0];
+                        } else if (sp.type === 'recurring' && sp.recurring_days) {
                           const days = Array.isArray(sp.recurring_days)
                             ? sp.recurring_days
                             : JSON.parse(sp.recurring_days);
 
-                          title = days
-                            .map((day: string) =>
-                              day.charAt(0).toUpperCase() + day.slice(1)
-                            )
-                            .join(', ');
+                          const dayList = days.map((day: string) => day.toLowerCase()).join(', ');
+                          details = `Every : ${dayList}`;
+                        } else if (sp.type === 'time_based') {
+                          if (sp.special_date) {
+                            const date = new Date(sp.special_date);
+                            const dateStr = date.toISOString().split('T')[0];
+                            details = `${formatTime(sp.start_time)} - ${formatTime(sp.end_time)} on ${dateStr}`;
+                          } else {
+                            details = `Every day : ${formatTime(sp.start_time)} - ${formatTime(sp.end_time)}`;
+                          }
                         }
-
                         return (
                           <div
                             key={sp.special_price_id}
                             className="bg-yellow-50 p-3 rounded-lg border border-yellow-200"
                           >
-                            <p className="text-yellow-800 font-semibold">{title}</p>
-
                             <p className="text-xl font-bold text-yellow-600">
                               Rs. {sp.special_price}
                               <span className="ml-1 text-lg font-medium">/hr</span>
+                              <span className="text-sm text-yellow-700"> ({details})</span>
                             </p>
 
                             {sp.message && (

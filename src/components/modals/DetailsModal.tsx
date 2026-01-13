@@ -21,18 +21,20 @@ interface Futsal {
  }
 
 interface SpecialPrice {
-    special_price_id: number;
-    futsal_id: number;
-    type: string;
-    special_date: string | null;
-    recurring_days: string[] | null;
-    special_price: number;
-    message?: string;
-    created_by: string;
-    created_at: string;
-    updated_at?: string;
-    futsal_name: string;
-  }
+     special_price_id: number;
+     futsal_id: number;
+     type: string;
+     special_date: string | null;
+     recurring_days: string[] | null;
+     start_time: string | null;
+     end_time: string | null;
+     special_price: number;
+     message?: string;
+     created_by: string;
+     created_at: string;
+     updated_at?: string;
+     futsal_name: string;
+   }
 
 interface DetailsModalProps {
   futsal: Futsal;
@@ -66,7 +68,7 @@ export default function DetailsModal({ futsal, onClose }: DetailsModalProps) {
      const [hours, minutes] = timeString.split(':').map(Number);
      const period = hours >= 12 ? 'PM' : 'AM';
      const displayHours = hours === 0 ? 12 : hours > 12 ? hours - 12 : hours;
-     return `${displayHours}:${minutes.toString().padStart(2, '0')} ${period}`;
+     return minutes === 0 ? `${displayHours}${period}` : `${displayHours}:${minutes.toString().padStart(2, '0')}${period}`;
    };
 
    const formatDate = (dateString: string): string => {
@@ -130,17 +132,32 @@ export default function DetailsModal({ futsal, onClose }: DetailsModalProps) {
                     <div className="space-y-2">
                       <p className="font-medium text-gray-700">Special Prices:</p>
                       {specialPrices.map((sp) => {
-                        let displayText = '';
+                        let details = '';
                         if (sp.type === 'date' && sp.special_date) {
-                          displayText = formatDate(sp.special_date);
+                          const date = new Date(sp.special_date);
+                          details = date.toISOString().split('T')[0];
                         } else if (sp.type === 'recurring' && sp.recurring_days) {
-                          const days = Array.isArray(sp.recurring_days) ? sp.recurring_days : JSON.parse(sp.recurring_days) as string[];
-                          displayText = days.map((day: string) => day.charAt(0).toUpperCase() + day.slice(1)).join(', ');
+                          const days = Array.isArray(sp.recurring_days)
+                            ? sp.recurring_days
+                            : JSON.parse(sp.recurring_days);
+
+                          const dayList = days.map((day: string) => day.toLowerCase()).join(', ');
+                          details = `Every : ${dayList}`;
+                        } else if (sp.type === 'time_based') {
+                          if (sp.special_date) {
+                            const date = new Date(sp.special_date);
+                            const dateStr = date.toISOString().split('T')[0];
+                            details = `${formatTime(sp.start_time!)} - ${formatTime(sp.end_time!)} on ${dateStr}`;
+                          } else {
+                            details = `Every day : ${formatTime(sp.start_time!)} - ${formatTime(sp.end_time!)}`;
+                          }
                         }
                         return (
                           <div key={sp.special_price_id} className="bg-yellow-50 p-3 rounded-lg border border-yellow-200">
-                            <p className="text-yellow-800 font-medium">{displayText}</p>
-                            <p className="text-xl font-bold text-yellow-600">Rs. {sp.special_price}/hr</p>
+                            <p className="text-xl font-bold text-yellow-600">
+                              Rs. {sp.special_price}/hr
+                              <span className="text-sm text-yellow-700"> ({details})</span>
+                            </p>
                             {sp.message && <p className="text-sm text-yellow-700 mt-1">{sp.message}</p>}
                           </div>
                         );
