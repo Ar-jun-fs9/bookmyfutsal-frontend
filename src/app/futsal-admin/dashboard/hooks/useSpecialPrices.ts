@@ -11,6 +11,7 @@ interface SpecialPrice {
   end_time?: string;
   special_price: number;
   message?: string;
+  is_offer: boolean;
   created_by: string;
   created_at: string;
   updated_at?: string;
@@ -54,6 +55,7 @@ export function useSpecialPrices(futsalId?: number) {
     end_time?: string;
     special_price: number;
     message?: string;
+    is_offer?: boolean;
   }) => {
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/special-prices`, {
@@ -85,6 +87,7 @@ export function useSpecialPrices(futsalId?: number) {
     recurring_days?: string[];
     start_time?: string;
     end_time?: string;
+    is_offer?: boolean;
   }) => {
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/special-prices/${id}`, {

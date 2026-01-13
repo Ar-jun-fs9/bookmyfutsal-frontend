@@ -1090,6 +1090,7 @@ export default function FutsalAdminDashboard() {
                       </div>
                     </div>
                   )}
+                  {/* Special Prices List */}
                   <div className="space-y-4">
                     {specialPricesLoading ? (
                       <p className="text-center text-gray-500">Loading special prices...</p>
@@ -1119,6 +1120,27 @@ export default function FutsalAdminDashboard() {
                                 )}
                                 <p>Price: Rs. {price.special_price}</p>
                                 {price.message && <p>Message: {price.message}</p>}
+                                <div className="flex items-center mt-2">
+                                  <label className="flex items-center cursor-pointer">
+                                    <input
+                                      type="checkbox"
+                                      checked={price.is_offer}
+                                      onChange={async (e) => {
+                                        const result = await updateSpecialPrice(price.special_price_id, { special_price: price.special_price, is_offer: e.target.checked });
+                                        if (result.success) {
+                                          showNotification({ message: `Offer ${e.target.checked ? 'disabled' : 'enabled'} successfully`, type: 'success' });
+                                        } else {
+                                          showNotification({ message: result.error || 'Error updating offer status', type: 'info' });
+                                        }
+                                      }}
+                                      className="sr-only"
+                                    />
+                                    <div className={`relative inline-block w-10 h-6 transition duration-200 ease-in-out rounded-full ${price.is_offer ? 'bg-green-600' : 'bg-gray-300'}`}>
+                                      <span className={`absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition-transform duration-200 ease-in-out ${price.is_offer ? 'translate-x-4' : 'translate-x-0'}`}></span>
+                                    </div>
+                                    <span className="ml-3 text-sm font-medium text-gray-700">Offer {price.is_offer ? 'Enabled' : 'Disabled'}</span>
+                                  </label>
+                                </div>
                               </div>
                               <div className="flex space-x-2">
                                 <button
