@@ -2235,21 +2235,34 @@ function BookingModal({ futsal, user, onClose, onSuccess, setSuccessModal, setCo
     })();
   }, [futsal, selectedDate, selectedShift, step]);
 
-  // Fetch price when date changes
+  // Fetch price when date or selected slot changes
   useEffect(() => {
     const fetchPrice = async () => {
       if (futsal.futsal_id && selectedDate) {
         try {
-          const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/special-prices/price/${futsal.futsal_id}/${selectedDate}`);
+          const selectedSlot = selectedSlotIds.length > 0 ? availableSlots.find(slot => slot.slot_id === selectedSlotIds[0]) : null;
+          const startTime = selectedSlot ? selectedSlot.start_time : undefined;
+
+          const url = startTime
+            ? `${process.env.NEXT_PUBLIC_API_URL}/api/special-prices/price/${futsal.futsal_id}/${selectedDate}?startTime=${startTime}`
+            : `${process.env.NEXT_PUBLIC_API_URL}/api/special-prices/price/${futsal.futsal_id}/${selectedDate}`;
+
+          const response = await fetch(url);
           if (response.ok) {
             const priceData = await response.json();
             setCurrentPrice(priceData);
 
-            // Show notification if special price
-            if (priceData.specialPrice) {
+            // Show notification only in appropriate step
+            if (priceData.specialPrice && !startTime && step === 1) {
+              // Date-specific or recurring special price: show only in date step (step 1)
               const message = `Normal: Rs. ${priceData.normalPrice} → ${priceData.specialPrice.message || 'Special Price'}: Rs. ${priceData.specialPrice.price}`;
               setPriceNotification({ isOpen: true, message });
-            } else {
+            } else if (priceData.timeBasedPrice && startTime && step === 3) {
+              // Time-based special price: show only in time slot step (step 3)
+              const message = `Normal: Rs. ${priceData.normalPrice} → ${priceData.timeBasedPrice.message || 'Time-Based Price'}: Rs. ${priceData.timeBasedPrice.price}`;
+              setPriceNotification({ isOpen: true, message });
+            } else if (step === 2 || step === 4) {
+              // Close modal in other steps to prevent it from staying open
               setPriceNotification(null);
             }
           }
@@ -2260,7 +2273,7 @@ function BookingModal({ futsal, user, onClose, onSuccess, setSuccessModal, setCo
     };
 
     fetchPrice();
-  }, [futsal.futsal_id, selectedDate]);
+  }, [futsal.futsal_id, selectedDate, selectedSlotIds, availableSlots, step]);
 
   // Check slot status before allowing selection
   const checkSlotStatus = async (slotId: number): Promise<string> => {
@@ -3319,20 +3332,33 @@ function UpdateBookingModal({ booking, onClose, onSuccess, setSuccessModal, show
     }
   }, [futsalId, booking.booking_id]);
 
-  // Fetch price when date changes
+  // Fetch price when date or selected slot changes
   useEffect(() => {
     const fetchPrice = async () => {
       if (futsalId && selectedDate) {
         try {
-          const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/special-prices/price/${futsalId}/${selectedDate}`);
+          const selectedSlot = selectedSlotIds.length > 0 ? availableSlots.find(slot => slot.slot_id === selectedSlotIds[0]) : null;
+          const startTime = selectedSlot ? selectedSlot.start_time : undefined;
+
+          const url = startTime
+            ? `${process.env.NEXT_PUBLIC_API_URL}/api/special-prices/price/${futsalId}/${selectedDate}?startTime=${startTime}`
+            : `${process.env.NEXT_PUBLIC_API_URL}/api/special-prices/price/${futsalId}/${selectedDate}`;
+
+          const response = await fetch(url);
           if (response.ok) {
             const priceData = await response.json();
 
-            // Show notification if special price
-            if (priceData.specialPrice) {
+            // Show notification only in appropriate step
+            if (priceData.specialPrice && !startTime && step === 1) {
+              // Date-specific or recurring special price: show only in date step (step 1)
               const message = `Normal: Rs. ${priceData.normalPrice} → ${priceData.specialPrice.message || 'Special Price'}: Rs. ${priceData.specialPrice.price}`;
               setPriceNotification({ isOpen: true, message });
-            } else {
+            } else if (priceData.timeBasedPrice && startTime && step === 3) {
+              // Time-based special price: show only in time slot step (step 3)
+              const message = `Normal: Rs. ${priceData.normalPrice} → ${priceData.timeBasedPrice.message || 'Time-Based Price'}: Rs. ${priceData.timeBasedPrice.price}`;
+              setPriceNotification({ isOpen: true, message });
+            } else if (step === 2) {
+              // Close modal in other steps to prevent it from staying open
               setPriceNotification(null);
             }
           }
@@ -3343,7 +3369,7 @@ function UpdateBookingModal({ booking, onClose, onSuccess, setSuccessModal, show
     };
 
     fetchPrice();
-  }, [futsalId, selectedDate, setPriceNotification]);
+  }, [futsalId, selectedDate, selectedSlotIds, availableSlots, step, setPriceNotification]);
 
   useEffect(() => {
     const fetchFutsal = async () => {
