@@ -380,14 +380,17 @@ export default function BookFutsal() {
             const priceData = await response.json();
             setCurrentPrice(priceData);
 
-            // Show notification if special or time-based price
-            if (priceData.specialPrice) {
+            // Show notification only in appropriate step
+            if (priceData.specialPrice && !startTime && bookingState.step === 1) {
+              // Date-specific or recurring special price: show only in date step (step 1)
               const message = `Normal: Rs. ${priceData.normalPrice} → ${priceData.specialPrice.message || 'Special Price'}: Rs. ${priceData.specialPrice.price}`;
               setPriceNotification({ isOpen: true, message });
-            } else if (priceData.timeBasedPrice) {
+            } else if (priceData.timeBasedPrice && startTime && bookingState.step === 3) {
+              // Time-based special price: show only in time slot step (step 3)
               const message = `Normal: Rs. ${priceData.normalPrice} → ${priceData.timeBasedPrice.message || 'Time-Based Price'}: Rs. ${priceData.timeBasedPrice.price}`;
               setPriceNotification({ isOpen: true, message });
-            } else {
+            } else if (bookingState.step === 2 || bookingState.step === 4 || bookingState.step === 5 || bookingState.step === 6 || bookingState.step === 7) {
+              // Close modal in other steps to prevent it from staying open
               setPriceNotification(null);
             }
           }
