@@ -806,7 +806,7 @@ export default function UserDashboard() {
                             )}
                           </div>
 
-                          <div className="p-6">
+                          <div className="p-4 md:p-6">
                             <div className="flex justify-between items-start mb-2">
                               <h3 className="text-xl font-bold text-gray-800">{futsal.name}</h3>
                               {futsal.game_format && (
@@ -1262,7 +1262,7 @@ function DetailsModal({ futsal, onClose }: { futsal: Futsal, onClose: () => void
   return (
     <div className="fixed inset-0 backdrop-blur-sm bg-black/20 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
-        <div className="p-6">
+        <div className="p-4 md:p-6">
           <div className="flex justify-between items-start mb-6">
             <h3 className="text-2xl font-bold text-gray-800">{futsal.name}</h3>
             <button
@@ -1796,7 +1796,7 @@ function RatingModal({ futsal, onClose, onRatingSubmitted, showNotification, set
           </button>
         </div>
 
-        <div className="p-6">
+        <div className="p-4 md:p-6">
           {/* Description */}
           <div className="mb-6">
             <h4 className="text-md font-semibold mb-2">Description</h4>

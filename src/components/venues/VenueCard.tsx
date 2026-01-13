@@ -203,7 +203,7 @@ const VenueCard = memo(function VenueCard({ futsal, index, specialPrices = [] }:
         )}
       </div>
 
-      <div className="p-3">
+      <div className="p-4 md:p-6">
         <div className="flex justify-between items-start mb-2">
           <h3 className="text-xl font-bold text-gray-800">{futsal.name}</h3>
           {futsal.game_format && (

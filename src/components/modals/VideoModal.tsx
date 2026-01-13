@@ -22,7 +22,7 @@ export default function VideoModal({ futsal, onClose }: VideoModalProps) {
             ×
           </button>
         </div>
-        <div className="p-6">
+        <div className="p-4 md:p-6">
           <video
             controls
             className="w-full h-auto max-h-[70vh] rounded-xl shadow-lg"

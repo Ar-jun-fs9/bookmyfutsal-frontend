@@ -326,7 +326,7 @@ export default function RatingModal({ futsal, onClose, onRatingSubmitted }: Rati
           </button>
         </div>
 
-        <div className="p-6">
+        <div className="p-4 md:p-6">
           <div className="mb-6">
             <h4 className="text-md font-semibold mb-2">Description</h4>
             <p className="text-gray-700">{futsal.description || 'No description available.'}</p>
