@@ -83,6 +83,10 @@ export function useSpecialPrices() {
   const updateSpecialPrice = async (id: number, data: {
     special_price: number;
     message?: string;
+    special_date?: string;
+    recurring_days?: string[];
+    start_time?: string;
+    end_time?: string;
   }) => {
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/special-prices/${id}`, {
