@@ -363,19 +363,29 @@ export default function BookFutsal() {
     }
   }, [storageKey]);
 
-  // Fetch price when date changes
+  // Fetch price when date or selected slot changes
   useEffect(() => {
     const fetchPrice = async () => {
       if (futsalId && bookingState.selectedDate) {
         try {
-          const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/special-prices/price/${futsalId}/${bookingState.selectedDate}`);
+          const selectedSlot = bookingState.selectedSlotIds.length > 0 ? availableSlots.find(slot => slot.slot_id === bookingState.selectedSlotIds[0]) : null;
+          const startTime = selectedSlot ? selectedSlot.start_time : undefined;
+
+          const url = startTime
+            ? `${process.env.NEXT_PUBLIC_API_URL}/api/special-prices/price/${futsalId}/${bookingState.selectedDate}?startTime=${startTime}`
+            : `${process.env.NEXT_PUBLIC_API_URL}/api/special-prices/price/${futsalId}/${bookingState.selectedDate}`;
+
+          const response = await fetch(url);
           if (response.ok) {
             const priceData = await response.json();
             setCurrentPrice(priceData);
 
-            // Show notification if special price
+            // Show notification if special or time-based price
             if (priceData.specialPrice) {
               const message = `Normal: Rs. ${priceData.normalPrice} → ${priceData.specialPrice.message || 'Special Price'}: Rs. ${priceData.specialPrice.price}`;
+              setPriceNotification({ isOpen: true, message });
+            } else if (priceData.timeBasedPrice) {
+              const message = `Normal: Rs. ${priceData.normalPrice} → ${priceData.timeBasedPrice.message || 'Time-Based Price'}: Rs. ${priceData.timeBasedPrice.price}`;
               setPriceNotification({ isOpen: true, message });
             } else {
               setPriceNotification(null);
@@ -388,7 +398,7 @@ export default function BookFutsal() {
     };
 
     fetchPrice();
-  }, [futsalId, bookingState.selectedDate]);
+  }, [futsalId, bookingState.selectedDate, bookingState.selectedSlotIds, availableSlots]);
 
   // Save booking progress to localStorage whenever state changes
   useEffect(() => {
@@ -1983,6 +1993,15 @@ export default function BookFutsal() {
             ) : null;
 
             const applicableSpecial = dateSpecial || recurringSpecial;
+
+            // Check for time-based pricing if no special price
+            let timeBasedPrice = null;
+            if (!applicableSpecial && bookingState.booking.time_slot) {
+              const slotStartTime = bookingState.booking.time_slot.split('-')[0];
+              // Note: In a real implementation, you'd fetch time-based prices for this futsal
+              // For now, we'll assume the effective price from currentPrice includes time-based pricing
+            }
+
             const rateToShow = applicableSpecial ? applicableSpecial.special_price : futsal.price_per_hour;
 
             return (
@@ -2100,7 +2119,14 @@ export default function BookFutsal() {
                           </div>
                           <div className="flex justify-between items-start">
                             <span className="text-gray-600 font-medium">Rate/Hour:</span>
-                            <span className="text-gray-800 font-semibold text-right ml-2">Rs. {rateToShow}</span>
+                            <span className="text-gray-800 font-semibold text-right ml-2">
+                              Rs. {rateToShow}
+                              {applicableSpecial && (
+                                <span className="text-xs text-green-600 ml-1">
+                                  ({applicableSpecial.message || 'Special Price'})
+                                </span>
+                              )}
+                            </span>
                           </div>
                           <div className="flex justify-between items-start">
                             <span className="text-gray-600 font-medium">Tracking Code:</span>

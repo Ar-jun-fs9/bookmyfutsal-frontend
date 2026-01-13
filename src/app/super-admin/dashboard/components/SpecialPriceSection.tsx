@@ -13,9 +13,11 @@ interface SpecialPriceSectionProps {
 interface SpecialPrice {
   special_price_id: number;
   futsal_id: number;
-  type: 'date' | 'recurring';
+  type: 'date' | 'recurring' | 'time_based';
   special_date?: string;
   recurring_days?: string[];
+  start_time?: string;
+  end_time?: string;
   special_price: number;
   message?: string;
   created_by: string;
@@ -32,6 +34,13 @@ export function SpecialPriceSection({ isVisible, onToggle }: SpecialPriceSection
   const [editingPrice, setEditingPrice] = useState<SpecialPrice | null>(null);
   const [notification, setNotification] = useState<{message: string, type: 'success' | 'info'} | null>(null);
   const [confirmModal, setConfirmModal] = useState<{isOpen: boolean, message: string, onConfirm: () => void}>({isOpen: false, message: '', onConfirm: () => {}});
+
+  const formatTime = (timeString: string): string => {
+    const [hours, minutes] = timeString.split(':').map(Number);
+    const period = hours >= 12 ? 'PM' : 'AM';
+    const displayHours = hours === 0 ? 12 : hours > 12 ? hours - 12 : hours;
+    return `${displayHours}:${minutes.toString().padStart(2, '0')} ${period}`;
+  };
 
   // Auto-hide notifications after 2 seconds
   useEffect(() => {
@@ -183,11 +192,13 @@ export function SpecialPriceSection({ isVisible, onToggle }: SpecialPriceSection
                       />
                     )}
                     <h4 className="font-bold">{price.futsal_name}</h4>
-                    <p>Type: {price.type === 'date' ? 'Date-specific' : 'Recurring'}</p>
+                    <p>Type: {price.type === 'date' ? 'Date-specific' : price.type === 'recurring' ? 'Recurring' : 'Time-based'}</p>
                     {price.type === 'date' ? (
                       <p>Date: {new Date(price.special_date!).toISOString().split('T')[0]}</p>
-                    ) : (
+                    ) : price.type === 'recurring' ? (
                       <p>Days: {price.recurring_days!.join(', ')}</p>
+                    ) : (
+                      <p>Time Range: {formatTime(price.start_time!)} - {formatTime(price.end_time!)}</p>
                     )}
                     <p>Price: Rs. {price.special_price}</p>
                     {price.message && <p>Message: {price.message}</p>}
@@ -208,6 +219,7 @@ export function SpecialPriceSection({ isVisible, onToggle }: SpecialPriceSection
                   </div>
                 </div>
               )}
+       
             </div>
           ))
         )}
@@ -236,13 +248,36 @@ function CreateSpecialPriceForm({ futsals, onSuccess, setNotification }: any) {
   const { createSpecialPrice } = useSpecialPrices();
   const [formData, setFormData] = useState({
     futsal_id: '',
-    type: 'date' as 'date' | 'recurring',
+    type: 'date' as 'date' | 'recurring' | 'time_based',
     special_dates: [] as string[],
     recurring_days: [] as string[],
+    start_time: '',
+    end_time: '',
     special_price: '',
     message: ''
   });
   const [currentDate, setCurrentDate] = useState('');
+
+  const selectedFutsal = futsals.find((f: any) => f.futsal_id === parseInt(formData.futsal_id));
+
+  const generateTimeOptions = (opening: string, closing: string) => {
+    const options = [];
+    const openingTime = new Date(`2000-01-01T${opening}`);
+    const closingTime = new Date(`2000-01-01T${closing}`);
+
+    for (let time = new Date(openingTime); time <= closingTime; time.setMinutes(time.getMinutes() + 30)) {
+      const timeString = time.toTimeString().slice(0, 5);
+      options.push(timeString);
+    }
+    return options;
+  };
+
+  const formatTime = (timeString: string): string => {
+    const [hours, minutes] = timeString.split(':').map(Number);
+    const period = hours >= 12 ? 'PM' : 'AM';
+    const displayHours = hours === 0 ? 12 : hours > 12 ? hours - 12 : hours;
+    return `${displayHours}:${minutes.toString().padStart(2, '0')} ${period}`;
+  };
 
   const addDate = () => {
     if (currentDate && !formData.special_dates.includes(currentDate)) {
@@ -271,29 +306,37 @@ function CreateSpecialPriceForm({ futsals, onSuccess, setNotification }: any) {
       setNotification({ message: 'Please select at least one day', type: 'info' });
       return;
     }
+    if (formData.type === 'time_based' && (!formData.start_time || !formData.end_time)) {
+      setNotification({ message: 'Please select both start and end times', type: 'info' });
+      return;
+    }
 
     const result = await createSpecialPrice({
       futsal_id: parseInt(formData.futsal_id),
       type: formData.type,
-      ...(formData.type === 'date' ? { special_dates: formData.special_dates } : { recurring_days: formData.recurring_days }),
+      ...(formData.type === 'date' ? { special_dates: formData.special_dates } :
+          formData.type === 'recurring' ? { recurring_days: formData.recurring_days } :
+          { start_time: formData.start_time, end_time: formData.end_time }),
       special_price: parseFloat(formData.special_price),
       message: formData.message || undefined
     });
 
     if (result.success) {
-      setNotification({ message: `${formData.type === 'date' ? 'Special prices' : 'Recurring special price'} created successfully`, type: 'success' });
+      setNotification({ message: `${formData.type === 'date' ? 'Special prices' : formData.type === 'recurring' ? 'Recurring special price' : 'Time-based special price'} created successfully`, type: 'success' });
       onSuccess();
     } else {
       setNotification({ message: result.error || 'Error creating special price', type: 'info' });
     }
   };
 
-  const handleTypeChange = (type: 'date' | 'recurring') => {
+  const handleTypeChange = (type: 'date' | 'recurring' | 'time_based') => {
     setFormData({
       ...formData,
       type,
       special_dates: [],
-      recurring_days: []
+      recurring_days: [],
+      start_time: '',
+      end_time: ''
     });
   };
 
@@ -363,11 +406,21 @@ function CreateSpecialPriceForm({ futsals, onSuccess, setNotification }: any) {
             />
             Recurring
           </label>
+          <label className="flex items-center">
+            <input
+              type="radio"
+              value="time_based"
+              checked={formData.type === 'time_based'}
+              onChange={() => handleTypeChange('time_based')}
+              className="mr-2"
+            />
+            Time-based price
+          </label>
         </div>
       </div>
 
-      {/* Conditional Selection */}
-      {formData.type === 'date' ? (
+      {/* Date Selection */}
+      {formData.type === 'date' && (
         <div className="space-y-3">
           <label className="block text-sm font-medium text-gray-700 mb-1">Special Dates</label>
           <div className="flex gap-2">
@@ -412,7 +465,10 @@ function CreateSpecialPriceForm({ futsals, onSuccess, setNotification }: any) {
             </div>
           )}
         </div>
-      ) : (
+      )}
+
+      {/* Recurring Days Selection */}
+      {formData.type === 'recurring' && (
         <div className="space-y-3">
           <label className="block text-sm font-medium text-gray-700 mb-1">Recurring Days</label>
           <div className="grid grid-cols-7 gap-2">
@@ -453,6 +509,109 @@ function CreateSpecialPriceForm({ futsals, onSuccess, setNotification }: any) {
         </div>
       )}
 
+      {/* Time-Based Selection */}
+      {formData.type === 'time_based' && (
+        <div className="space-y-3">
+          <label className="block text-sm font-semibold text-gray-700 mb-2">
+            🕒 Time Range
+          </label>
+
+          {selectedFutsal ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="relative">
+                <label
+                  htmlFor="startTime"
+                  className="block text-sm font-semibold text-gray-700 mb-2"
+                >
+                  Start Time
+                </label>
+
+                <div className="relative">
+                  <select
+                    id="startTime"
+                    value={formData.start_time}
+                    onChange={(e) =>
+                      setFormData({ ...formData, start_time: e.target.value })
+                    }
+                    className="w-full px-4 py-3 pl-12 bg-white border border-gray-200 rounded-lg text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-400/50 focus:border-green-400/50 transition-all duration-300 font-medium text-sm"
+                    required
+                  >
+                    <option value="">Select start time</option>
+                    {generateTimeOptions(selectedFutsal.opening_hours, selectedFutsal.closing_hours).map((time: string) => (
+                      <option key={time} value={time}>
+                        {formatTime(time)}
+                      </option>
+                    ))}
+                  </select>
+
+                  <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-green-500">
+                    <svg
+                      className="w-5 h-5"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                      />
+                    </svg>
+                  </div>
+                </div>
+              </div>
+
+              <div className="relative">
+                <label
+                  htmlFor="endTime"
+                  className="block text-sm font-semibold text-gray-700 mb-2"
+                >
+                  End Time
+                </label>
+
+                <div className="relative">
+                  <select
+                    id="endTime"
+                    value={formData.end_time}
+                    onChange={(e) =>
+                      setFormData({ ...formData, end_time: e.target.value })
+                    }
+                    className="w-full px-4 py-3 pl-12 bg-white border border-gray-200 rounded-lg text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-400/50 focus:border-green-400/50 transition-all duration-300 font-medium text-sm"
+                    required
+                  >
+                    <option value="">Select end time</option>
+                    {generateTimeOptions(selectedFutsal.opening_hours, selectedFutsal.closing_hours).map((time: string) => (
+                      <option key={time} value={time}>
+                        {formatTime(time)}
+                      </option>
+                    ))}
+                  </select>
+
+                  <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-green-500">
+                    <svg
+                      className="w-5 h-5"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                      />
+                    </svg>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <p className="text-sm text-gray-500">Please select a futsal first to see time options.</p>
+          )}
+        </div>
+      )}
+
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">Message (Optional)</label>
         <input
@@ -465,10 +624,10 @@ function CreateSpecialPriceForm({ futsals, onSuccess, setNotification }: any) {
       <div className="flex justify-end mt-4">
         <button
           type="submit"
-          disabled={(formData.type === 'date' && formData.special_dates.length === 0) || (formData.type === 'recurring' && formData.recurring_days.length === 0)}
+          disabled={(formData.type === 'date' && formData.special_dates.length === 0) || (formData.type === 'recurring' && formData.recurring_days.length === 0) || (formData.type === 'time_based' && (!formData.start_time || !formData.end_time))}
           className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          Create {formData.type === 'date' ? 'Special Price' : 'Recurring Special Price'}
+          Create {formData.type === 'date' ? 'Special Price' : formData.type === 'recurring' ? 'Recurring Special Price' : 'Time-Based Special Price'}
         </button>
       </div>
     </form>

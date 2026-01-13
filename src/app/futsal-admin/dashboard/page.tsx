@@ -13,6 +13,7 @@ import { useFutsalRatings } from '@/hooks/useRatings';
 import { filterReducer, initialFilterState } from '@/reducers/filterReducer';
 // import { useSocketHandler } from '@/hooks/useSocketHandler';
 import { useSpecialPrices } from './hooks/useSpecialPrices';
+import { useTimeBasedPricing } from './hooks/useTimeBasedPricing';
 
 interface Admin {
   id: number;
@@ -98,75 +99,79 @@ function categorizeBooking(booking: any): 'past' | 'today' | 'future' {
 }
 
 export default function FutsalAdminDashboard() {
-    const router = useRouter();
-    const queryClient = useQueryClient();
-    const { role, logout, hydrated } = useAuthStore();
-    const [user, setUser] = useState<Admin | null>(null);
-    const admin = user;
-   const { socket } = useSocketStore();
-    const { showNotification, notification } = useNotificationStore();
+  const router = useRouter();
+  const queryClient = useQueryClient();
+  const { role, logout, hydrated } = useAuthStore();
+  const [user, setUser] = useState<Admin | null>(null);
+  const admin = user;
+  const { socket } = useSocketStore();
+  const { showNotification, notification } = useNotificationStore();
 
-   // Local state for UI
-   const [slotDate, setSlotDate] = useState(() => {
-     const today = new Date();
-     return today.getFullYear() + '-' +
-       String(today.getMonth() + 1).padStart(2, '0') + '-' +
-       String(today.getDate()).padStart(2, '0');
-   });
-   const [showSlots, setShowSlots] = useState(false);
-   const [editingFutsal, setEditingFutsal] = useState(false);
-   const [editingAdmin, setEditingAdmin] = useState(false);
-   const [editingBooking, setEditingBooking] = useState<any | null>(null);
-   const [editingRating, setEditingRating] = useState<any | null>(null);
-   const [creatingRating, setCreatingRating] = useState(false);
-   const [showFutsalInfo, setShowFutsalInfo] = useState(false);
-   const [showBookings, setShowBookings] = useState(false);
-   const [showRatings, setShowRatings] = useState(false);
-   const [showSpecialPrices, setShowSpecialPrices] = useState(false);
-   const [creatingSpecialPrice, setCreatingSpecialPrice] = useState(false);
-   const [editingSpecialPrice, setEditingSpecialPrice] = useState<any | null>(null);
-   const [bookingFilter, setBookingFilter] = useState<'all' | 'past' | 'today' | 'future' | 'cancelled'>('all');
-   const [searchTerm, setSearchTerm] = useState('');
-   const [confirmModal, setConfirmModal] = useState<{ isOpen: boolean, message: string, onConfirm: () => void }>({ isOpen: false, message: '', onConfirm: () => { } });
-   const [deletedBookings, setDeletedBookings] = useState<number[]>([]);
-   const [selectedBookings, setSelectedBookings] = useState<number[]>([]);
-   const [selectAll, setSelectAll] = useState(false);
-   const [showCheckboxes, setShowCheckboxes] = useState(false);
-   const [selectedRatings, setSelectedRatings] = useState<number[]>([]);
-   const [selectAllRatings, setSelectAllRatings] = useState(false);
-   const [showRatingCheckboxes, setShowRatingCheckboxes] = useState(false);
+  // Local state for UI
+  const [slotDate, setSlotDate] = useState(() => {
+    const today = new Date();
+    return today.getFullYear() + '-' +
+      String(today.getMonth() + 1).padStart(2, '0') + '-' +
+      String(today.getDate()).padStart(2, '0');
+  });
+  const [showSlots, setShowSlots] = useState(false);
+  const [editingFutsal, setEditingFutsal] = useState(false);
+  const [editingAdmin, setEditingAdmin] = useState(false);
+  const [editingBooking, setEditingBooking] = useState<any | null>(null);
+  const [editingRating, setEditingRating] = useState<any | null>(null);
+  const [creatingRating, setCreatingRating] = useState(false);
+  const [showFutsalInfo, setShowFutsalInfo] = useState(false);
+  const [showBookings, setShowBookings] = useState(false);
+  const [showRatings, setShowRatings] = useState(false);
+  const [showSpecialPrices, setShowSpecialPrices] = useState(false);
+  const [creatingSpecialPrice, setCreatingSpecialPrice] = useState(false);
+  const [editingSpecialPrice, setEditingSpecialPrice] = useState<any | null>(null);
+  const [showTimeBasedPricing, setShowTimeBasedPricing] = useState(false);
+  const [creatingTimeBasedPricing, setCreatingTimeBasedPricing] = useState(false);
+  const [editingTimeBasedPricing, setEditingTimeBasedPricing] = useState<any | null>(null);
+  const [bookingFilter, setBookingFilter] = useState<'all' | 'past' | 'today' | 'future' | 'cancelled'>('all');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [confirmModal, setConfirmModal] = useState<{ isOpen: boolean, message: string, onConfirm: () => void }>({ isOpen: false, message: '', onConfirm: () => { } });
+  const [deletedBookings, setDeletedBookings] = useState<number[]>([]);
+  const [selectedBookings, setSelectedBookings] = useState<number[]>([]);
+  const [selectAll, setSelectAll] = useState(false);
+  const [showCheckboxes, setShowCheckboxes] = useState(false);
+  const [selectedRatings, setSelectedRatings] = useState<number[]>([]);
+  const [selectAllRatings, setSelectAllRatings] = useState(false);
+  const [showRatingCheckboxes, setShowRatingCheckboxes] = useState(false);
 
-   // Reducer for filters
-   const [filterState, dispatch] = useReducer(filterReducer, initialFilterState);
+  // Reducer for filters
+  const [filterState, dispatch] = useReducer(filterReducer, initialFilterState);
 
-   // React Query hooks
-   const { data: futsalsData } = useFutsals();
-   const futsal = admin?.futsal_id ? futsalsData?.find((f: Futsal) => f.futsal_id === admin.futsal_id) : null;
-   const { data: bookingsData, refetch: refetchBookings } = useFutsalBookings(futsal?.futsal_id || 0);
-   const { data: slotsData } = useFutsalSlotsForDate(futsal?.futsal_id ?? 0, slotDate);
-   const closeAllSlotsMutation = useCloseAllSlotsForDate();
-   const openAllSlotsMutation = useOpenAllSlotsForDate();
-   const updateSlotStatusMutation = useUpdateSlotStatus();
-   const { data: ratingsData } = useFutsalRatings(futsal?.futsal_id);
-   const { specialPrices, loading: specialPricesLoading, createSpecialPrice, updateSpecialPrice, deleteSpecialPrice } = useSpecialPrices(futsal?.futsal_id);
+  // React Query hooks
+  const { data: futsalsData } = useFutsals();
+  const futsal = admin?.futsal_id ? futsalsData?.find((f: Futsal) => f.futsal_id === admin.futsal_id) : null;
+  const { data: bookingsData, refetch: refetchBookings } = useFutsalBookings(futsal?.futsal_id || 0);
+  const { data: slotsData } = useFutsalSlotsForDate(futsal?.futsal_id ?? 0, slotDate);
+  const closeAllSlotsMutation = useCloseAllSlotsForDate();
+  const openAllSlotsMutation = useOpenAllSlotsForDate();
+  const updateSlotStatusMutation = useUpdateSlotStatus();
+  const { data: ratingsData } = useFutsalRatings(futsal?.futsal_id);
+  const { specialPrices, loading: specialPricesLoading, createSpecialPrice, updateSpecialPrice, deleteSpecialPrice } = useSpecialPrices(futsal?.futsal_id);
+  const { timeBasedPricings, loading: timeBasedPricingLoading, createTimeBasedPricing, updateTimeBasedPricing, deleteTimeBasedPricing } = useTimeBasedPricing(futsal?.futsal_id);
 
-   // Processed data
-   const bookings = bookingsData?.bookings || [];
-   const slots = slotsData?.slots || [];
-   const ratings = ratingsData || [];
+  // Processed data
+  const bookings = bookingsData?.bookings || [];
+  const slots = slotsData?.slots || [];
+  const ratings = ratingsData || [];
 
-   // Filtered bookings for display and counts
-   const filteredBookings = bookings
-     .filter((b: any) => !deletedBookings.includes(b.booking_id))
-     .filter((b: any) => {
-       if (!searchTerm) return true;
-       const searchLower = searchTerm.toLowerCase();
-       return (
-         b.first_name?.toLowerCase().includes(searchLower) ||
-         b.user_phone?.includes(searchTerm) ||
-         b.team_name?.toLowerCase().includes(searchLower)
-       );
-     });
+  // Filtered bookings for display and counts
+  const filteredBookings = bookings
+    .filter((b: any) => !deletedBookings.includes(b.booking_id))
+    .filter((b: any) => {
+      if (!searchTerm) return true;
+      const searchLower = searchTerm.toLowerCase();
+      return (
+        b.first_name?.toLowerCase().includes(searchLower) ||
+        b.user_phone?.includes(searchTerm) ||
+        b.team_name?.toLowerCase().includes(searchLower)
+      );
+    });
 
   useEffect(() => {
     if (hydrated) {
@@ -221,7 +226,7 @@ export default function FutsalAdminDashboard() {
       isOpen: true,
       message: 'Are you sure you want to logout?',
       onConfirm: () => {
-        setConfirmModal({ isOpen: false, message: '', onConfirm: () => {} });
+        setConfirmModal({ isOpen: false, message: '', onConfirm: () => { } });
         logout();
         sessionStorage.removeItem('futsal_admin');
         sessionStorage.removeItem('assigned_futsal');
@@ -349,7 +354,7 @@ export default function FutsalAdminDashboard() {
       isOpen: true,
       message: 'Confirm Action\nAre you sure you want to cancel this booking permanently?',
       onConfirm: async () => {
-        setConfirmModal({ isOpen: false, message: '', onConfirm: () => {} });
+        setConfirmModal({ isOpen: false, message: '', onConfirm: () => { } });
         try {
           const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/bookings/futsal-admin/${bookingId}`, {
             method: 'DELETE',
@@ -385,7 +390,7 @@ export default function FutsalAdminDashboard() {
         isOpen: true,
         message: 'Are you sure you want to permanently hide this expired booking from your dashboard?',
         onConfirm: () => {
-          setConfirmModal({ isOpen: false, message: '', onConfirm: () => {} });
+          setConfirmModal({ isOpen: false, message: '', onConfirm: () => { } });
           // Add to hidden bookings list
           const updatedHidden = [...deletedBookings, bookingId];
           setDeletedBookings(updatedHidden);
@@ -399,7 +404,7 @@ export default function FutsalAdminDashboard() {
         isOpen: true,
         message: 'Are you sure you want to permanently hide this cancelled booking from your dashboard?',
         onConfirm: () => {
-          setConfirmModal({ isOpen: false, message: '', onConfirm: () => {} });
+          setConfirmModal({ isOpen: false, message: '', onConfirm: () => { } });
           // Add to hidden bookings list
           const updatedHidden = [...deletedBookings, bookingId];
           setDeletedBookings(updatedHidden);
@@ -431,7 +436,7 @@ export default function FutsalAdminDashboard() {
       isOpen: true,
       message: filterMessages[bookingFilter],
       onConfirm: () => {
-        setConfirmModal({ isOpen: false, message: '', onConfirm: () => {} });
+        setConfirmModal({ isOpen: false, message: '', onConfirm: () => { } });
 
         // Hide selected bookings from dashboard permanently (localStorage)
         const updatedHidden = [...deletedBookings, ...selectedBookings];
@@ -503,12 +508,28 @@ export default function FutsalAdminDashboard() {
       isOpen: true,
       message: 'Are you sure you want to delete this special price?',
       onConfirm: async () => {
-        setConfirmModal({ isOpen: false, message: '', onConfirm: () => {} });
+        setConfirmModal({ isOpen: false, message: '', onConfirm: () => { } });
         const result = await deleteSpecialPrice(id);
         if (result.success) {
           showNotification({ message: 'Special price deleted successfully', type: 'success' });
         } else {
           showNotification({ message: result.error || 'Error deleting special price', type: 'info' });
+        }
+      }
+    });
+  };
+
+  const handleDeleteTimeBasedPricing = async (id: number) => {
+    setConfirmModal({
+      isOpen: true,
+      message: 'Are you sure you want to delete this time-based pricing?',
+      onConfirm: async () => {
+        setConfirmModal({ isOpen: false, message: '', onConfirm: () => { } });
+        const result = await deleteTimeBasedPricing(id);
+        if (result.success) {
+          showNotification({ message: 'Time-based pricing deleted successfully', type: 'success' });
+        } else {
+          showNotification({ message: result.error || 'Error deleting time-based pricing', type: 'info' });
         }
       }
     });
@@ -550,7 +571,7 @@ export default function FutsalAdminDashboard() {
       isOpen: true,
       message: 'Are you sure you want to delete this rating?',
       onConfirm: async () => {
-        setConfirmModal({ isOpen: false, message: '', onConfirm: () => {} });
+        setConfirmModal({ isOpen: false, message: '', onConfirm: () => { } });
 
         try {
           const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/ratings/${ratingId}`, {
@@ -582,7 +603,7 @@ export default function FutsalAdminDashboard() {
       isOpen: true,
       message: `Are you sure you want to delete ${selectedRatings.length} selected rating${selectedRatings.length > 1 ? 's' : ''}?`,
       onConfirm: async () => {
-        setConfirmModal({ isOpen: false, message: '', onConfirm: () => {} });
+        setConfirmModal({ isOpen: false, message: '', onConfirm: () => { } });
 
         try {
           const deletePromises = selectedRatings.map((ratingId: number) =>
@@ -773,12 +794,12 @@ export default function FutsalAdminDashboard() {
                         <div
                           key={slot.slot_id}
                           className={` p-2 md:p-4 border rounded ${slot.display_status === 'booked'
-                              ? 'bg-red-100 border-red-500'
-                              : slot.display_status === 'expired'
-                                ? 'bg-yellow-100 border-yellow-500'
-                                : slot.status === 'disabled'
-                                  ? 'bg-gray-100 border-gray-500'
-                                  : 'bg-green-100 border-green-500'
+                            ? 'bg-red-100 border-red-500'
+                            : slot.display_status === 'expired'
+                              ? 'bg-yellow-100 border-yellow-500'
+                              : slot.status === 'disabled'
+                                ? 'bg-gray-100 border-gray-500'
+                                : 'bg-green-100 border-green-500'
                             }`}
                         >
                           <div className="font-semibold text-center mb-1 md:mb-2 text-sm md:text-base">
@@ -799,8 +820,8 @@ export default function FutsalAdminDashboard() {
                               onClick={() => toggleSlotStatus(slot.slot_id, slot.status)}
                               disabled={slot.display_status === 'booked' || slot.display_status === 'expired'}
                               className={`flex-1 px-2 md:px-3 py-1 rounded text-xs md:text-sm ${slot.status === 'available'
-                                  ? 'bg-red-600 hover:bg-red-700 text-white'
-                                  : 'bg-green-600 hover:bg-green-700 text-white'
+                                ? 'bg-red-600 hover:bg-red-700 text-white'
+                                : 'bg-green-600 hover:bg-green-700 text-white'
                                 } disabled:opacity-50 disabled:cursor-not-allowed`}
                             >
                               {slot.status === 'available' ? 'Close Slot' : 'Open Slot'}
@@ -864,8 +885,8 @@ export default function FutsalAdminDashboard() {
                             setShowCheckboxes(false);
                           }}
                           className={`px-4 py-2 rounded-lg font-medium transition-all duration-300 flex items-center gap-2 ${bookingFilter === filter.key
-                              ? 'bg-linear-to-r from-green-500 to-green-600 text-white shadow-lg'
-                              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                            ? 'bg-linear-to-r from-green-500 to-green-600 text-white shadow-lg'
+                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                             }`}
                         >
                           <span>{filter.icon}</span>
@@ -980,44 +1001,44 @@ export default function FutsalAdminDashboard() {
                                 )}
 
                                 <div className="flex space-x-2">
-                                    {!b.cancelled_by && (
-                                      <>
-                                        <button
-                                          onClick={() => setEditingBooking(b)}
-                                          disabled={isPastBooking || !!b.cancelled_by}
-                                          className={`px-3 py-1 rounded text-sm transition-all duration-300 ${isPastBooking || !!b.cancelled_by
-                                              ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                                              : 'bg-linear-to-r from-green-600 to-green-700 text-white hover:shadow-lg transform hover:scale-105'
-                                            }`}
-                                        >
-                                          Edit
-                                        </button>
-                                        {isPastBooking ? (
-                                          <button
-                                            onClick={() => handleDeleteBooking(b.booking_id)}
-                                            className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-sm hover:shadow-lg transform hover:scale-105 transition-all duration-300"
-                                          >
-                                            Delete
-                                          </button>
-                                        ) : (
-                                          <button
-                                            onClick={() => handleCancelBooking(b.booking_id)}
-                                            className="bg-linear-to-r from-red-600 to-red-700 text-white px-3 py-1 rounded text-sm hover:shadow-lg transform hover:scale-105 transition-all duration-300"
-                                          >
-                                            Cancel
-                                          </button>
-                                        )}
-                                      </>
-                                    )}
-                                    {b.cancelled_by && (
+                                  {!b.cancelled_by && (
+                                    <>
                                       <button
-                                        onClick={() => handleDeleteBooking(b.booking_id)}
-                                        className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-sm hover:shadow-lg transform hover:scale-105 transition-all duration-300"
+                                        onClick={() => setEditingBooking(b)}
+                                        disabled={isPastBooking || !!b.cancelled_by}
+                                        className={`px-3 py-1 rounded text-sm transition-all duration-300 ${isPastBooking || !!b.cancelled_by
+                                          ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                                          : 'bg-linear-to-r from-green-600 to-green-700 text-white hover:shadow-lg transform hover:scale-105'
+                                          }`}
                                       >
-                                        Delete
+                                        Edit
                                       </button>
-                                    )}
-                                  </div>
+                                      {isPastBooking ? (
+                                        <button
+                                          onClick={() => handleDeleteBooking(b.booking_id)}
+                                          className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-sm hover:shadow-lg transform hover:scale-105 transition-all duration-300"
+                                        >
+                                          Delete
+                                        </button>
+                                      ) : (
+                                        <button
+                                          onClick={() => handleCancelBooking(b.booking_id)}
+                                          className="bg-linear-to-r from-red-600 to-red-700 text-white px-3 py-1 rounded text-sm hover:shadow-lg transform hover:scale-105 transition-all duration-300"
+                                        >
+                                          Cancel
+                                        </button>
+                                      )}
+                                    </>
+                                  )}
+                                  {b.cancelled_by && (
+                                    <button
+                                      onClick={() => handleDeleteBooking(b.booking_id)}
+                                      className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-sm hover:shadow-lg transform hover:scale-105 transition-all duration-300"
+                                    >
+                                      Delete
+                                    </button>
+                                  )}
+                                </div>
                               </div>
                             </div>
 
@@ -1028,6 +1049,189 @@ export default function FutsalAdminDashboard() {
                 </>
               )}
             </div>
+
+            {/* Special Prices Management */}
+            <div className="bg-white rounded-lg p-2">
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-xl font-semibold bg-linear-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">Special Prices Management</h3>
+                <div className="flex space-x-2">
+                  <button
+                    onClick={() => setShowSpecialPrices(!showSpecialPrices)}
+                    className="bg-linear-to-r from-green-600 to-green-700 text-white font-bold py-2 px-4 rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 border border-green-500/30 hover:border-green-400/50"
+                  >
+                    {showSpecialPrices ? 'Hide' : 'Show'}
+                  </button>
+                  {showSpecialPrices && (
+                    <button
+                      onClick={() => setCreatingSpecialPrice(!creatingSpecialPrice)}
+                      className="bg-linear-to-r from-green-600 to-green-700 text-white font-bold py-2 px-4 rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 border border-green-500/30 hover:border-green-400/50"
+                    >
+                      {creatingSpecialPrice ? 'Cancel' : 'Create'}
+                    </button>
+                  )}
+                </div>
+              </div>
+              {showSpecialPrices && (
+                <>
+                  {creatingSpecialPrice && futsal && (
+                    <div className="mb-6 relative bg-white rounded-2xl shadow-2xl overflow-hidden transform transition-all duration-500 hover:scale-[1.01]">
+                      {/* Gradient Background */}
+                      <div className="absolute inset-0 bg-linear-to-br from-green-50 via-white to-green-50 opacity-70"></div>
+
+                      {/* Content */}
+                      <div className="relative p-6 sm:p-8">
+                        <CreateSpecialPriceForm
+                          futsalId={futsal.futsal_id}
+                          openingHours={futsal.opening_hours}
+                          closingHours={futsal.closing_hours}
+                          onSuccess={() => setCreatingSpecialPrice(false)}
+                          setNotification={showNotification}
+                        />
+                      </div>
+                    </div>
+                  )}
+                  <div className="space-y-4">
+                    {specialPricesLoading ? (
+                      <p className="text-center text-gray-500">Loading special prices...</p>
+                    ) : specialPrices.length === 0 ? (
+                      <p className="text-center text-gray-500">No special prices set for this futsal.</p>
+                    ) : (
+                      specialPrices.map((price) => (
+                        <div key={price.special_price_id} className="border rounded p-4">
+                          {editingSpecialPrice?.special_price_id === price.special_price_id ? (
+                            <EditSpecialPriceForm
+                              price={price}
+                              onUpdate={() => setEditingSpecialPrice(null)}
+                              onCancel={() => setEditingSpecialPrice(null)}
+                              setNotification={showNotification}
+                            />
+                          ) : (
+                            <div className="flex justify-between items-start">
+                              <div className="flex-1">
+                                <h4 className="font-bold">{futsal?.name}</h4>
+                                <p>Type: {price.type === 'date' ? 'Date-specific' : price.type === 'recurring' ? 'Recurring' : 'Time-based'}</p>
+                                {price.type === 'date' ? (
+                                  <p>Date: {new Date(price.special_date!).toISOString().split('T')[0]}</p>
+                                ) : price.type === 'recurring' ? (
+                                  <p>Days: {price.recurring_days?.join(', ') || 'None'}</p>
+                                ) : (
+                                  <p>Time Range: {formatTime(price.start_time!)} - {formatTime(price.end_time!)}{price.special_date ? ` on ${new Date(price.special_date).toISOString().split('T')[0]}` : ''}</p>
+                                )}
+                                <p>Price: Rs. {price.special_price}</p>
+                                {price.message && <p>Message: {price.message}</p>}
+                              </div>
+                              <div className="flex space-x-2">
+                                <button
+                                  onClick={() => setEditingSpecialPrice(price)}
+                                  className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded"
+                                >
+                                  Edit
+                                </button>
+                                <button
+                                  onClick={() => handleDeleteSpecialPrice(price.special_price_id)}
+                                  className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded"
+                                >
+                                  Delete
+                                </button>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </>
+              )}
+            </div>
+
+            {/* Time-Based Pricing Management */}
+            {/* <div className="bg-white rounded-lg p-2">
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-xl font-semibold bg-linear-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">Time-Based Pricing Management</h3>
+                <div className="flex space-x-2">
+                  <button
+                    onClick={() => setShowTimeBasedPricing(!showTimeBasedPricing)}
+                    className="bg-linear-to-r from-green-600 to-green-700 text-white font-bold py-2 px-4 rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 border border-green-500/30 hover:border-green-400/50"
+                  >
+                    {showTimeBasedPricing ? 'Hide' : 'Show'}
+                  </button>
+                  {showTimeBasedPricing && (
+                    <button
+                      onClick={() => setCreatingTimeBasedPricing(!creatingTimeBasedPricing)}
+                      className="bg-linear-to-r from-green-600 to-green-700 text-white font-bold py-2 px-4 rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 border border-green-500/30 hover:border-green-400/50"
+                    >
+                      {creatingTimeBasedPricing ? 'Cancel' : 'Create'}
+                    </button>
+                  )}
+                </div>
+              </div>
+              {showTimeBasedPricing && (
+                <>
+                  {creatingTimeBasedPricing && futsal && (
+                    <div className="mb-6 relative bg-white rounded-2xl shadow-2xl overflow-hidden transform transition-all duration-500 hover:scale-[1.01]">
+                      
+                      <div className="absolute inset-0 bg-linear-to-br from-green-50 via-white to-green-50 opacity-70"></div>
+
+                      
+                      <div className="relative p-6 sm:p-8">
+                        <CreateTimeBasedPricingForm
+                          futsalId={futsal.futsal_id}
+                          openingHours={futsal.opening_hours}
+                          closingHours={futsal.closing_hours}
+                          onSuccess={() => setCreatingTimeBasedPricing(false)}
+                          setNotification={showNotification}
+                        />
+                      </div>
+                    </div>
+                  )}
+                  <div className="space-y-4">
+                    {timeBasedPricingLoading ? (
+                      <p className="text-center text-gray-500">Loading time-based pricing...</p>
+                    ) : timeBasedPricings.length === 0 ? (
+                      <p className="text-center text-gray-500">No time-based pricing set for this futsal.</p>
+                    ) : (
+                      timeBasedPricings.map((price) => (
+                        <div key={price.time_based_pricing_id} className="border rounded p-4">
+                          {editingTimeBasedPricing?.time_based_pricing_id === price.time_based_pricing_id ? (
+                            <EditTimeBasedPricingForm
+                              price={price}
+                              openingHours={futsal?.opening_hours}
+                              closingHours={futsal?.closing_hours}
+                              onUpdate={() => setEditingTimeBasedPricing(null)}
+                              onCancel={() => setEditingTimeBasedPricing(null)}
+                              setNotification={showNotification}
+                            />
+                          ) : (
+                            <div className="flex justify-between items-start">
+                              <div className="flex-1">
+                                <h4 className="font-bold">{futsal?.name}</h4>
+                                <p>Time Range: {formatTime(price.start_time)} - {formatTime(price.end_time)}</p>
+                                <p>Price: Rs. {price.price}</p>
+                                {price.message && <p>Message: {price.message}</p>}
+                              </div>
+                              <div className="flex space-x-2">
+                                <button
+                                  onClick={() => setEditingTimeBasedPricing(price)}
+                                  className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded"
+                                >
+                                  Edit
+                                </button>
+                                <button
+                                  onClick={() => handleDeleteTimeBasedPricing(price.time_based_pricing_id)}
+                                  className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded"
+                                >
+                                  Delete
+                                </button>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </>
+              )}
+            </div> */}
 
             {/* Ratings Management */}
             <div className="bg-white rounded-lg p-2">
@@ -1187,7 +1391,7 @@ export default function FutsalAdminDashboard() {
             </div>
 
             {/* Special Prices Management */}
-            <div className="bg-white rounded-lg p-2">
+            {/* <div className="bg-white rounded-lg p-2">
               <div className="flex justify-between items-center mb-4">
                 <h3 className="text-xl font-semibold bg-linear-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">Special Prices Management</h3>
                 <div className="flex space-x-2">
@@ -1211,13 +1415,15 @@ export default function FutsalAdminDashboard() {
                 <>
                   {creatingSpecialPrice && futsal && (
                     <div className="mb-6 relative bg-white rounded-2xl shadow-2xl overflow-hidden transform transition-all duration-500 hover:scale-[1.01]">
-                      {/* Gradient Background */}
+                      
                       <div className="absolute inset-0 bg-linear-to-br from-green-50 via-white to-green-50 opacity-70"></div>
 
-                      {/* Content */}
+                    
                       <div className="relative p-6 sm:p-8">
                         <CreateSpecialPriceForm
                           futsalId={futsal.futsal_id}
+                          openingHours={futsal.opening_hours}
+                          closingHours={futsal.closing_hours}
                           onSuccess={() => setCreatingSpecialPrice(false)}
                           setNotification={showNotification}
                         />
@@ -1243,11 +1449,13 @@ export default function FutsalAdminDashboard() {
                             <div className="flex justify-between items-start">
                               <div className="flex-1">
                                 <h4 className="font-bold">{futsal?.name}</h4>
-                                <p>Type: {price.type === 'date' ? 'Date-specific' : 'Recurring'}</p>
+                                <p>Type: {price.type === 'date' ? 'Date-specific' : price.type === 'recurring' ? 'Recurring' : 'Time-based'}</p>
                                 {price.type === 'date' ? (
                                   <p>Date: {new Date(price.special_date!).toISOString().split('T')[0]}</p>
-                                ) : (
+                                ) : price.type === 'recurring' ? (
                                   <p>Days: {price.recurring_days!.join(', ')}</p>
+                                ) : (
+                                  <p>Time Range: {formatTime(price.start_time!)} - {formatTime(price.end_time!)}</p>
                                 )}
                                 <p>Price: Rs. {price.special_price}</p>
                                 {price.message && <p>Message: {price.message}</p>}
@@ -1274,7 +1482,7 @@ export default function FutsalAdminDashboard() {
                   </div>
                 </>
               )}
-            </div>
+            </div> */}
           </div>
         </div>
       </main>
@@ -1368,12 +1576,15 @@ export default function FutsalAdminDashboard() {
 }
 
 // Create Special Price Form Component
-function CreateSpecialPriceForm({ futsalId, onSuccess, setNotification }: { futsalId: number, onSuccess: () => void, setNotification: (notification: { message: string, type: 'success' | 'info' }) => void }) {
+function CreateSpecialPriceForm({ futsalId, openingHours, closingHours, onSuccess, setNotification }: { futsalId: number, openingHours: string, closingHours: string, onSuccess: () => void, setNotification: (notification: { message: string, type: 'success' | 'info' }) => void }) {
   const { createSpecialPrice } = useSpecialPrices(futsalId);
   const [formData, setFormData] = useState({
-    type: 'date' as 'date' | 'recurring',
+    type: 'date' as 'date' | 'recurring' | 'time_based',
     special_dates: [] as string[],
     recurring_days: [] as string[],
+    start_time: '',
+    end_time: '',
+    special_date: '',
     special_price: '',
     message: ''
   });
@@ -1396,12 +1607,15 @@ function CreateSpecialPriceForm({ futsalId, onSuccess, setNotification }: { futs
     });
   };
 
-  const handleTypeChange = (type: 'date' | 'recurring') => {
+  const handleTypeChange = (type: 'date' | 'recurring' | 'time_based') => {
     setFormData({
       ...formData,
       type,
       special_dates: [],
-      recurring_days: []
+      recurring_days: [],
+      start_time: '',
+      end_time: '',
+      special_date: ''
     });
   };
 
@@ -1414,6 +1628,18 @@ function CreateSpecialPriceForm({ futsalId, onSuccess, setNotification }: { futs
     });
   };
 
+  const generateTimeOptions = (opening: string, closing: string) => {
+    const options = [];
+    const openingTime = new Date(`2000-01-01T${opening}`);
+    const closingTime = new Date(`2000-01-01T${closing}`);
+
+    for (let time = new Date(openingTime); time <= closingTime; time.setMinutes(time.getMinutes() + 30)) {
+      const timeString = time.toTimeString().slice(0, 5);
+      options.push(timeString);
+    }
+    return options;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (formData.type === 'date' && formData.special_dates.length === 0) {
@@ -1422,6 +1648,10 @@ function CreateSpecialPriceForm({ futsalId, onSuccess, setNotification }: { futs
     }
     if (formData.type === 'recurring' && formData.recurring_days.length === 0) {
       setNotification({ message: 'Please select at least one day', type: 'info' });
+      return;
+    }
+    if (formData.type === 'time_based' && (!formData.start_time || !formData.end_time)) {
+      setNotification({ message: 'Please select both start and end times', type: 'info' });
       return;
     }
 
@@ -1434,13 +1664,15 @@ function CreateSpecialPriceForm({ futsalId, onSuccess, setNotification }: { futs
     const result = await createSpecialPrice({
       futsal_id: futsalId,
       type: formData.type,
-      ...(formData.type === 'date' ? { special_dates: formData.special_dates } : { recurring_days: formData.recurring_days }),
+      ...(formData.type === 'date' ? { special_dates: formData.special_dates } :
+        formData.type === 'recurring' ? { recurring_days: formData.recurring_days } :
+          { start_time: formData.start_time, end_time: formData.end_time, special_date: formData.special_date || undefined }),
       special_price: price,
       message: formData.message || undefined
     });
 
     if (result.success) {
-      setNotification({ message: `${formData.type === 'date' ? 'Special prices' : 'Recurring special price'} created successfully`, type: 'success' });
+      setNotification({ message: `${formData.type === 'date' ? 'Special prices' : formData.type === 'recurring' ? 'Recurring special price' : 'Time-based special price'} created successfully`, type: 'success' });
       onSuccess();
     } else {
       setNotification({ message: result.error || 'Error creating special price', type: 'info' });
@@ -1488,6 +1720,16 @@ function CreateSpecialPriceForm({ futsalId, onSuccess, setNotification }: { futs
                 className="mr-2"
               />
               Recurring
+            </label>
+            <label className="flex items-center">
+              <input
+                type="radio"
+                value="time_based"
+                checked={formData.type === 'time_based'}
+                onChange={() => handleTypeChange('time_based')}
+                className="mr-2"
+              />
+              Time-based price
             </label>
           </div>
         </div>
@@ -1566,21 +1808,36 @@ function CreateSpecialPriceForm({ futsalId, onSuccess, setNotification }: { futs
         )}
 
         {/* Recurring Days Selection */}
+        {/* Recurring Days Selection */}
         {formData.type === 'recurring' && (
           <div className="space-y-3">
             <label className="block text-sm font-semibold text-gray-700 mb-2">
               📅 Recurring Days
             </label>
+
             <div className="grid grid-cols-2 gap-3">
-              {['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'].map((day) => (
-                <label key={day} className="flex items-center p-3 border-2 rounded-lg cursor-pointer transition-all duration-300 hover:border-green-400">
+              {[
+                'sunday',
+                'monday',
+                'tuesday',
+                'wednesday',
+                'thursday',
+                'friday',
+                'saturday',
+              ].map((day) => (
+                <label
+                  key={day}
+                  className="flex items-center p-3 border-2 rounded-lg cursor-pointer transition-all duration-300 hover:border-green-400"
+                >
                   <input
                     type="checkbox"
                     checked={formData.recurring_days.includes(day)}
                     onChange={() => toggleDay(day)}
                     className="mr-3 text-green-600 focus:ring-green-500"
                   />
-                  <span className="text-sm font-medium text-gray-700 capitalize">{day}</span>
+                  <span className="text-sm font-medium text-gray-700 capitalize">
+                    {day}
+                  </span>
                 </label>
               ))}
             </div>
@@ -1588,7 +1845,9 @@ function CreateSpecialPriceForm({ futsalId, onSuccess, setNotification }: { futs
             {/* Selected Days */}
             {formData.recurring_days.length > 0 && (
               <div className="space-y-2">
-                <p className="text-sm text-gray-600">Selected Days ({formData.recurring_days.length}):</p>
+                <p className="text-sm text-gray-600">
+                  Selected Days ({formData.recurring_days.length}):
+                </p>
                 <div className="flex flex-wrap gap-2">
                   {formData.recurring_days.map((day) => (
                     <span
@@ -1608,6 +1867,125 @@ function CreateSpecialPriceForm({ futsalId, onSuccess, setNotification }: { futs
                 </div>
               </div>
             )}
+          </div>
+        )}
+
+        {/* Time-Based Selection */}
+        {formData.type === 'time_based' && (
+          <div className="space-y-3">
+            <label className="block text-sm font-semibold text-gray-700 mb-2">
+              🕒 Time Range
+            </label>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="relative">
+                <label
+                  htmlFor="startTime"
+                  className="block text-sm font-semibold text-gray-700 mb-2"
+                >
+                  Start Time
+                </label>
+
+                <div className="relative">
+                  <select
+                    id="startTime"
+                    value={formData.start_time}
+                    onChange={(e) =>
+                      setFormData({ ...formData, start_time: e.target.value })
+                    }
+                    className="w-full px-4 py-3 pl-12 bg-white border border-gray-200 rounded-lg text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-400/50 focus:border-green-400/50 transition-all duration-300 font-medium text-sm"
+                    required
+                  >
+                    <option value="">Select start time</option>
+                    {generateTimeOptions(openingHours, closingHours).map((time) => (
+                      <option key={time} value={time}>
+                        {formatTime(time)}
+                      </option>
+                    ))}
+                  </select>
+
+                  <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-green-500">
+                    <svg
+                      className="w-5 h-5"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                      />
+                    </svg>
+                  </div>
+                </div>
+              </div>
+
+              <div className="relative">
+                <label
+                  htmlFor="endTime"
+                  className="block text-sm font-semibold text-gray-700 mb-2"
+                >
+                  End Time
+                </label>
+
+                <div className="relative">
+                  <select
+                    id="endTime"
+                    value={formData.end_time}
+                    onChange={(e) =>
+                      setFormData({ ...formData, end_time: e.target.value })
+                    }
+                    className="w-full px-4 py-3 pl-12 bg-white border border-gray-200 rounded-lg text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-400/50 focus:border-green-400/50 transition-all duration-300 font-medium text-sm"
+                    required
+                  >
+                    <option value="">Select end time</option>
+                    {generateTimeOptions(openingHours, closingHours).map((time) => (
+                      <option key={time} value={time}>
+                        {formatTime(time)}
+                      </option>
+                    ))}
+                  </select>
+
+                  <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-green-500">
+                    <svg
+                      className="w-5 h-5"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                      />
+                    </svg>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="relative">
+              <label htmlFor="specialDate" className="block text-sm font-semibold text-gray-700 mb-2">
+                📅 Choose Date (Optional)
+              </label>
+              <div className="relative">
+                <input
+                  id="specialDate"
+                  type="date"
+                  value={formData.special_date}
+                  onChange={(e) => setFormData({ ...formData, special_date: e.target.value })}
+                  className="w-full px-4 py-3 pl-12 bg-white border border-gray-200 rounded-lg text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-400/50 focus:border-green-400/50 transition-all duration-300 font-medium text-sm"
+                />
+                <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-green-500">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                </div>
+              </div>
+            </div>
           </div>
         )}
 
@@ -1640,19 +2018,445 @@ function CreateSpecialPriceForm({ futsalId, onSuccess, setNotification }: { futs
         <div className="flex flex-col sm:flex-row gap-3 pt-4">
           <button
             type="submit"
-            disabled={(formData.type === 'date' && formData.special_dates.length === 0) || (formData.type === 'recurring' && formData.recurring_days.length === 0)}
+            disabled={(formData.type === 'date' && formData.special_dates.length === 0) || (formData.type === 'recurring' && formData.recurring_days.length === 0) || (formData.type === 'time_based' && (!formData.start_time || !formData.end_time))}
             className="flex-1 bg-linear-to-r from-green-500 to-green-600 text-white font-semibold py-3 px-6 rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 border border-green-400/30 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
           >
             <span className="flex items-center justify-center">
               <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
               </svg>
-              Create {formData.type === 'date' ? 'Special Price' : 'Recurring Special Price'}{formData.type === 'date' && formData.special_dates.length > 1 ? 's' : ''}
+              Create {formData.type === 'date' ? 'Special Price' : formData.type === 'recurring' ? 'Recurring Special Price' : 'Time-Based Special Price'}{formData.type === 'date' && formData.special_dates.length > 1 ? 's' : ''}
             </span>
           </button>
           <button
             type="button"
             onClick={onSuccess}
+            className="flex-1 sm:flex-none bg-linear-to-r from-gray-500 to-gray-600 text-white font-semibold py-3 px-6 rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 border border-gray-400/30"
+          >
+            <span className="flex items-center justify-center">
+              <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+              Cancel
+            </span>
+          </button>
+        </div>
+      </form>
+    </div>
+  );
+}
+
+// Create Time-Based Pricing Form Component
+function CreateTimeBasedPricingForm({ futsalId, openingHours, closingHours, onSuccess, setNotification }: {
+  futsalId: number,
+  openingHours: string,
+  closingHours: string,
+  onSuccess: () => void,
+  setNotification: (notification: { message: string, type: 'success' | 'info' }) => void
+}) {
+  const { createTimeBasedPricing } = useTimeBasedPricing(futsalId);
+  const [formData, setFormData] = useState({
+    start_time: '',
+    end_time: '',
+    price: '',
+    message: ''
+  });
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    const price = parseFloat(formData.price);
+    if (isNaN(price) || price <= 0) {
+      setNotification({ message: 'Please enter a valid positive price', type: 'info' });
+      return;
+    }
+
+    if (!formData.start_time || !formData.end_time) {
+      setNotification({ message: 'Please select both start and end times', type: 'info' });
+      return;
+    }
+
+    if (formData.start_time >= formData.end_time) {
+      setNotification({ message: 'End time must be after start time', type: 'info' });
+      return;
+    }
+
+    const result = await createTimeBasedPricing({
+      futsal_id: futsalId,
+      start_time: formData.start_time,
+      end_time: formData.end_time,
+      price,
+      message: formData.message || undefined
+    });
+
+    if (result.success) {
+      setNotification({ message: 'Time-based pricing created successfully', type: 'success' });
+      onSuccess();
+    } else {
+      setNotification({ message: result.error || 'Error creating time-based pricing', type: 'info' });
+    }
+  };
+
+  const generateTimeOptions = () => {
+    const options = [];
+    const opening = new Date(`2000-01-01T${openingHours}`);
+    const closing = new Date(`2000-01-01T${closingHours}`);
+
+    for (let time = new Date(opening); time <= closing; time.setMinutes(time.getMinutes() + 30)) {
+      const timeString = time.toTimeString().slice(0, 5);
+      options.push(timeString);
+    }
+    return options;
+  };
+
+  return (
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="text-center mb-6">
+        <div className="inline-flex items-center justify-center w-12 h-12 sm:w-14 sm:h-14 bg-linear-to-br from-green-500 to-green-600 rounded-lg mb-3 shadow-lg">
+          <svg className="w-6 h-6 sm:w-7 sm:h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        </div>
+        <h3 className="text-xl sm:text-2xl font-bold bg-linear-to-r from-green-600 to-green-700 bg-clip-text text-transparent mb-2">
+          Create Time-Based Pricing
+        </h3>
+        <p className="text-gray-600 text-sm">
+          Set pricing for specific time ranges within operating hours
+        </p>
+      </div>
+
+      <form onSubmit={handleSubmit} className="space-y-5">
+        {/* Time Range Selection */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="relative">
+            <label htmlFor="startTime" className="block text-sm font-semibold text-gray-700 mb-2">
+              🕒 Start Time
+            </label>
+            <div className="relative">
+              <select
+                id="startTime"
+                value={formData.start_time}
+                onChange={(e) => setFormData({ ...formData, start_time: e.target.value })}
+                className="w-full px-4 py-3 pl-12 bg-white border border-gray-200 rounded-lg text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-400/50 focus:border-green-400/50 transition-all duration-300 font-medium text-sm"
+                required
+              >
+                <option value="">Select start time</option>
+                {generateTimeOptions().map(time => (
+                  <option key={time} value={time}>{formatTime(time)}</option>
+                ))}
+              </select>
+              <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-green-500">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <div className="relative">
+            <label htmlFor="endTime" className="block text-sm font-semibold text-gray-700 mb-2">
+              🕒 End Time
+            </label>
+            <div className="relative">
+              <select
+                id="endTime"
+                value={formData.end_time}
+                onChange={(e) => setFormData({ ...formData, end_time: e.target.value })}
+                className="w-full px-4 py-3 pl-12 bg-white border border-gray-200 rounded-lg text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-400/50 focus:border-green-400/50 transition-all duration-300 font-medium text-sm"
+                required
+              >
+                <option value="">Select end time</option>
+                {generateTimeOptions().map(time => (
+                  <option key={time} value={time}>{formatTime(time)}</option>
+                ))}
+              </select>
+              <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-green-500">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="relative">
+          <label htmlFor="timeBasedPrice" className="block text-sm font-semibold text-gray-700 mb-2">
+            💰 Price (Rs.)
+          </label>
+          <div className="relative">
+            <input
+              id="timeBasedPrice"
+              type="number"
+              step="0.01"
+              value={formData.price}
+              onChange={(e) => setFormData({ ...formData, price: e.target.value })}
+              placeholder="Enter price"
+              required
+              className="w-full px-4 py-3 pl-12 bg-white border border-gray-200 rounded-lg text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-400/50 focus:border-green-400/50 transition-all duration-300 font-medium text-sm"
+            />
+            <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-green-500">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <div className="relative">
+          <label htmlFor="timeBasedMessage" className="block text-sm font-semibold text-gray-700 mb-2">
+            💬 Message (Optional)
+          </label>
+          <div className="relative">
+            <textarea
+              id="timeBasedMessage"
+              placeholder="Add a message explaining the time-based price..."
+              value={formData.message}
+              onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+              className="w-full px-4 py-3 pl-12 bg-white border border-gray-200 rounded-lg text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-400/50 focus:border-green-400/50 transition-all duration-300 font-medium text-sm"
+              rows={3}
+              maxLength={200}
+            />
+            <div className="absolute left-4 top-4 text-green-500">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+              </svg>
+            </div>
+          </div>
+          <div className="text-right text-xs text-gray-500 mt-1">
+            {formData.message.length}/200
+          </div>
+        </div>
+
+        {/* Action Buttons */}
+        <div className="flex flex-col sm:flex-row gap-3 pt-4">
+          <button
+            type="submit"
+            className="flex-1 bg-linear-to-r from-green-500 to-green-600 text-white font-semibold py-3 px-6 rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 border border-green-400/30"
+          >
+            <span className="flex items-center justify-center">
+              <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+              </svg>
+              Create Time-Based Pricing
+            </span>
+          </button>
+          <button
+            type="button"
+            onClick={onSuccess}
+            className="flex-1 sm:flex-none bg-linear-to-r from-gray-500 to-gray-600 text-white font-semibold py-3 px-6 rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 border border-gray-400/30"
+          >
+            <span className="flex items-center justify-center">
+              <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+              Cancel
+            </span>
+          </button>
+        </div>
+      </form>
+    </div>
+  );
+}
+
+// Edit Time-Based Pricing Form Component
+function EditTimeBasedPricingForm({ price, openingHours, closingHours, onUpdate, onCancel, setNotification }: {
+  price: any,
+  openingHours: string,
+  closingHours: string,
+  onUpdate: () => void,
+  onCancel: () => void,
+  setNotification: (notification: { message: string, type: 'success' | 'info' }) => void
+}) {
+  const { updateTimeBasedPricing } = useTimeBasedPricing(price.futsal_id);
+  const [formData, setFormData] = useState({
+    start_time: price.start_time,
+    end_time: price.end_time,
+    price: price.price.toString(),
+    message: price.message || ''
+  });
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    const priceNum = parseFloat(formData.price);
+    if (isNaN(priceNum) || priceNum <= 0) {
+      setNotification({ message: 'Please enter a valid positive price', type: 'info' });
+      return;
+    }
+
+    if (!formData.start_time || !formData.end_time) {
+      setNotification({ message: 'Please select both start and end times', type: 'info' });
+      return;
+    }
+
+    if (formData.start_time >= formData.end_time) {
+      setNotification({ message: 'End time must be after start time', type: 'info' });
+      return;
+    }
+
+    const result = await updateTimeBasedPricing(price.time_based_pricing_id, {
+      start_time: formData.start_time,
+      end_time: formData.end_time,
+      price: priceNum,
+      message: formData.message || undefined
+    });
+
+    if (result.success) {
+      setNotification({ message: 'Time-based pricing updated successfully', type: 'success' });
+      onUpdate();
+    } else {
+      setNotification({ message: result.error || 'Error updating time-based pricing', type: 'info' });
+    }
+  };
+
+  const generateTimeOptions = () => {
+    const options = [];
+    const opening = new Date(`2000-01-01T${openingHours}`);
+    const closing = new Date(`2000-01-01T${closingHours}`);
+
+    for (let time = new Date(opening); time <= closing; time.setMinutes(time.getMinutes() + 30)) {
+      const timeString = time.toTimeString().slice(0, 5);
+      options.push(timeString);
+    }
+    return options;
+  };
+
+  return (
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="text-center mb-6">
+        <div className="inline-flex items-center justify-center w-12 h-12 sm:w-14 sm:h-14 bg-linear-to-br from-green-500 to-green-600 rounded-lg mb-3 shadow-lg">
+          <svg className="w-6 h-6 sm:w-7 sm:h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+          </svg>
+        </div>
+        <h3 className="text-xl sm:text-2xl font-bold bg-linear-to-r from-green-600 to-green-700 bg-clip-text text-transparent mb-2">
+          Edit Time-Based Pricing
+        </h3>
+        <p className="text-gray-600 text-sm">
+          Update the time-based pricing details
+        </p>
+      </div>
+
+      <form onSubmit={handleSubmit} className="space-y-5">
+        {/* Time Range Selection */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="relative">
+            <label htmlFor="editStartTime" className="block text-sm font-semibold text-gray-700 mb-2">
+              🕒 Start Time
+            </label>
+            <div className="relative">
+              <select
+                id="editStartTime"
+                value={formData.start_time}
+                onChange={(e) => setFormData({ ...formData, start_time: e.target.value })}
+                className="w-full px-4 py-3 pl-12 bg-white border border-gray-200 rounded-lg text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-400/50 focus:border-green-400/50 transition-all duration-300 font-medium text-sm"
+                required
+              >
+                <option value="">Select start time</option>
+                {generateTimeOptions().map(time => (
+                  <option key={time} value={time}>{formatTime(time)}</option>
+                ))}
+              </select>
+              <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-green-500">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <div className="relative">
+            <label htmlFor="editEndTime" className="block text-sm font-semibold text-gray-700 mb-2">
+              🕒 End Time
+            </label>
+            <div className="relative">
+              <select
+                id="editEndTime"
+                value={formData.end_time}
+                onChange={(e) => setFormData({ ...formData, end_time: e.target.value })}
+                className="w-full px-4 py-3 pl-12 bg-white border border-gray-200 rounded-lg text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-400/50 focus:border-green-400/50 transition-all duration-300 font-medium text-sm"
+                required
+              >
+                <option value="">Select end time</option>
+                {generateTimeOptions().map(time => (
+                  <option key={time} value={time}>{formatTime(time)}</option>
+                ))}
+              </select>
+              <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-green-500">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="relative">
+          <label htmlFor="editTimeBasedPrice" className="block text-sm font-semibold text-gray-700 mb-2">
+            💰 Price (Rs.)
+          </label>
+          <div className="relative">
+            <input
+              id="editTimeBasedPrice"
+              type="number"
+              step="0.01"
+              value={formData.price}
+              onChange={(e) => setFormData({ ...formData, price: e.target.value })}
+              placeholder="Enter price"
+              required
+              className="w-full px-4 py-3 pl-12 bg-white border border-gray-200 rounded-lg text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-400/50 focus:border-green-400/50 transition-all duration-300 font-medium text-sm"
+            />
+            <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-green-500">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <div className="relative">
+          <label htmlFor="editTimeBasedMessage" className="block text-sm font-semibold text-gray-700 mb-2">
+            💬 Message (Optional)
+          </label>
+          <div className="relative">
+            <textarea
+              id="editTimeBasedMessage"
+              placeholder="Add a message explaining the time-based price..."
+              value={formData.message}
+              onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+              className="w-full px-4 py-3 pl-12 bg-white border border-gray-200 rounded-lg text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-400/50 focus:border-green-400/50 transition-all duration-300 font-medium text-sm"
+              rows={3}
+              maxLength={200}
+            />
+            <div className="absolute left-4 top-4 text-green-500">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+              </svg>
+            </div>
+          </div>
+          <div className="text-right text-xs text-gray-500 mt-1">
+            {formData.message.length}/200
+          </div>
+        </div>
+
+        {/* Action Buttons */}
+        <div className="flex flex-col sm:flex-row gap-3 pt-4">
+          <button
+            type="submit"
+            className="flex-1 bg-linear-to-r from-green-500 to-green-600 text-white font-semibold py-3 px-6 rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 border border-green-400/30"
+          >
+            <span className="flex items-center justify-center">
+              <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+              </svg>
+              Update Time-Based Pricing
+            </span>
+          </button>
+          <button
+            type="button"
+            onClick={onCancel}
             className="flex-1 sm:flex-none bg-linear-to-r from-gray-500 to-gray-600 text-white font-semibold py-3 px-6 rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 border border-gray-400/30"
           >
             <span className="flex items-center justify-center">
@@ -1793,8 +2597,8 @@ function CreateRatingForm({ futsalId, onSuccess, onCancel, setNotification }: { 
           </label>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <label className={`flex items-center p-3 border-2 rounded-lg cursor-pointer transition-all duration-300 ${!isAnonymous
-                ? 'border-green-500 bg-green-50 shadow-md'
-                : 'border-gray-200 hover:border-green-300'
+              ? 'border-green-500 bg-green-50 shadow-md'
+              : 'border-gray-200 hover:border-green-300'
               }`}>
               <input
                 type="radio"
@@ -1805,8 +2609,8 @@ function CreateRatingForm({ futsalId, onSuccess, onCancel, setNotification }: { 
               <span className="text-sm font-medium text-gray-700">Named User</span>
             </label>
             <label className={`flex items-center p-3 border-2 rounded-lg cursor-pointer transition-all duration-300 ${isAnonymous
-                ? 'border-green-500 bg-green-50 shadow-md'
-                : 'border-gray-200 hover:border-green-300'
+              ? 'border-green-500 bg-green-50 shadow-md'
+              : 'border-gray-200 hover:border-green-300'
               }`}>
               <input
                 type="radio"
@@ -1859,8 +2663,8 @@ function CreateRatingForm({ futsalId, onSuccess, onCancel, setNotification }: { 
               >
                 <svg
                   className={`w-8 h-8 sm:w-10 sm:h-10 ${star <= rating
-                      ? 'text-yellow-400 drop-shadow-lg'
-                      : 'text-gray-300 hover:text-yellow-300'
+                    ? 'text-yellow-400 drop-shadow-lg'
+                    : 'text-gray-300 hover:text-yellow-300'
                     }`}
                   fill="currentColor"
                   viewBox="0 0 20 20"
@@ -2209,12 +3013,12 @@ function EditBookingForm({ booking, onUpdate, onCancel, adminId, setNotification
                     <button
                       key={shift}
                       onClick={() => {
-                            const newShift = selectedShift === shift ? '' : shift;
-                            setSelectedShift(newShift);
-                          }}
+                        const newShift = selectedShift === shift ? '' : shift;
+                        setSelectedShift(newShift);
+                      }}
                       className={`relative p-6 border-2 rounded-xl transition-all duration-300 transform hover:scale-105 ${selectedShift === shift
-                          ? "bg-linear-to-br from-green-500 to-green-600 border-green-500 text-white shadow-lg"
-                          : "bg-white border-gray-200 hover:border-green-300 hover:shadow-md"
+                        ? "bg-linear-to-br from-green-500 to-green-600 border-green-500 text-white shadow-lg"
+                        : "bg-white border-gray-200 hover:border-green-300 hover:shadow-md"
                         }`}
                     >
                       {selectedShift === shift && (
@@ -2334,16 +3138,16 @@ function EditBookingForm({ booking, onUpdate, onCancel, adminId, setNotification
                           slot.status === "pending"
                         }
                         className={`relative p-4 border-2 rounded-xl text-center transition-all duration-300 transform hover:scale-105 ${slot.display_status === "booked"
-                            ? "bg-red-50 border-red-300 cursor-not-allowed opacity-60"
-                            : slot.display_status === "expired"
-                              ? "bg-yellow-50 border-yellow-300 cursor-not-allowed opacity-60"
-                              : slot.status === "disabled"
-                                ? "bg-gray-50 border-gray-300 cursor-not-allowed opacity-60"
-                                : slot.status === "pending"
-                                  ? "bg-orange-50 border-orange-300 cursor-not-allowed opacity-60"
-                                  : selectedSlotId === slot.slot_id
-                                    ? "bg-linear-to-br from-green-500 to-green-600 border-green-500 text-white shadow-lg"
-                                    : "bg-white border-gray-200 hover:border-green-300 hover:shadow-md"
+                          ? "bg-red-50 border-red-300 cursor-not-allowed opacity-60"
+                          : slot.display_status === "expired"
+                            ? "bg-yellow-50 border-yellow-300 cursor-not-allowed opacity-60"
+                            : slot.status === "disabled"
+                              ? "bg-gray-50 border-gray-300 cursor-not-allowed opacity-60"
+                              : slot.status === "pending"
+                                ? "bg-orange-50 border-orange-300 cursor-not-allowed opacity-60"
+                                : selectedSlotId === slot.slot_id
+                                  ? "bg-linear-to-br from-green-500 to-green-600 border-green-500 text-white shadow-lg"
+                                  : "bg-white border-gray-200 hover:border-green-300 hover:shadow-md"
                           }`}
                       >
                         {selectedSlotId === slot.slot_id && (
@@ -2354,20 +3158,20 @@ function EditBookingForm({ booking, onUpdate, onCancel, adminId, setNotification
                           </div>
                         )}
                         <div className={`font-bold text-sm mb-1 ${selectedSlotId === slot.slot_id ? 'text-white' :
-                            slot.display_status === "booked" ? 'text-red-600' :
-                              slot.display_status === "expired" ? 'text-yellow-600' :
-                                slot.status === "disabled" ? 'text-gray-600' :
-                                  slot.status === "pending" ? 'text-orange-600' :
-                                    'text-gray-800'
+                          slot.display_status === "booked" ? 'text-red-600' :
+                            slot.display_status === "expired" ? 'text-yellow-600' :
+                              slot.status === "disabled" ? 'text-gray-600' :
+                                slot.status === "pending" ? 'text-orange-600' :
+                                  'text-gray-800'
                           }`}>
                           {formatTimeSlot(slot.start_time)} - {formatTimeSlot(slot.end_time)}
                         </div>
                         <div className={`text-sm ${selectedSlotId === slot.slot_id ? 'text-green-100' :
-                            slot.display_status === "booked" ? 'text-red-500' :
-                              slot.display_status === "expired" ? 'text-yellow-500' :
-                                slot.status === "disabled" ? 'text-gray-500' :
-                                  slot.status === "pending" ? 'text-orange-500' :
-                                    'text-gray-600'
+                          slot.display_status === "booked" ? 'text-red-500' :
+                            slot.display_status === "expired" ? 'text-yellow-500' :
+                              slot.status === "disabled" ? 'text-gray-500' :
+                                slot.status === "pending" ? 'text-orange-500' :
+                                  'text-gray-600'
                           }`}>
                           {slot.display_status === "booked"
                             ? `👤 ${slot.booker_name || "User"}`
@@ -2595,8 +3399,8 @@ function EditRatingForm({ rating, onUpdate, onCancel }: { rating: any, onUpdate:
               >
                 <svg
                   className={`w-8 h-8 sm:w-10 sm:h-10 ${star <= userRating
-                      ? 'text-yellow-400 drop-shadow-lg'
-                      : 'text-gray-300 hover:text-yellow-300'
+                    ? 'text-yellow-400 drop-shadow-lg'
+                    : 'text-gray-300 hover:text-yellow-300'
                     }`}
                   fill="currentColor"
                   viewBox="0 0 20 20"

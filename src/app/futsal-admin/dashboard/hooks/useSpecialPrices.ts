@@ -4,9 +4,11 @@ import { useAuthStore } from '@/stores/authStore';
 interface SpecialPrice {
   special_price_id: number;
   futsal_id: number;
-  type: 'date' | 'recurring';
+  type: 'date' | 'recurring' | 'time_based';
   special_date?: string;
   recurring_days?: string[];
+  start_time?: string;
+  end_time?: string;
   special_price: number;
   message?: string;
   created_by: string;
@@ -45,9 +47,11 @@ export function useSpecialPrices(futsalId?: number) {
 
   const createSpecialPrice = async (data: {
     futsal_id: number;
-    type?: 'date' | 'recurring';
+    type?: 'date' | 'recurring' | 'time_based';
     special_dates?: string[];
     recurring_days?: string[];
+    start_time?: string;
+    end_time?: string;
     special_price: number;
     message?: string;
   }) => {
