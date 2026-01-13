@@ -22,7 +22,8 @@ export default function BookingTracker() {
     if (trackedBooking) {
       const fetchPrice = async () => {
         try {
-          const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/special-prices/price/${trackedBooking.futsal_id}/${trackedBooking.booking_date}`);
+          const startTime = trackedBooking.time_slot.split('-')[0].trim();
+          const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/special-prices/price/${trackedBooking.futsal_id}/${trackedBooking.booking_date}?startTime=${startTime}`);
           if (response.ok) {
             const data = await response.json();
             setTotalAmount(data.effectivePrice);

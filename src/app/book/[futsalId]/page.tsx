@@ -1995,15 +1995,25 @@ export default function BookFutsal() {
               sp.type === 'recurring' && sp.recurring_days && sp.recurring_days.includes(dayOfWeek)
             ) : null;
 
-            const applicableSpecial = dateSpecial || recurringSpecial;
-
-            // Check for time-based pricing if no special price
-            let timeBasedPrice = null;
-            if (!applicableSpecial && bookingState.booking.time_slot) {
-              const slotStartTime = bookingState.booking.time_slot.split('-')[0];
-              // Note: In a real implementation, you'd fetch time-based prices for this futsal
-              // For now, we'll assume the effective price from currentPrice includes time-based pricing
+            // Check for time-based special price if no date or recurring
+            let timeBasedSpecial = null;
+            if (!dateSpecial && !recurringSpecial && bookingState.booking.time_slot) {
+              const slotStartTime = bookingState.booking.time_slot.split('-')[0].trim();
+              // Check for date-specific time-based first
+              timeBasedSpecial = specialPrices.find(sp =>
+                sp.type === 'time_based' && sp.special_date === bookingDate &&
+                sp.start_time <= slotStartTime && sp.end_time >= slotStartTime
+              );
+              // If no date-specific time-based, check general time-based
+              if (!timeBasedSpecial) {
+                timeBasedSpecial = specialPrices.find(sp =>
+                  sp.type === 'time_based' && sp.special_date === null &&
+                  sp.start_time <= slotStartTime && sp.end_time >= slotStartTime
+                );
+              }
             }
+
+            const applicableSpecial = dateSpecial || recurringSpecial || timeBasedSpecial;
 
             const rateToShow = applicableSpecial ? applicableSpecial.special_price : futsal.price_per_hour;
 
