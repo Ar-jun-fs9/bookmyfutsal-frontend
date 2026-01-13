@@ -99,6 +99,7 @@ export default function UserDashboard() {
   const [showCheckboxes, setShowCheckboxes] = useState(false);
   const [showAllFutsals, setShowAllFutsals] = useState(false);
   const [availableShifts, setAvailableShifts] = useState<string[]>([]);
+  const [futsalSpecialPrices, setFutsalSpecialPrices] = useState<{[key: number]: any[]}>({});
   // const [availableSlots, setAvailableSlots] = useState<any[]>([]);
   // const [otpCode, setOtpCode] = useState('');
   // const [loggedInUser, setLoggedInUser] = useState<User | null>(null);
@@ -140,6 +141,29 @@ export default function UserDashboard() {
     const state = { selectedFutsal, showBooking };
     sessionStorage.setItem('dashboardState', JSON.stringify(state));
   }, [selectedFutsal, showBooking]);
+
+  // Fetch special prices for all futsals
+  useEffect(() => {
+    const fetchSpecialPrices = async () => {
+      const prices: {[key: number]: any[]} = {};
+      for (const futsal of futsals) {
+        try {
+          const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/special-prices/${futsal.futsal_id}`);
+          if (response.ok) {
+            const data = await response.json();
+            prices[futsal.futsal_id] = data.specialPrices || [];
+          }
+        } catch (error) {
+          console.error('Error fetching special prices for futsal', futsal.futsal_id, error);
+        }
+      }
+      setFutsalSpecialPrices(prices);
+    };
+
+    if (futsals.length > 0) {
+      fetchSpecialPrices();
+    }
+  }, [futsals]);
 
   // Prevent background scrolling when modals are open
   useEffect(() => {
@@ -866,12 +890,17 @@ export default function UserDashboard() {
                               </button>
                               <button
                                 onClick={() => handleDetailsModal(futsal)}
-                                className="bg-white border-2 border-gray-200 text-gray-700 p-2 rounded-lg hover:bg-gray-50 hover:border-gray-300 transition-all duration-300"
+                                className="bg-white border-2 border-gray-200 text-gray-700 p-2 rounded-lg hover:bg-gray-50 hover:border-gray-300 transition-all duration-300 relative"
                                 title="Details"
                               >
                                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                 </svg>
+                                {futsalSpecialPrices[futsal.futsal_id]?.some(sp => sp.is_offer) && (
+                                  <span className="absolute -top-5 left-1/2 transform -translate-x-1/2 text-[10px] text-red-600 font-bold animate-pulse bg-white px-0.5 rounded pointer-events-none whitespace-nowrap">
+                                    special offer
+                                  </span>
+                                )}
                               </button>
                               {futsal.video && (
                                 <button
@@ -1347,7 +1376,7 @@ function DetailsModal({ futsal, onClose }: { futsal: Futsal, onClose: () => void
                             <p className="text-xl font-bold text-yellow-600">
                               Rs. {sp.special_price}
                               <span className="ml-1 text-lg font-medium">/hr</span>
-                              {sp.is_offer && <span className="ml-2 text-red-600 font-bold animate-pulse">OFFER</span>}
+                              {sp.is_offer && <span className="ml-2 text-red-600 font-bold animate-pulse">special offer</span>}
                               <span className="text-sm text-yellow-700"> ({details})</span>
                             </p>
 
