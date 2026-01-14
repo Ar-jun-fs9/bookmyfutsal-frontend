@@ -343,7 +343,7 @@ export function EditBookingForm({ booking, onUpdate, onCancel, setNotification }
                 <div className="absolute inset-0 bg-linear-to-br from-green-50 via-white to-blue-50 opacity-50"></div>
 
                 {/* Content */}
-                <div className="relative p-8">
+                <div className="relative p-2 sm:p-8">
                   {/* Header */}
                   <div className="text-center mb-8">
                     <div className="inline-flex items-center justify-center w-16 h-16 bg-linear-to-br from-green-500 to-green-600 rounded-lg mb-4 shadow-lg">
@@ -449,7 +449,7 @@ export function EditBookingForm({ booking, onUpdate, onCancel, setNotification }
                 <div className="absolute inset-0 bg-linear-to-br from-green-50 via-white to-blue-50 opacity-50"></div>
 
                 {/* Content */}
-                <div className="relative p-8">
+                <div className="relative p-2 sm:p-8">
                   {/* Header */}
                   <div className="text-center mb-8">
                     <div className="inline-flex items-center justify-center w-16 h-16 bg-linear-to-br from-green-500 to-green-600 rounded-lg mb-4 shadow-lg">
