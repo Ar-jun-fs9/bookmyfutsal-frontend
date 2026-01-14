@@ -515,16 +515,7 @@ export default function BookFutsal() {
         dispatch({ type: 'REMOVE_SELECTED_SLOT', payload: slot.slot_id });
         dispatch({ type: 'UPDATE_SLOT_STATUS', payload: { slotId: slot.slot_id, status: 'available', display_status: 'available' } });
       } else {
-        // Clicking different slot, release previous if any
-        if (bookingState.selectedSlotIds.length > 0) {
-          for (const id of bookingState.selectedSlotIds) {
-            await releaseSlotReservation(id);
-            dispatch({ type: 'UPDATE_SLOT_STATUS', payload: { slotId: id, status: 'available', display_status: 'available' } });
-          }
-          dispatch({ type: 'CLEAR_SELECTED_SLOTS' });
-        }
-
-        // Reserve new slot
+        // Clicking different slot, reserve new slot first
         const reserveResponse = await fetch(
           `${process.env.NEXT_PUBLIC_API_URL}/api/time-slots/${slot.slot_id}/reserve`,
           {
@@ -537,6 +528,14 @@ export default function BookFutsal() {
 
         if (reserveResponse.ok) {
           // Reservation successful
+          // Now release previous if any
+          if (bookingState.selectedSlotIds.length > 0) {
+            for (const id of bookingState.selectedSlotIds) {
+              await releaseSlotReservation(id);
+              dispatch({ type: 'UPDATE_SLOT_STATUS', payload: { slotId: id, status: 'available', display_status: 'available' } });
+            }
+          }
+          dispatch({ type: 'CLEAR_SELECTED_SLOTS' });
           dispatch({ type: 'ADD_SELECTED_SLOT', payload: slot.slot_id });
           dispatch({ type: 'UPDATE_SLOT_STATUS', payload: { slotId: slot.slot_id, status: 'pending', display_status: 'pending' } });
         } else {
