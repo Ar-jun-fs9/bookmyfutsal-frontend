@@ -519,6 +519,7 @@ export default function BookFutsal() {
         if (bookingState.selectedSlotIds.length > 0) {
           for (const id of bookingState.selectedSlotIds) {
             await releaseSlotReservation(id);
+            dispatch({ type: 'UPDATE_SLOT_STATUS', payload: { slotId: id, status: 'available', display_status: 'available' } });
           }
           dispatch({ type: 'CLEAR_SELECTED_SLOTS' });
         }
