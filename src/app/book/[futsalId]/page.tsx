@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef, useReducer, useCallback } from "react";
+import { useEffect, useState, useRef, useReducer } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from 'next/link';
 import html2canvas from "html2canvas";
@@ -100,37 +100,6 @@ export default function BookFutsal() {
   const booking = bookingState.booking;
   const formatTimeSlot = formatTime;
   const phone = bookingState.phone;
-
-  // Debounced phone verification check
-  const debouncedCheckVerification = useCallback(
-    debounce(async (phoneNumber: string) => {
-      if (phoneNumber.length === 10) {
-        try {
-          const checkResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/otp/check-verified?contact=${phoneNumber}&contact_type=phone`);
-          const checkData = await checkResponse.json();
-          setShowOtpNote(!checkData.verified);
-        } catch (error) {
-          console.error("Error checking verification:", error);
-          setShowOtpNote(true); // Default to show if error
-        }
-      } else {
-        setShowOtpNote(false);
-      }
-    }, 800),
-    []
-  );
-
-  // Debounce utility function
-  function debounce<T extends (...args: any[]) => any>(
-    func: T,
-    wait: number
-  ): (...args: Parameters<T>) => void {
-    let timeout: NodeJS.Timeout;
-    return (...args: Parameters<T>) => {
-      clearTimeout(timeout);
-      timeout = setTimeout(() => func(...args), wait);
-    };
-  }
 
   const downloadAsImage = async (format: 'png' | 'jpeg' | 'webp' = 'png') => {
     if (summaryRef.current) {
@@ -546,7 +515,15 @@ export default function BookFutsal() {
         dispatch({ type: 'REMOVE_SELECTED_SLOT', payload: slot.slot_id });
         dispatch({ type: 'UPDATE_SLOT_STATUS', payload: { slotId: slot.slot_id, status: 'available', display_status: 'available' } });
       } else {
-        // Clicking different slot, reserve new slot first
+        // Clicking different slot, release previous if any
+        if (bookingState.selectedSlotIds.length > 0) {
+          for (const id of bookingState.selectedSlotIds) {
+            await releaseSlotReservation(id);
+          }
+          dispatch({ type: 'CLEAR_SELECTED_SLOTS' });
+        }
+
+        // Reserve new slot
         const reserveResponse = await fetch(
           `${process.env.NEXT_PUBLIC_API_URL}/api/time-slots/${slot.slot_id}/reserve`,
           {
@@ -559,14 +536,6 @@ export default function BookFutsal() {
 
         if (reserveResponse.ok) {
           // Reservation successful
-          // Now release previous if any
-          if (bookingState.selectedSlotIds.length > 0) {
-            for (const id of bookingState.selectedSlotIds) {
-              await releaseSlotReservation(id);
-              dispatch({ type: 'UPDATE_SLOT_STATUS', payload: { slotId: id, status: 'available', display_status: 'available' } });
-            }
-          }
-          dispatch({ type: 'CLEAR_SELECTED_SLOTS' });
           dispatch({ type: 'ADD_SELECTED_SLOT', payload: slot.slot_id });
           dispatch({ type: 'UPDATE_SLOT_STATUS', payload: { slotId: slot.slot_id, status: 'pending', display_status: 'pending' } });
         } else {
@@ -1152,7 +1121,7 @@ export default function BookFutsal() {
                 <div className="absolute inset-0 bg-linear-to-br from-green-50 via-white to-blue-50 opacity-50"></div>
 
                 {/* Content */}
-                <div className="relative p-2 sm:p-8">
+                <div className="relative p-8">
                   {/* Header */}
                   <div className="text-center mb-8">
                     <div className="inline-flex items-center justify-center w-16 h-16 bg-linear-to-br from-green-500 to-green-600 rounded-lg mb-4 shadow-lg">
@@ -1439,44 +1408,51 @@ export default function BookFutsal() {
                                 maxLength={10}
                                 pattern="9[0-9]{9}"
                                 onChange={async (e) => {
-                                   const value = e.target.value.replace(/\D/g, ""); // Only allow digits
-                                   if (value.length <= 10 && (value === "" || value.startsWith("9"))) {
-                                     dispatch({ type: 'SET_PHONE', payload: value });
-                                     // Auto-fill eSewa phone number with the entered phone number
-                                     setEsewaPhone(value);
-                                     if (value.length === 10) {
-                                       // Check for verified phone and pre-populate if available
-                                       try {
-                                         const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/bookings/last-verified/${value}`);
-                                         const data = await response.json();
-                                         if (data.verified && data.guest_name) {
-                                           dispatch({ type: 'SET_NAME', payload: data.guest_name });
-                                           dispatch({ type: 'SET_NUMBER_OF_PLAYERS', payload: data.number_of_players?.toString() || '5' });
-                                           dispatch({ type: 'SET_TEAM_NAME', payload: data.team_name || "" });
-                                         } else {
-                                           // Clear fields if not verified or no data
-                                           dispatch({ type: 'SET_NAME', payload: "" });
-                                           dispatch({ type: 'SET_NUMBER_OF_PLAYERS', payload: '10' });
-                                           dispatch({ type: 'SET_TEAM_NAME', payload: "" });
-                                         }
-                                       } catch (error) {
-                                         console.error("Error fetching last booking details:", error);
-                                         // Clear fields on error
-                                         dispatch({ type: 'SET_NAME', payload: "" });
-                                         dispatch({ type: 'SET_NUMBER_OF_PLAYERS', payload: '5' });
-                                         dispatch({ type: 'SET_TEAM_NAME', payload: "" });
-                                       }
-                                       // Debounced check for OTP verification status
-                                       debouncedCheckVerification(value);
-                                     } else {
-                                       // Clear fields when phone is not complete
-                                       dispatch({ type: 'SET_NAME', payload: "" });
-                                       dispatch({ type: 'SET_NUMBER_OF_PLAYERS', payload: '10' });
-                                       dispatch({ type: 'SET_TEAM_NAME', payload: "" });
-                                       setShowOtpNote(false);
-                                     }
-                                   }
-                                 }}
+                                  const value = e.target.value.replace(/\D/g, ""); // Only allow digits
+                                  if (value.length <= 10 && (value === "" || value.startsWith("9"))) {
+                                    dispatch({ type: 'SET_PHONE', payload: value });
+                                    // Auto-fill eSewa phone number with the entered phone number
+                                    setEsewaPhone(value);
+                                    if (value.length === 10) {
+                                      // Check for verified phone and pre-populate if available
+                                      try {
+                                        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/bookings/last-verified/${value}`);
+                                        const data = await response.json();
+                                        if (data.verified && data.guest_name) {
+                                          dispatch({ type: 'SET_NAME', payload: data.guest_name });
+                                          dispatch({ type: 'SET_NUMBER_OF_PLAYERS', payload: data.number_of_players?.toString() || '5' });
+                                          dispatch({ type: 'SET_TEAM_NAME', payload: data.team_name || "" });
+                                        } else {
+                                          // Clear fields if not verified or no data
+                                          dispatch({ type: 'SET_NAME', payload: "" });
+                                          dispatch({ type: 'SET_NUMBER_OF_PLAYERS', payload: '10' });
+                                          dispatch({ type: 'SET_TEAM_NAME', payload: "" });
+                                        }
+                                      } catch (error) {
+                                        console.error("Error fetching last booking details:", error);
+                                        // Clear fields on error
+                                        dispatch({ type: 'SET_NAME', payload: "" });
+                                        dispatch({ type: 'SET_NUMBER_OF_PLAYERS', payload: '5' });
+                                        dispatch({ type: 'SET_TEAM_NAME', payload: "" });
+                                      }
+                                      // Check if phone is verified for OTP note
+                                      try {
+                                        const checkResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/otp/check-verified?contact=${value}&contact_type=phone`);
+                                        const checkData = await checkResponse.json();
+                                        setShowOtpNote(!checkData.verified);
+                                      } catch (error) {
+                                        console.error("Error checking verification:", error);
+                                        setShowOtpNote(true); // Default to show if error
+                                      }
+                                    } else {
+                                      // Clear fields when phone is not complete
+                                      dispatch({ type: 'SET_NAME', payload: "" });
+                                      dispatch({ type: 'SET_NUMBER_OF_PLAYERS', payload: '10' });
+                                      dispatch({ type: 'SET_TEAM_NAME', payload: "" });
+                                      setShowOtpNote(false);
+                                    }
+                                  }
+                                }}
                                 required
                                 className="w-full px-4 py-3 pl-12 bg-white border-2 border-gray-200 rounded-lg text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-400/50 focus:border-green-400/50 transition-all duration-300 font-medium text-sm"
                               />
@@ -1648,7 +1624,7 @@ export default function BookFutsal() {
                 <div className="absolute inset-0 bg-linear-to-br from-green-50 via-white to-blue-50 opacity-50"></div>
 
                 {/* Content */}
-                <div className="relative p-2 sm:p-8">
+                <div className="relative p-8">
                   {/* Header */}
                   <div className="text-center mb-8">
                     <div className="inline-flex items-center justify-center w-16 h-16 bg-linear-to-br from-green-500 to-green-600 rounded-lg mb-4 shadow-lg">
@@ -1701,7 +1677,7 @@ export default function BookFutsal() {
                           value={bookingState.otpCode}
                           onChange={(e) => dispatch({ type: 'SET_OTP_CODE', payload: e.target.value })}
                           required
-                          className="w-full px-6 py-4 border-2 border-gray-200 rounded-xl text-center text-2xl font-mono font-bold tracking-widest focus:border-green-500 focus:ring-4 focus:ring-green-100 transition-all duration-300 text-gray-700"
+                          className="w-full px-6 py-4  bg-white border border-gray-200 rounded-lg text-center text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-400/50 focus:border-green-400/50 transition-all duration-300 font-medium text-2xl"
                           maxLength={6}
                         />
                         <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-green-400">
@@ -1799,7 +1775,7 @@ export default function BookFutsal() {
                 <div className="absolute inset-0 bg-linear-to-br from-green-50 via-white to-blue-50 opacity-50"></div>
 
                 {/* Content */}
-                <div className="relative p-2 sm:p-8">
+                <div className="relative p-8">
                   {/* Header */}
                   <div className="text-center mb-8">
                     <div className="inline-flex items-center justify-center w-16 h-16 bg-linear-to-br from-green-500 to-green-600 rounded-lg mb-4 shadow-lg">
@@ -1948,7 +1924,7 @@ export default function BookFutsal() {
                 <div className="absolute inset-0 bg-linear-to-br from-green-50 via-white to-blue-50 opacity-50"></div>
 
                 {/* Content */}
-                <div className="relative p-2 sm:p-8">
+                <div className="relative p-8">
                   {/* Header */}
                   <div className="text-center mb-8">
                     <div className="inline-flex items-center justify-center w-16 h-16 bg-linear-to-br from-green-500 to-green-600 rounded-lg mb-4 shadow-lg">
