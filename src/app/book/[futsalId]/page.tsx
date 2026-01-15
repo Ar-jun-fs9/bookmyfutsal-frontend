@@ -983,6 +983,9 @@ export default function BookFutsal() {
                         message: 'Are you sure you want to cancel this booking?',
                         onConfirm: () => {
                           setConfirmModal({ isOpen: false, message: '', onConfirm: () => { } });
+                          // Release selected slots
+                          bookingState.selectedSlotIds.forEach(id => releaseSlotReservation(id));
+                          dispatch({ type: 'CLEAR_SELECTED_SLOTS' });
                           localStorage.removeItem(storageKey);
                           router.push("/");
                         }
@@ -1104,6 +1107,8 @@ export default function BookFutsal() {
                         message: 'Are you sure you want to cancel this booking?',
                         onConfirm: () => {
                           setConfirmModal({ isOpen: false, message: '', onConfirm: () => { } });
+                          // Release selected slots
+                          bookingState.selectedSlotIds.forEach(id => releaseSlotReservation(id));
                           localStorage.removeItem(storageKey);
                           router.push("/");
                         }
@@ -1237,7 +1242,6 @@ export default function BookFutsal() {
                           setConfirmModal({ isOpen: false, message: '', onConfirm: () => { } });
                           // Release selected slots
                           bookingState.selectedSlotIds.forEach(id => releaseSlotReservation(id));
-                          dispatch({ type: 'CLEAR_SELECTED_SLOTS' });
                           localStorage.removeItem(storageKey);
                           router.push("/");
                         }
