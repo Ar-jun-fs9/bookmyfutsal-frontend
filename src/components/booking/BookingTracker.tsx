@@ -53,7 +53,7 @@ export default function BookingTracker() {
       if (bookDate < currentDate) {
         setIsExpired(true);
         showNotification({ message: 'Your booking is expired.', type: 'info' });
-        setTrackingCode('');
+        // Don't clear tracking code for expired bookings that exist
       } else if (bookDate.getTime() === currentDate.getTime()) {
         const endTime = trackedBooking.time_slot.split('-')[1];
         const [hours, minutes] = endTime.split(':').map(Number);
@@ -62,7 +62,7 @@ export default function BookingTracker() {
         if (now > bookingEnd) {
           setIsExpired(true);
           showNotification({ message: 'Your booking is expired.', type: 'info' });
-          setTrackingCode('');
+          // Don't clear tracking code for expired bookings that exist
         } else {
           setIsExpired(false);
         }
@@ -332,12 +332,17 @@ export default function BookingTracker() {
       </div>
 
       {/* Booking Summary */}
-      {trackedBooking && hasSearched && !isExpired && (
+      {trackedBooking && hasSearched && (
         <div className="flex justify-center px-4">
           <div ref={summaryRef} className="bg-white rounded-2xl max-w-lg w-full shadow-2xl border border-gray-200 p-6">
             <div className="text-center mb-6">
               <img src="/logo/logo.png" alt="Logo" className="w-20 h-20 mx-auto mb-4 rounded-lg shadow-lg" />
               <h2 className="text-2xl font-bold text-gray-800">Booking Confirmation</h2>
+              {isExpired && (
+                <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+                  <p className="text-red-800 font-semibold">⏰ Your booking has expired</p>
+                </div>
+              )}
             </div>
             <div className="space-y-2 text-gray-700">
               <p><strong>Futsal:</strong> {trackedBooking.futsal_name}</p>
@@ -369,7 +374,12 @@ export default function BookingTracker() {
               </button>
               <button
                 onClick={handleCancelBooking}
-                className="flex-1 bg-linear-to-r from-red-500 to-red-600 text-white py-3 px-4 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300"
+                disabled={isExpired}
+                className={`flex-1 py-3 px-4 rounded-xl shadow-lg transform hover:scale-105 transition-all duration-300 ${
+                  isExpired
+                    ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                    : 'bg-linear-to-r from-red-500 to-red-600 text-white hover:shadow-xl'
+                }`}
               >
                 ❌ Cancel Booking
               </button>
