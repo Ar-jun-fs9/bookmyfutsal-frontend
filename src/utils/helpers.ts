@@ -65,15 +65,15 @@ export const categorizeBooking = (booking: any): 'past' | 'today' | 'future' => 
     // Match date is today - check the time
     if (!timeSlot) return 'past';
 
-    // Parse the start time from time_slot (format: "HH:MM-HH:MM")
-    const startTime = timeSlot.split('-')[0];
-    const [hours, minutes] = startTime.split(':').map(Number);
+    // Parse the end time from time_slot (format: "HH:MM-HH:MM")
+    const endTime = timeSlot.split('-')[1];
+    const [hours, minutes] = endTime.split(':').map(Number);
 
-    // Create a date object for today with the match start time
-    const matchStartTime = new Date(today);
-    matchStartTime.setHours(hours, minutes, 0, 0);
+    // Create a date object for today with the match end time
+    const matchEndTime = new Date(today);
+    matchEndTime.setHours(hours, minutes, 0, 0);
 
-    return matchStartTime > now ? 'today' : 'past';
+    return matchEndTime > now ? 'today' : 'past';
   }
 };
 

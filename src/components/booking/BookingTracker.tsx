@@ -55,11 +55,11 @@ export default function BookingTracker() {
         showNotification({ message: 'Your booking is expired.', type: 'info' });
         setTrackingCode('');
       } else if (bookDate.getTime() === currentDate.getTime()) {
-        const startTime = trackedBooking.time_slot.split('-')[0];
-        const [hours, minutes] = startTime.split(':').map(Number);
-        const bookingStart = new Date(now);
-        bookingStart.setHours(hours, minutes, 0, 0);
-        if (now > bookingStart) {
+        const endTime = trackedBooking.time_slot.split('-')[1];
+        const [hours, minutes] = endTime.split(':').map(Number);
+        const bookingEnd = new Date(now);
+        bookingEnd.setHours(hours, minutes, 0, 0);
+        if (now > bookingEnd) {
           setIsExpired(true);
           showNotification({ message: 'Your booking is expired.', type: 'info' });
           setTrackingCode('');

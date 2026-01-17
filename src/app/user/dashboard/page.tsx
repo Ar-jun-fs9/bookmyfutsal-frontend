@@ -1013,6 +1013,14 @@ export default function UserDashboard() {
                       .map((booking) => {
                         const category = categorizeBooking(booking);
                         const isPastBooking = category === 'past';
+                        const startTimeReached = (() => {
+                          const [startTime] = booking.time_slot.split('-');
+                          const [hours, minutes] = startTime.split(':').map(Number);
+                          const bookingDateTime = new Date(booking.booking_date);
+                          bookingDateTime.setHours(hours, minutes, 0, 0);
+                          const now = new Date();
+                          return now >= bookingDateTime;
+                        })();
                         return (
                           <div key={booking.booking_id} className={`border rounded p-4 ${isPastBooking ? 'bg-gray-50 border-gray-300' : ''}`}>
                             <div className="flex justify-between">
@@ -1067,8 +1075,8 @@ export default function UserDashboard() {
                                     <>
                                       <button
                                         onClick={() => handleUpdateBooking(booking)}
-                                        disabled={isPastBooking || (booking.update_count || 0) >= 2}
-                                        className={`px-2 py-1 rounded-lg text-xs sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 ${isPastBooking || (booking.update_count || 0) >= 2
+                                        disabled={startTimeReached || (booking.update_count || 0) >= 2}
+                                        className={`px-2 py-1 rounded-lg text-xs sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 ${startTimeReached || (booking.update_count || 0) >= 2
                                           ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
                                           : 'bg-linear-to-r from-green-500 to-green-600 text-white'
                                           }`}
