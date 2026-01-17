@@ -104,7 +104,7 @@ export function SpecialPriceSection({ isVisible, onToggle }: SpecialPriceSection
             onClick={onToggle}
             className="bg-linear-to-r from-blue-500 to-blue-600 text-white font-bold py-2.5 px-6 rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 border border-blue-400/30 hover:border-blue-400/50"
           >
-            Show Special Prices
+            Show S Prices
           </button>
         </div>
       </div>

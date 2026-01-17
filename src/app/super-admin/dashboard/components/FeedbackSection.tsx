@@ -85,7 +85,7 @@ export function FeedbackSection({ isVisible, onToggle }: FeedbackSectionProps) {
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-xl font-semibold text-gray-900">Feedback and Bugs</h3>
           <button onClick={onToggle} className="bg-linear-to-r from-blue-500 to-blue-600 text-white font-bold py-2.5 px-6 rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 border border-blue-400/30 hover:border-blue-400/50">
-            Show Feedbacks and Bugs
+            Show Feedbacks
           </button>
         </div>
       </div>
