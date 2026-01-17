@@ -519,8 +519,8 @@ export default function BookFutsal() {
         if (bookingState.selectedSlotIds.length > 0) {
           for (const id of bookingState.selectedSlotIds) {
             await releaseSlotReservation(id);
+            dispatch({ type: 'UPDATE_SLOT_STATUS', payload: { slotId: id, status: 'available', display_status: 'available' } });
           }
-          dispatch({ type: 'CLEAR_SELECTED_SLOTS' });
         }
 
         // Reserve new slot
@@ -536,7 +536,7 @@ export default function BookFutsal() {
 
         if (reserveResponse.ok) {
           // Reservation successful
-          dispatch({ type: 'ADD_SELECTED_SLOT', payload: slot.slot_id });
+          dispatch({ type: 'SET_SELECTED_SLOT_IDS', payload: [slot.slot_id] });
           dispatch({ type: 'UPDATE_SLOT_STATUS', payload: { slotId: slot.slot_id, status: 'pending', display_status: 'pending' } });
         } else {
           // Reservation failed
@@ -2554,3 +2554,4 @@ export default function BookFutsal() {
     </div>
   );
 }
+

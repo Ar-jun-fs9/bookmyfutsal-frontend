@@ -27,6 +27,7 @@ export type BookingAction =
   | { type: 'ADD_SELECTED_SLOT'; payload: number }
   | { type: 'REMOVE_SELECTED_SLOT'; payload: number }
   | { type: 'CLEAR_SELECTED_SLOTS' }
+  | { type: 'SET_SELECTED_SLOT_IDS'; payload: number[] }
   | { type: 'UPDATE_SLOT_STATUS'; payload: { slotId: number; status: string; display_status: string } }
   | { type: 'SET_PHONE'; payload: string }
   | { type: 'SET_NAME'; payload: string }
@@ -81,6 +82,8 @@ export const bookingReducer = (state: BookingState, action: BookingAction): Book
       return { ...state, selectedSlotIds: state.selectedSlotIds.filter(id => id !== action.payload) };
     case 'CLEAR_SELECTED_SLOTS':
       return { ...state, selectedSlotIds: [] };
+    case 'SET_SELECTED_SLOT_IDS':
+      return { ...state, selectedSlotIds: action.payload };
     case 'UPDATE_SLOT_STATUS':
       return {
         ...state,
