@@ -317,8 +317,7 @@ export default function UserDashboard() {
             setSelectedBookings([]);
             setSelectAll(false);
           } else {
-            const errorData = await response.json();
-            showNotification({ message: errorData.message || 'Error deleting bookings', type: 'info' });
+            showNotification({ message: 'Error deleting bookings', type: 'info' });
           }
         } catch (error) {
           console.error('Error deleting bookings:', error);
