@@ -2203,6 +2203,23 @@ function BookingModal({ futsal, user, onClose, onSuccess, setSuccessModal, setCo
   const [specialPrices, setSpecialPrices] = useState<any[]>([]);
   const phone = user?.phone || '';
 
+  const fetchPriceForSlot = async (slot: any) => {
+    if (step !== 3) return;
+    try {
+      const url = `${process.env.NEXT_PUBLIC_API_URL}/api/special-prices/price/${futsal.futsal_id}/${selectedDate}?startTime=${slot.start_time}`;
+      const response = await fetch(url);
+      if (response.ok) {
+        const priceData = await response.json();
+        if (priceData.timeBasedPrice) {
+          const message = `Normal Price: Rs. ${priceData.normalPrice} → Time-Based Price: Rs. ${priceData.timeBasedPrice.price}`;
+          setPriceNotification({ isOpen: true, message });
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching price for slot:', error);
+    }
+  };
+
   // console.log('BookingModal - Initial state:', { step, selectedDate, futsalId: futsal.futsal_id, booking: null });
 
   // Remove local priceNotification state since it's now in main component
@@ -2275,17 +2292,12 @@ function BookingModal({ futsal, user, onClose, onSuccess, setSuccessModal, setCo
     })();
   }, [futsal, selectedDate, selectedShift, step]);
 
-  // Fetch price when date or selected slot changes
+  // Fetch price when date or step changes
   useEffect(() => {
     const fetchPrice = async () => {
       if (futsal.futsal_id && selectedDate) {
         try {
-          const selectedSlot = selectedSlotIds.length > 0 ? availableSlots.find(slot => slot.slot_id === selectedSlotIds[0]) : null;
-          const startTime = selectedSlot ? selectedSlot.start_time : undefined;
-
-          const url = startTime
-            ? `${process.env.NEXT_PUBLIC_API_URL}/api/special-prices/price/${futsal.futsal_id}/${selectedDate}?startTime=${startTime}`
-            : `${process.env.NEXT_PUBLIC_API_URL}/api/special-prices/price/${futsal.futsal_id}/${selectedDate}`;
+          const url = `${process.env.NEXT_PUBLIC_API_URL}/api/special-prices/price/${futsal.futsal_id}/${selectedDate}`;
 
           const response = await fetch(url);
           if (response.ok) {
@@ -2293,13 +2305,9 @@ function BookingModal({ futsal, user, onClose, onSuccess, setSuccessModal, setCo
             setCurrentPrice(priceData);
 
             // Show notification only in appropriate step
-            if (priceData.specialPrice && !startTime && step === 1) {
+            if (priceData.specialPrice && step === 1) {
               // Date-specific or recurring special price: show only in date step (step 1)
               const message = `Normal: Rs. ${priceData.normalPrice} → ${priceData.specialPrice.message || 'Special Price'}: Rs. ${priceData.specialPrice.price}`;
-              setPriceNotification({ isOpen: true, message });
-            } else if (priceData.timeBasedPrice && startTime && step === 3) {
-              // Time-based special price: show only in time slot step (step 3)
-              const message = `Normal: Rs. ${priceData.normalPrice} → ${priceData.timeBasedPrice.message || 'Time-Based Price'}: Rs. ${priceData.timeBasedPrice.price}`;
               setPriceNotification({ isOpen: true, message });
             } else if (step === 2 || step === 4) {
               // Close modal in other steps to prevent it from staying open
@@ -2313,7 +2321,7 @@ function BookingModal({ futsal, user, onClose, onSuccess, setSuccessModal, setCo
     };
 
     fetchPrice();
-  }, [futsal.futsal_id, selectedDate, selectedSlotIds, availableSlots, step]);
+  }, [futsal.futsal_id, selectedDate, step]);
 
   // Check slot status before allowing selection
   const checkSlotStatus = async (slotId: number): Promise<string> => {
@@ -2354,6 +2362,8 @@ function BookingModal({ futsal, user, onClose, onSuccess, setSuccessModal, setCo
           setSelectedSlotIds(prev => [...prev, slot.slot_id]);
           // Update local to pending
           setAvailableSlots(prev => prev.map(s => s.slot_id === slot.slot_id ? { ...s, display_status: 'pending' } : s));
+          // Fetch price and show notification if special
+          fetchPriceForSlot(slot);
         } else {
           // Reservation failed
           if (reserveData.status === 'pending') {
@@ -3350,6 +3360,23 @@ function UpdateBookingModal({ booking, onClose, onSuccess, setSuccessModal, show
   const [teamName, setTeamName] = useState(booking.team_name || '');
   const [loading, setLoading] = useState(false);
 
+  const fetchPriceForSlot = async (slot: any) => {
+    if (step !== 3) return;
+    try {
+      const url = `${process.env.NEXT_PUBLIC_API_URL}/api/special-prices/price/${futsalId}/${selectedDate}?startTime=${slot.start_time}`;
+      const response = await fetch(url);
+      if (response.ok) {
+        const priceData = await response.json();
+        if (priceData.timeBasedPrice) {
+          const message = `Normal Price: Rs. ${priceData.normalPrice} → Time-Based Price: Rs. ${priceData.timeBasedPrice.price}`;
+          setPriceNotification({ isOpen: true, message });
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching price for slot:', error);
+    }
+  };
+
   // Get futsal_id from the booking, with fallback fetch if missing
   const [futsalId, setFutsalId] = useState<number | undefined>(booking.futsal_id);
   // console.log('UpdateBookingModal - Initial state:', { step, selectedDate, futsalId, booking });
@@ -3372,30 +3399,21 @@ function UpdateBookingModal({ booking, onClose, onSuccess, setSuccessModal, show
     }
   }, [futsalId, booking.booking_id]);
 
-  // Fetch price when date or selected slot changes
+  // Fetch price when date or step changes
   useEffect(() => {
     const fetchPrice = async () => {
       if (futsalId && selectedDate) {
         try {
-          const selectedSlot = selectedSlotIds.length > 0 ? availableSlots.find(slot => slot.slot_id === selectedSlotIds[0]) : null;
-          const startTime = selectedSlot ? selectedSlot.start_time : undefined;
-
-          const url = startTime
-            ? `${process.env.NEXT_PUBLIC_API_URL}/api/special-prices/price/${futsalId}/${selectedDate}?startTime=${startTime}`
-            : `${process.env.NEXT_PUBLIC_API_URL}/api/special-prices/price/${futsalId}/${selectedDate}`;
+          const url = `${process.env.NEXT_PUBLIC_API_URL}/api/special-prices/price/${futsalId}/${selectedDate}`;
 
           const response = await fetch(url);
           if (response.ok) {
             const priceData = await response.json();
 
             // Show notification only in appropriate step
-            if (priceData.specialPrice && !startTime && step === 1) {
+            if (priceData.specialPrice && step === 1) {
               // Date-specific or recurring special price: show only in date step (step 1)
               const message = `Normal: Rs. ${priceData.normalPrice} → ${priceData.specialPrice.message || 'Special Price'}: Rs. ${priceData.specialPrice.price}`;
-              setPriceNotification({ isOpen: true, message });
-            } else if (priceData.timeBasedPrice && startTime && step === 3) {
-              // Time-based special price: show only in time slot step (step 3)
-              const message = `Normal: Rs. ${priceData.normalPrice} → ${priceData.timeBasedPrice.message || 'Time-Based Price'}: Rs. ${priceData.timeBasedPrice.price}`;
               setPriceNotification({ isOpen: true, message });
             } else if (step === 2) {
               // Close modal in other steps to prevent it from staying open
@@ -3409,7 +3427,7 @@ function UpdateBookingModal({ booking, onClose, onSuccess, setSuccessModal, show
     };
 
     fetchPrice();
-  }, [futsalId, selectedDate, selectedSlotIds, availableSlots, step, setPriceNotification]);
+  }, [futsalId, selectedDate, step, setPriceNotification]);
 
   useEffect(() => {
     const fetchFutsal = async () => {
@@ -3485,6 +3503,8 @@ function UpdateBookingModal({ booking, onClose, onSuccess, setSuccessModal, show
           setSelectedSlotIds([slot.slot_id]);
           // Update local to pending
           setAvailableSlots(prev => prev.map(s => s.slot_id === slot.slot_id ? { ...s, display_status: 'pending' } : s));
+          // Fetch price and show notification if special
+          fetchPriceForSlot(slot);
         } else {
           // Reservation failed
           if (reserveData.status === 'pending') {
