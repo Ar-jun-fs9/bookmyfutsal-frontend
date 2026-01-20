@@ -213,9 +213,6 @@ class ApiService {
     });
   }
 
-  async checkVerified(contact: string) {
-    return this.request(`/otp/check-verified?contact=${encodeURIComponent(contact)}`);
-  }
 
   // Users
   async registerUser(userData: any) {

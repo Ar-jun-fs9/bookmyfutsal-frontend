@@ -350,7 +350,6 @@ export default function BookFutsal() {
 
   // Simple UI state
   const [otpCountdown, setOtpCountdown] = useState(0);
-  const [showOtpNote, setShowOtpNote] = useState(false);
   const [esewaPhone, setEsewaPhone] = useState('');
   const [confirmModal, setConfirmModal] = useState<{ isOpen: boolean, message: string, onConfirm: () => void } | null>(null);
 
@@ -606,38 +605,26 @@ export default function BookFutsal() {
         return;
       }
 
-      // Check if phone is already verified
-      const checkResponse = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/otp/check-verified?contact=${bookingState.phone}&contact_type=phone`
-      );
-      const checkData = await checkResponse.json();
-
-      if (checkData.verified) {
-        // Phone already verified, proceed to payment
-        dispatch({ type: 'SET_USER', payload: { user_id: 0, name: bookingState.name, phone: bookingState.phone } });
-        dispatch({ type: 'SET_STEP', payload: 5 });
-      } else {
-        // Need to verify phone first
-        const otpResponse = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/api/otp/generate`,
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              contact: bookingState.phone,
-              otp_type: "phone",
-            }),
-          }
-        );
-
-        if (otpResponse.ok) {
-          const otpData = await otpResponse.json();
-          showNotification({ message: `OTP sent to ${bookingState.phone}. OTP: ${otpData.otp_code}`, type: 'info' });
-          setOtpCountdown(60); // Start 1-minute countdown
-          dispatch({ type: 'SET_STEP', payload: 4 }); // Go to OTP verification step
-        } else {
-          showNotification({ message: "Failed to send OTP", type: 'info' });
+      // Always send OTP for security
+      const otpResponse = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/otp/generate`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            contact: bookingState.phone,
+            otp_type: "phone",
+          }),
         }
+      );
+
+      if (otpResponse.ok) {
+        const otpData = await otpResponse.json();
+        showNotification({ message: `OTP sent to ${bookingState.phone}. OTP: ${otpData.otp_code}`, type: 'info' });
+        setOtpCountdown(60); // Start 1-minute countdown
+        dispatch({ type: 'SET_STEP', payload: 4 }); // Go to OTP verification step
+      } else {
+        showNotification({ message: "Failed to send OTP", type: 'info' });
       }
     } catch (error) {
       console.error("Error:", error);
@@ -1271,10 +1258,10 @@ export default function BookFutsal() {
                       Pick Your Time Slot
                     </h2>
                     <p className="text-gray-600 text-sm">Choose the perfect time for your game</p>
-                    {showOtpNote && !loggedInUser && (
+                    {!loggedInUser && (
                       <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mt-4">
                         <p className="text-sm text-blue-800">
-                          📱 <strong>OTP Verification:</strong> One-time verification required for new numbers. If you've booked before with this number, no OTP needed.
+                          📱 <strong>OTP Verification:</strong> One-time verification required in every booking due to security risk.
                         </p>
                       </div>
                     )}
@@ -1418,42 +1405,15 @@ export default function BookFutsal() {
                                     // Auto-fill eSewa phone number with the entered phone number
                                     setEsewaPhone(value);
                                     if (value.length === 10) {
-                                      // Check for verified phone and pre-populate if available
-                                      try {
-                                        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/bookings/last-verified/${value}`);
-                                        const data = await response.json();
-                                        if (data.verified && data.guest_name) {
-                                          dispatch({ type: 'SET_NAME', payload: data.guest_name });
-                                          dispatch({ type: 'SET_NUMBER_OF_PLAYERS', payload: data.number_of_players?.toString() || '5' });
-                                          dispatch({ type: 'SET_TEAM_NAME', payload: data.team_name || "" });
-                                        } else {
-                                          // Clear fields if not verified or no data
-                                          dispatch({ type: 'SET_NAME', payload: "" });
-                                          dispatch({ type: 'SET_NUMBER_OF_PLAYERS', payload: '10' });
-                                          dispatch({ type: 'SET_TEAM_NAME', payload: "" });
-                                        }
-                                      } catch (error) {
-                                        console.error("Error fetching last booking details:", error);
-                                        // Clear fields on error
-                                        dispatch({ type: 'SET_NAME', payload: "" });
-                                        dispatch({ type: 'SET_NUMBER_OF_PLAYERS', payload: '5' });
-                                        dispatch({ type: 'SET_TEAM_NAME', payload: "" });
-                                      }
-                                      // Check if phone is verified for OTP note
-                                      try {
-                                        const checkResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/otp/check-verified?contact=${value}&contact_type=phone`);
-                                        const checkData = await checkResponse.json();
-                                        setShowOtpNote(!checkData.verified);
-                                      } catch (error) {
-                                        console.error("Error checking verification:", error);
-                                        setShowOtpNote(true); // Default to show if error
-                                      }
+                                      // Clear fields for new booking
+                                      dispatch({ type: 'SET_NAME', payload: "" });
+                                      dispatch({ type: 'SET_NUMBER_OF_PLAYERS', payload: '10' });
+                                      dispatch({ type: 'SET_TEAM_NAME', payload: "" });
                                     } else {
                                       // Clear fields when phone is not complete
                                       dispatch({ type: 'SET_NAME', payload: "" });
                                       dispatch({ type: 'SET_NUMBER_OF_PLAYERS', payload: '10' });
                                       dispatch({ type: 'SET_TEAM_NAME', payload: "" });
-                                      setShowOtpNote(false);
                                     }
                                   }
                                 }}
@@ -1563,7 +1523,7 @@ export default function BookFutsal() {
                             className="flex-1 order-1 sm:order-2 bg-linear-to-r from-green-500 to-green-600 text-white font-semibold py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 border border-green-400/30"
                           >
                             <span className="flex items-center justify-center">
-                              {showOtpNote ? 'Next: OTP Verify' : 'Next: Advance Payment'}
+                              Next: OTP Verify
                               <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                               </svg>
