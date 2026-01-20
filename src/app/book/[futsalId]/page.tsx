@@ -352,7 +352,26 @@ export default function BookFutsal() {
   const [otpCountdown, setOtpCountdown] = useState(0);
   const [esewaPhone, setEsewaPhone] = useState('');
   const [confirmModal, setConfirmModal] = useState<{ isOpen: boolean, message: string, onConfirm: () => void } | null>(null);
-
+  
+  const [lastBooking, setLastBooking] = useState<{guest_name: string, number_of_players: number, team_name?: string} | null>(null);
+  
+  const fetchLastBooking = async (phone: string) => {
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/bookings/last-by-phone/${phone}`);
+      if (response.ok) {
+        const data = await response.json();
+        setLastBooking(data.lastBooking);
+        if (data.lastBooking) {
+          dispatch({ type: 'SET_NAME', payload: data.lastBooking.guest_name });
+          dispatch({ type: 'SET_NUMBER_OF_PLAYERS', payload: data.lastBooking.number_of_players.toString() });
+          dispatch({ type: 'SET_TEAM_NAME', payload: data.lastBooking.team_name || '' });
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching last booking:', error);
+    }
+  };
+  
   // Load booking progress from localStorage on mount
   useEffect(() => {
     const saved = localStorage.getItem(storageKey);
@@ -1258,7 +1277,7 @@ export default function BookFutsal() {
                       Pick Your Time Slot
                     </h2>
                     <p className="text-gray-600 text-sm">Choose the perfect time for your game</p>
-                    {!loggedInUser && (
+                    {!loggedInUser && bookingState.phone.length === 10 && (
                       <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mt-4">
                         <p className="text-sm text-blue-800">
                           📱 <strong>OTP Verification:</strong> One-time verification required in every booking due to security risk.
@@ -1409,7 +1428,10 @@ export default function BookFutsal() {
                                       dispatch({ type: 'SET_NAME', payload: "" });
                                       dispatch({ type: 'SET_NUMBER_OF_PLAYERS', payload: '10' });
                                       dispatch({ type: 'SET_TEAM_NAME', payload: "" });
+                                      // Fetch last booking
+                                      await fetchLastBooking(value);
                                     } else {
+                                      setLastBooking(null);
                                       // Clear fields when phone is not complete
                                       dispatch({ type: 'SET_NAME', payload: "" });
                                       dispatch({ type: 'SET_NUMBER_OF_PLAYERS', payload: '10' });
