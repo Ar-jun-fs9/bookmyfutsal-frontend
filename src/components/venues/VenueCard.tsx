@@ -42,6 +42,7 @@ const VenueCard = memo(function VenueCard({ futsal, index, specialPrices = [] }:
   } = useModalStore();
 
   const images = useMemo(() => futsal.images || [], [futsal.images]);
+  const hasSpecialOffer = useMemo(() => specialPrices.some(sp => sp.is_offer), [specialPrices]);
 
   const formattedTimeRange = useMemo(() => {
     if (futsal.opening_hours && futsal.closing_hours) {
@@ -152,7 +153,7 @@ const VenueCard = memo(function VenueCard({ futsal, index, specialPrices = [] }:
 
   return (
     <div
-      className="bg-white rounded-2xl shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-500 border border-gray-100 overflow-hidden -up"
+      className="bg-white rounded-2xl shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-500 border border-gray-100 overflow-hidden"
       style={{ animationDelay: `${index * 100}ms` }}
     >
       {/* Image Carousel */}
@@ -165,6 +166,12 @@ const VenueCard = memo(function VenueCard({ futsal, index, specialPrices = [] }:
           />
         )}
         <div className="absolute inset-0 bg-linear-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+
+        {hasSpecialOffer && (
+          <div className="absolute top-4 left-4 bg-red-600 text-white px-3 py-1 rounded-lg font-bold text-sm animate-bounce">
+            SPECIAL OFFER
+          </div>
+        )}
 
         {/* Navigation Arrows */}
         {images.length > 1 && (
@@ -296,7 +303,7 @@ const VenueCard = memo(function VenueCard({ futsal, index, specialPrices = [] }:
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
             {specialPrices.some(sp => sp.is_offer) && (
-              <span className="absolute -top-5 left-1/2 transform -translate-x-1/2 text-[10px] text-red-600 font-bold animate-pulse bg-white px-0.5 rounded pointer-events-none whitespace-nowrap">
+              <span className="absolute -top-6 left-1/2 transform -translate-x-1/2 text-[15px] text-red-600 font-bold animate-pulse bg-white px-0.5 rounded pointer-events-none whitespace-nowrap">
                 special offer
               </span>
             )}
