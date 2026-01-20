@@ -14,6 +14,7 @@ import { filterReducer, initialFilterState } from '@/reducers/filterReducer';
 // import { useSocketHandler } from '@/hooks/useSocketHandler';
 import { useSpecialPrices } from './hooks/useSpecialPrices';
 import { useTimeBasedPricing } from './hooks/useTimeBasedPricing';
+import { OfferMessageModal } from '../../super-admin/dashboard/components/modals/OfferMessageModal';
 
 interface Admin {
   id: number;
@@ -101,7 +102,7 @@ function categorizeBooking(booking: any): 'past' | 'today' | 'future' {
 export default function FutsalAdminDashboard() {
   const router = useRouter();
   const queryClient = useQueryClient();
-  const { role, logout, hydrated } = useAuthStore();
+  const { role, logout, hydrated, tokens } = useAuthStore();
   const [user, setUser] = useState<Admin | null>(null);
   const admin = user;
   const { socket } = useSocketStore();
@@ -139,6 +140,7 @@ export default function FutsalAdminDashboard() {
   const [selectedRatings, setSelectedRatings] = useState<number[]>([]);
   const [selectAllRatings, setSelectAllRatings] = useState(false);
   const [showRatingCheckboxes, setShowRatingCheckboxes] = useState(false);
+  const [offerMessageModal, setOfferMessageModal] = useState<{isOpen: boolean, price: any, onConfirm: (message: string) => void, existingMessage?: string}>({isOpen: false, price: null, onConfirm: () => {}, existingMessage: ''});
 
   // Reducer for filters
   const [filterState, dispatch] = useReducer(filterReducer, initialFilterState);
@@ -631,6 +633,24 @@ export default function FutsalAdminDashboard() {
         }
       }
     });
+  };
+
+  const checkExistingOfferMessage = async (futsalId: number): Promise<string | null> => {
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/special-prices/offer-message/${futsalId}`, {
+        headers: {
+          'Authorization': `Bearer ${tokens?.accessToken}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      if (response.ok) {
+        const data = await response.json();
+        return data.offerMessage;
+      }
+    } catch (error) {
+      console.error('Error checking offer message:', error);
+    }
+    return null;
   };
 
   return (
@@ -1129,11 +1149,30 @@ export default function FutsalAdminDashboard() {
                                       type="checkbox"
                                       checked={price.is_offer}
                                       onChange={async (e) => {
-                                        const result = await updateSpecialPrice(price.special_price_id, { special_price: price.special_price, is_offer: e.target.checked });
-                                        if (result.success) {
-                                          showNotification({ message: `Offer ${e.target.checked ? 'disabled' : 'enabled'} successfully`, type: 'success' });
+                                        if (e.target.checked) {
+                                          // Enabling offer, always show modal to enter/edit message
+                                          const existingMessage = (await checkExistingOfferMessage(price.futsal_id)) || '';
+                                          setOfferMessageModal({
+                                            isOpen: true,
+                                            price,
+                                            onConfirm: async (message: string) => {
+                                              const result = await updateSpecialPrice(price.special_price_id, { special_price: price.special_price, is_offer: true, offer_message: message });
+                                              if (result.success) {
+                                                showNotification({ message: 'Offer enabled successfully', type: 'success' });
+                                              } else {
+                                                showNotification({ message: result.error || 'Error updating offer status', type: 'info' });
+                                              }
+                                            },
+                                            existingMessage
+                                          });
                                         } else {
-                                          showNotification({ message: result.error || 'Error updating offer status', type: 'info' });
+                                          // Disabling offer
+                                          const result = await updateSpecialPrice(price.special_price_id, { special_price: price.special_price, is_offer: false });
+                                          if (result.success) {
+                                            showNotification({ message: 'Offer disabled successfully', type: 'success' });
+                                          } else {
+                                            showNotification({ message: result.error || 'Error updating offer status', type: 'info' });
+                                          }
                                         }
                                       }}
                                       className="sr-only"
@@ -1596,6 +1635,13 @@ export default function FutsalAdminDashboard() {
           </div>
         </div>
       )}
+
+      <OfferMessageModal
+        isOpen={offerMessageModal.isOpen}
+        onClose={() => setOfferMessageModal({ isOpen: false, price: null, onConfirm: () => {}, existingMessage: '' })}
+        onConfirm={offerMessageModal.onConfirm}
+        initialMessage={offerMessageModal.existingMessage || ''}
+      />
     </div>
   );
 }

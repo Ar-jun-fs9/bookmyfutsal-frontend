@@ -2,8 +2,10 @@ import { useState, useEffect } from 'react';
 import { useSpecialPrices } from '../hooks/useSpecialPrices';
 import { useFutsals } from '../hooks/useFutsals';
 import { useBulkOperations } from '../hooks/useBulkOperations';
+import { useAuthStore } from '@/stores/authStore';
 import { ConfirmModal } from './modals/ConfirmModal';
 import { NotificationModal } from './modals/NotificationModal';
+import { OfferMessageModal } from './modals/OfferMessageModal';
 
 interface SpecialPriceSectionProps {
   isVisible: boolean;
@@ -20,6 +22,7 @@ interface SpecialPrice {
   end_time?: string;
   special_price: number;
   message?: string;
+  offer_message?: string;
   is_offer: boolean;
   created_by: string;
   created_at: string;
@@ -31,10 +34,12 @@ export function SpecialPriceSection({ isVisible, onToggle }: SpecialPriceSection
   const { specialPrices, loading, createSpecialPrice, updateSpecialPrice, deleteSpecialPrice } = useSpecialPrices();
   const { futsals } = useFutsals();
   const { selectedItems, showCheckboxes, toggleSelection, toggleSelectAll, clearSelection, selectedCount } = useBulkOperations();
+  const { tokens } = useAuthStore();
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [editingPrice, setEditingPrice] = useState<SpecialPrice | null>(null);
   const [notification, setNotification] = useState<{message: string, type: 'success' | 'info'} | null>(null);
   const [confirmModal, setConfirmModal] = useState<{isOpen: boolean, message: string, onConfirm: () => void}>({isOpen: false, message: '', onConfirm: () => {}});
+  const [offerMessageModal, setOfferMessageModal] = useState<{isOpen: boolean, price: SpecialPrice | null, onConfirm: (message: string) => void, existingMessage?: string}>({isOpen: false, price: null, onConfirm: () => {}, existingMessage: ''});
 
   const formatTime = (timeString: string): string => {
     const [hours, minutes] = timeString.split(':').map(Number);
@@ -52,6 +57,24 @@ export function SpecialPriceSection({ isVisible, onToggle }: SpecialPriceSection
       return () => clearTimeout(timer);
     }
   }, [notification]);
+
+  const checkExistingOfferMessage = async (futsalId: number): Promise<string | null> => {
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/special-prices/offer-message/${futsalId}`, {
+        headers: {
+          'Authorization': `Bearer ${tokens?.accessToken}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      if (response.ok) {
+        const data = await response.json();
+        return data.offerMessage;
+      }
+    } catch (error) {
+      console.error('Error checking offer message:', error);
+    }
+    return null;
+  };
 
   const handleDeleteSpecialPrice = (id: number) => {
     setConfirmModal({
@@ -210,11 +233,30 @@ export function SpecialPriceSection({ isVisible, onToggle }: SpecialPriceSection
                           type="checkbox"
                           checked={price.is_offer}
                           onChange={async (e) => {
-                            const result = await updateSpecialPrice(price.special_price_id, { special_price: price.special_price, is_offer: e.target.checked });
-                            if (result.success) {
-                              setNotification({ message: `Offer ${e.target.checked ? 'disabled' : 'enabled'} successfully`, type: 'success' });
+                            if (e.target.checked) {
+                              // Enabling offer, always show modal to enter/edit message
+                              const existingMessage = (await checkExistingOfferMessage(price.futsal_id)) || '';
+                              setOfferMessageModal({
+                                isOpen: true,
+                                price,
+                                onConfirm: async (message: string) => {
+                                  const result = await updateSpecialPrice(price.special_price_id, { special_price: price.special_price, is_offer: true, offer_message: message });
+                                  if (result.success) {
+                                    setNotification({ message: 'Offer enabled successfully', type: 'success' });
+                                  } else {
+                                    setNotification({ message: result.error || 'Error updating offer status', type: 'info' });
+                                  }
+                                },
+                                existingMessage
+                              });
                             } else {
-                              setNotification({ message: result.error || 'Error updating offer status', type: 'info' });
+                              // Disabling offer
+                              const result = await updateSpecialPrice(price.special_price_id, { special_price: price.special_price, is_offer: false });
+                              if (result.success) {
+                                setNotification({ message: 'Offer disabled successfully', type: 'success' });
+                              } else {
+                                setNotification({ message: result.error || 'Error updating offer status', type: 'info' });
+                              }
                             }
                           }}
                           className="sr-only"
@@ -261,6 +303,13 @@ export function SpecialPriceSection({ isVisible, onToggle }: SpecialPriceSection
         message={notification?.message || ''}
         type={notification?.type || 'info'}
         onClose={() => setNotification(null)}
+      />
+
+      <OfferMessageModal
+        isOpen={offerMessageModal.isOpen}
+        onClose={() => setOfferMessageModal({ isOpen: false, price: null, onConfirm: () => {}, existingMessage: '' })}
+        onConfirm={offerMessageModal.onConfirm}
+        initialMessage={offerMessageModal.existingMessage || ''}
       />
     </div>
   );

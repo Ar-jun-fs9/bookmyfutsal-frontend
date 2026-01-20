@@ -43,6 +43,10 @@ const VenueCard = memo(function VenueCard({ futsal, index, specialPrices = [] }:
 
   const images = useMemo(() => futsal.images || [], [futsal.images]);
   const hasSpecialOffer = useMemo(() => specialPrices.some(sp => sp.is_offer), [specialPrices]);
+  const offerMessage = useMemo(() => {
+    const offerPrice = specialPrices.find(sp => sp.is_offer && sp.offer_message);
+    return offerPrice?.offer_message || 'Special Offer';
+  }, [specialPrices]);
 
   const formattedTimeRange = useMemo(() => {
     if (futsal.opening_hours && futsal.closing_hours) {
@@ -169,7 +173,7 @@ const VenueCard = memo(function VenueCard({ futsal, index, specialPrices = [] }:
 
         {hasSpecialOffer && (
           <div className="absolute top-4 left-4 bg-red-600 text-white px-3 py-1 rounded-lg font-bold text-sm animate-bounce">
-            SPECIAL OFFER
+            {offerMessage.toUpperCase()}
           </div>
         )}
 
@@ -304,7 +308,7 @@ const VenueCard = memo(function VenueCard({ futsal, index, specialPrices = [] }:
             </svg>
             {specialPrices.some(sp => sp.is_offer) && (
               <span className="absolute -top-6 left-1/2 transform -translate-x-1/2 text-[15px] text-red-600 font-bold animate-pulse rounded pointer-events-none whitespace-nowrap">
-                special offer
+                {offerMessage}
               </span>
             )}
           </button>

@@ -11,6 +11,7 @@ interface SpecialPrice {
   end_time?: string;
   special_price: number;
   message?: string;
+  offer_message?: string;
   is_offer: boolean;
   created_by: string;
   created_at: string;
@@ -85,6 +86,7 @@ export function useSpecialPrices() {
   const updateSpecialPrice = async (id: number, data: {
     special_price: number;
     message?: string;
+    offer_message?: string;
     special_date?: string;
     recurring_days?: string[];
     start_time?: string;
