@@ -1267,7 +1267,7 @@ export default function BookFutsal() {
                     )}
                   </div>
 
-                  {/* Date and Shift Info */}
+                  {/* Date and Shift Infoo */}
                   <div className="bg-linear-to-r from-green-100 to-blue-100 rounded-xl p-4 mb-6 border border-green-200">
                     <div className="flex items-center justify-center space-x-6">
                       <div className="flex items-center">
