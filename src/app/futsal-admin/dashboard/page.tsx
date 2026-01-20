@@ -154,7 +154,7 @@ export default function FutsalAdminDashboard() {
   const openAllSlotsMutation = useOpenAllSlotsForDate();
   const updateSlotStatusMutation = useUpdateSlotStatus();
   const { data: ratingsData } = useFutsalRatings(futsal?.futsal_id);
-  const { specialPrices, loading: specialPricesLoading, createSpecialPrice, updateSpecialPrice, deleteSpecialPrice } = useSpecialPrices(futsal?.futsal_id);
+  const { specialPrices, loading: specialPricesLoading, createSpecialPrice, updateSpecialPrice, deleteSpecialPrice, updateLocalSpecialPrice } = useSpecialPrices(futsal?.futsal_id);
   const { timeBasedPricings, loading: timeBasedPricingLoading, createTimeBasedPricing, updateTimeBasedPricing, deleteTimeBasedPricing } = useTimeBasedPricing(futsal?.futsal_id);
 
   // Processed data
@@ -1156,13 +1156,19 @@ export default function FutsalAdminDashboard() {
                                             isOpen: true,
                                             price,
                                             onConfirm: async (message: string) => {
-                                              await updateSpecialPrice(price.special_price_id, { special_price: price.special_price, is_offer: true, offer_message: message });
+                                              const result = await updateSpecialPrice(price.special_price_id, { special_price: price.special_price, is_offer: true, offer_message: message });
+                                              if (result.success) {
+                                                updateLocalSpecialPrice(price.special_price_id, { is_offer: true, offer_message: message });
+                                              }
                                             },
                                             existingMessage
                                           });
                                         } else {
                                           // Disabling offer
-                                          await updateSpecialPrice(price.special_price_id, { special_price: price.special_price, is_offer: false });
+                                          const result = await updateSpecialPrice(price.special_price_id, { special_price: price.special_price, is_offer: false });
+                                          if (result.success) {
+                                            updateLocalSpecialPrice(price.special_price_id, { is_offer: false });
+                                          }
                                         }
                                       }}
                                       className="sr-only"

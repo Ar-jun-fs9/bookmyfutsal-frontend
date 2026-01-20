@@ -142,12 +142,19 @@ export function useSpecialPrices() {
     }
   }, [tokens?.accessToken]);
 
+  const updateLocalSpecialPrice = (id: number, updates: Partial<SpecialPrice>) => {
+    setSpecialPrices(prev => prev.map(price =>
+      price.special_price_id === id ? { ...price, ...updates } : price
+    ));
+  };
+
   return {
     specialPrices,
     loading,
     fetchSpecialPrices,
     createSpecialPrice,
     updateSpecialPrice,
-    deleteSpecialPrice
+    deleteSpecialPrice,
+    updateLocalSpecialPrice
   };
 }

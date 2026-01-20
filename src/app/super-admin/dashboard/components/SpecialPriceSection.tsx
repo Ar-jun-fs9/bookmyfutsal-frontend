@@ -31,7 +31,7 @@ interface SpecialPrice {
 }
 
 export function SpecialPriceSection({ isVisible, onToggle }: SpecialPriceSectionProps) {
-  const { specialPrices, loading, createSpecialPrice, updateSpecialPrice, deleteSpecialPrice } = useSpecialPrices();
+  const { specialPrices, loading, createSpecialPrice, updateSpecialPrice, deleteSpecialPrice, updateLocalSpecialPrice } = useSpecialPrices();
   const { futsals } = useFutsals();
   const { selectedItems, showCheckboxes, toggleSelection, toggleSelectAll, clearSelection, selectedCount } = useBulkOperations();
   const { tokens } = useAuthStore();
@@ -240,13 +240,19 @@ export function SpecialPriceSection({ isVisible, onToggle }: SpecialPriceSection
                                 isOpen: true,
                                 price,
                                 onConfirm: async (message: string) => {
-                                  await updateSpecialPrice(price.special_price_id, { special_price: price.special_price, is_offer: true, offer_message: message });
+                                  const result = await updateSpecialPrice(price.special_price_id, { special_price: price.special_price, is_offer: true, offer_message: message });
+                                  if (result.success) {
+                                    updateLocalSpecialPrice(price.special_price_id, { is_offer: true, offer_message: message });
+                                  }
                                 },
                                 existingMessage
                               });
                             } else {
                               // Disabling offer
-                              await updateSpecialPrice(price.special_price_id, { special_price: price.special_price, is_offer: false });
+                              const result = await updateSpecialPrice(price.special_price_id, { special_price: price.special_price, is_offer: false });
+                              if (result.success) {
+                                updateLocalSpecialPrice(price.special_price_id, { is_offer: false });
+                              }
                             }
                           }}
                           className="sr-only"
