@@ -71,7 +71,6 @@ export function useSpecialPrices() {
       });
 
       if (response.ok) {
-        await fetchSpecialPrices();
         return { success: true };
       } else {
         const errorData = await response.json();
@@ -104,7 +103,6 @@ export function useSpecialPrices() {
       });
 
       if (response.ok) {
-        await fetchSpecialPrices();
         return { success: true };
       } else {
         const errorData = await response.json();
@@ -127,7 +125,6 @@ export function useSpecialPrices() {
       });
 
       if (response.ok) {
-        await fetchSpecialPrices();
         return { success: true };
       } else {
         const errorData = await response.json();

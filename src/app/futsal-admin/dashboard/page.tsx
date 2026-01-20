@@ -1156,23 +1156,13 @@ export default function FutsalAdminDashboard() {
                                             isOpen: true,
                                             price,
                                             onConfirm: async (message: string) => {
-                                              const result = await updateSpecialPrice(price.special_price_id, { special_price: price.special_price, is_offer: true, offer_message: message });
-                                              if (result.success) {
-                                                showNotification({ message: 'Offer enabled successfully', type: 'success' });
-                                              } else {
-                                                showNotification({ message: result.error || 'Error updating offer status', type: 'info' });
-                                              }
+                                              await updateSpecialPrice(price.special_price_id, { special_price: price.special_price, is_offer: true, offer_message: message });
                                             },
                                             existingMessage
                                           });
                                         } else {
                                           // Disabling offer
-                                          const result = await updateSpecialPrice(price.special_price_id, { special_price: price.special_price, is_offer: false });
-                                          if (result.success) {
-                                            showNotification({ message: 'Offer disabled successfully', type: 'success' });
-                                          } else {
-                                            showNotification({ message: result.error || 'Error updating offer status', type: 'info' });
-                                          }
+                                          await updateSpecialPrice(price.special_price_id, { special_price: price.special_price, is_offer: false });
                                         }
                                       }}
                                       className="sr-only"
