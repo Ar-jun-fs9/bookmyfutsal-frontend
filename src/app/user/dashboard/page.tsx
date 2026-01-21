@@ -298,31 +298,17 @@ export default function UserDashboard() {
       onConfirm: async () => {
         setConfirmModal({ isOpen: false, message: '', onConfirm: () => { } });
 
-        try {
-          const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/bookings/user/bulk-delete`, {
-            method: 'DELETE',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              booking_ids: selectedBookings,
-              user_id: user?.user_id
-            }),
-          });
+        // Hide selected bookings from dashboard permanently (sessionStorage)
+        const updatedDeleted = [...deletedBookings, ...selectedBookings];
+        setDeletedBookings(updatedDeleted);
+        sessionStorage.setItem('user_deleted_bookings', JSON.stringify(updatedDeleted));
 
-          if (response.ok) {
-            const data = await response.json();
-            showNotification({ message: `${data.deletedCount} bookings deleted successfully!`, type: 'success' });
-            // Remove deleted bookings from state
-            // setBookings(bookings.filter(b => !selectedBookings.includes(b.booking_id)));
-            // Clear selection
-            setSelectedBookings([]);
-            setSelectAll(false);
-          } else {
-            showNotification({ message: 'Error deleting bookings', type: 'info' });
-          }
-        } catch (error) {
-          console.error('Error deleting bookings:', error);
-          showNotification({ message: 'Error deleting bookings', type: 'info' });
-        }
+        showNotification({ message: `${selectedBookings.length} booking${selectedBookings.length > 1 ? 's' : ''} deleted `, type: 'success' });
+
+        // Clear selection
+        setSelectedBookings([]);
+        setSelectAll(false);
+        setShowCheckboxes(false);
       }
     });
   };

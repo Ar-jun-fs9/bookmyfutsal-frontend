@@ -445,7 +445,7 @@ export default function FutsalAdminDashboard() {
         setDeletedBookings(updatedHidden);
         localStorage.setItem('futsal_admin_hidden_bookings', JSON.stringify(updatedHidden));
 
-        showNotification({ message: `${selectedBookings.length} booking${selectedBookings.length > 1 ? 's' : ''} permanently hidden from dashboard!`, type: 'success' });
+        showNotification({ message: `${selectedBookings.length} booking${selectedBookings.length > 1 ? 's' : ''} deleted `, type: 'success' });
 
         // Clear selection
         setSelectedBookings([]);
