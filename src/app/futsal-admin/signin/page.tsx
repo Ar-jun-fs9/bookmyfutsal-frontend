@@ -202,12 +202,12 @@ export default function FutsalAdminSignin() {
   return (
     <><header className="sticky top-0 z-50 bg-linear-to-r from-gray-900 via-green-900 to-blue-900 backdrop-blur-md shadow-2xl border-b border-green-500/20">
         <div className="max-w-7xl mx-auto px-1 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-4">
+          <div className="flex justify-between items-center py-4 px-2">
             {/* Logo */}
             <div onClick={() => window.location.href = '/'} className="flex items-center space-x-3 cursor-pointer">
               <div className="relative">
-                <img src="/logo/logo.png" alt="BookMyFutsal" className="h-12 w-12 rounded-lg ml-2 shadow-lg ring-2 ring-green-400/50" />
-                <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-400 rounded-full animate-pulse"></div>
+                <img src="/logo/logo.png" alt="BookMyFutsal" className="h-12 w-12 rounded-lg bg-green-900 shadow-lg ring-2 ring-white" />
+                <div className="absolute -top-1 -right-1 w-4 h-4 bg-white rounded-full animate-pulse"></div>
               </div>
               <h1 className="text-2xl md:text-3xl font-bold text-white drop-shadow-lg">
                 <span className="bg-linear-to-r from-green-400 to-blue-400 bg-clip-text text-transparent">BookMy</span>

@@ -207,7 +207,7 @@ export default function UserLogin() {
     <>
     <header className="sticky top-0 z-50 bg-linear-to-r from-gray-900 via-green-900 to-blue-900 backdrop-blur-md shadow-2xl border-b border-green-500/20">
         <div className="max-w-7xl mx-auto px-1 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-4">
+          <div className="flex justify-between items-center py-4 px-2">
             {/* Logo */}
             <div onClick={() => window.location.href = '/'} className="flex items-center space-x-3 cursor-pointer">
               <div className="relative">
