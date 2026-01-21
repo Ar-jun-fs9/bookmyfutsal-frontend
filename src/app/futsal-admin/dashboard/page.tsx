@@ -971,10 +971,18 @@ export default function FutsalAdminDashboard() {
                   {/* Search by Date Button */}
                   <div className="flex justify-center mb-2">
                     <button
-                      onClick={() => setShowDateFilter(!showDateFilter)}
-                      className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium"
+                      onClick={() => {
+                        if (showDateFilter) {
+                          setDateStart('');
+                          setDateEnd('');
+                          setShowDateFilter(false);
+                        } else {
+                          setShowDateFilter(true);
+                        }
+                      }}
+                      className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-medium"
                     >
-                      {showDateFilter ? 'Hide Date Filter' : 'Search by Date'}
+                      {showDateFilter ? 'Clear Date Filter' : 'Search by Date'}
                     </button>
                   </div>
 
