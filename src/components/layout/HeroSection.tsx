@@ -53,7 +53,7 @@ export default function HeroSection() {
             <div className="absolute inset-0 rounded-lg bg-linear-to-br from-green-400/20 via-blue-500/20 to-purple-600/20 blur-3xl animate-pulse"></div>
 
             <img
-              src="/logo/logo.png"
+              src="/logo/logo1.png"
               alt="BookMyFutsal Logo"
               className="relative z-10 w-full h-full object-contain drop-shadow-[0_0_25px_rgba(0,255,120,0.4)] animate-logo-float"
             />
