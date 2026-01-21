@@ -23,7 +23,7 @@ interface AdminSectionProps {
 
 export function AdminSection({ futsals, superAdminId, isVisible, onToggle }: AdminSectionProps) {
   const { tokens } = useAuthStore();
-  const { admins, loading, error, deleteAdmin, bulkDelete, refetch } = useFutsalAdmins();
+  const { admins, loading, error, deleteAdmin, bulkDelete, blockAdmin, unblockAdmin, refetch } = useFutsalAdmins();
   const { selectedItems, showCheckboxes, toggleSelection, toggleSelectAll, clearSelection, selectedCount } = useBulkOperations();
   const [showCreateAdmin, setShowCreateAdmin] = useState(false);
   const [editingAdmin, setEditingAdmin] = useState<any | null>(null);
@@ -77,6 +77,31 @@ export function AdminSection({ futsals, superAdminId, isVisible, onToggle }: Adm
         }
       }
     });
+  };
+
+  const handleBlockAdmin = (id: number) => {
+    setConfirmModal({
+      isOpen: true,
+      message: 'Are you sure you want to block this futsal admin?',
+      onConfirm: async () => {
+        setConfirmModal({ isOpen: false, message: '', onConfirm: () => {} });
+        const result = await blockAdmin(id, 'Blocked by super admin');
+        if (result.success) {
+          setNotification({ message: 'Futsal admin blocked successfully', type: 'success' });
+        } else {
+          setNotification({ message: result.error || 'Error blocking futsal admin', type: 'info' });
+        }
+      }
+    });
+  };
+
+  const handleUnblockAdmin = async (id: number) => {
+    const result = await unblockAdmin(id);
+    if (result.success) {
+      setNotification({ message: 'Futsal admin unblocked successfully', type: 'success' });
+    } else {
+      setNotification({ message: result.error || 'Error unblocking futsal admin', type: 'info' });
+    }
   };
 
   if (!isVisible) {
@@ -186,6 +211,12 @@ export function AdminSection({ futsals, superAdminId, isVisible, onToggle }: Adm
                     className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded"
                   >
                     Edit
+                  </button>
+                  <button
+                    onClick={() => handleBlockAdmin(admin.id)}
+                    className="bg-yellow-600 hover:bg-yellow-700 text-white px-3 py-1 rounded"
+                  >
+                    Block
                   </button>
                   <button
                     onClick={() => handleDeleteAdmin(admin.id)}

@@ -140,6 +140,50 @@ export function useFutsalAdmins() {
     }
   };
 
+  const blockAdmin = async (id: number, reason?: string, duration?: number) => {
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/futsal-admins/${id}/block`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${tokens?.accessToken}`,
+        },
+        body: JSON.stringify({ reason, duration_minutes: duration }),
+      });
+
+      if (response.ok) {
+        return { success: true };
+      } else {
+        const errorData = await response.json();
+        return { success: false, error: errorData.message || 'Error blocking futsal admin' };
+      }
+    } catch (err) {
+      console.error('Error blocking futsal admin:', err);
+      return { success: false, error: 'Error blocking futsal admin' };
+    }
+  };
+
+  const unblockAdmin = async (id: number) => {
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/futsal-admins/${id}/unblock`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${tokens?.accessToken}`,
+        },
+      });
+
+      if (response.ok) {
+        return { success: true };
+      } else {
+        const errorData = await response.json();
+        return { success: false, error: errorData.message || 'Error unblocking futsal admin' };
+      }
+    } catch (err) {
+      console.error('Error unblocking futsal admin:', err);
+      return { success: false, error: 'Error unblocking futsal admin' };
+    }
+  };
+
   useEffect(() => {
     if (tokens?.accessToken) {
       fetchAdmins();
@@ -181,6 +225,8 @@ export function useFutsalAdmins() {
     updateAdmin,
     deleteAdmin,
     bulkDelete,
+    blockAdmin,
+    unblockAdmin,
     refetch: fetchAdmins
   };
 }
