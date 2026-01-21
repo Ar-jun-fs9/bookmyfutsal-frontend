@@ -25,8 +25,6 @@ export default function UserLogin() {
   const [notification, setNotification] = useState<{message: string, type: 'success' | 'info'} | null>(null);
   const router = useRouter();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [rateLimitError, setRateLimitError] = useState(false);
-  const [rateLimitCountdown, setRateLimitCountdown] = useState(0);
 
   // OTP countdown timer
   useEffect(() => {
@@ -58,19 +56,6 @@ export default function UserLogin() {
       return () => clearTimeout(timer);
     }
   }, [notification]);
-
-  // Rate limit countdown timer
-  useEffect(() => {
-    let interval: NodeJS.Timeout;
-    if (rateLimitCountdown > 0) {
-      interval = setInterval(() => {
-        setRateLimitCountdown((prev) => prev - 1);
-      }, 1000);
-    } else if (rateLimitCountdown === 0 && rateLimitError) {
-      setRateLimitError(false);
-    }
-    return () => clearInterval(interval);
-  }, [rateLimitCountdown, rateLimitError]);
 
   // Auto-hide login error messages after 2 seconds
   useEffect(() => {
@@ -105,14 +90,6 @@ export default function UserLogin() {
         setRole('registered_user');
         setTokens(data.tokens);
         router.push('/user/dashboard');
-      } else if (response.status === 429) {
-        const remainingTime = parseInt(data.message.split('After: ')[1]) || 120;
-        setRateLimitError(true);
-        setRateLimitCountdown(remainingTime);
-        setError('');
-        // Clear fields on rate limit for security
-        setUsername('');
-        setPassword('');
       } else {
         setError(data.message || 'Login failed');
         // Clear fields on invalid credentials for security
@@ -436,17 +413,6 @@ export default function UserLogin() {
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
                         <p className="text-sm text-red-800 font-medium">{error}</p>
-                      </div>
-                    </div>
-                  )}
-
-                  {rateLimitError && (
-                    <div className="bg-orange-50 border border-orange-200 rounded-lg p-3">
-                      <div className="flex items-center">
-                        <svg className="w-4 h-4 text-orange-600 mr-2 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
-                        </svg>
-                        <p className="text-sm text-orange-800 font-medium">Too many login attempts. Please try again After: {rateLimitCountdown}</p>
                       </div>
                     </div>
                   )}
