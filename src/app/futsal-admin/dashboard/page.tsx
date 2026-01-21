@@ -1552,7 +1552,7 @@ function CreateSpecialPriceForm({ futsalId, openingHours, closingHours, onSucces
         formData.type === 'recurring' ? { recurring_days: formData.recurring_days } :
           { start_time: formData.start_time, end_time: formData.end_time, special_date: formData.special_date || undefined }),
       special_price: price,
-      message: formData.message || undefined
+      message: formData.message
     });
 
     if (result.success) {
@@ -1972,7 +1972,7 @@ function CreateTimeBasedPricingForm({ futsalId, openingHours, closingHours, onSu
       start_time: formData.start_time,
       end_time: formData.end_time,
       price,
-      message: formData.message || undefined
+      message: formData.message
     });
 
     if (result.success) {
@@ -2185,7 +2185,7 @@ function EditTimeBasedPricingForm({ price, openingHours, closingHours, onUpdate,
       start_time: formData.start_time,
       end_time: formData.end_time,
       price: priceNum,
-      message: formData.message || undefined
+      message: formData.message
     });
 
     if (result.success) {
@@ -2395,7 +2395,7 @@ function EditSpecialPriceForm({ price, onUpdate, onCancel, setNotification }: { 
     e.preventDefault();
     const updateData: any = {
       special_price: parseFloat(formData.special_price),
-      message: formData.message || undefined
+      message: formData.message
     };
 
     if (price.type === 'date') {

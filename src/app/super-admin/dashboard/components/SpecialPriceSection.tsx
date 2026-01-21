@@ -386,7 +386,7 @@ function CreateSpecialPriceForm({ futsals, onSuccess, setNotification }: any) {
           formData.type === 'recurring' ? { recurring_days: formData.recurring_days } :
           { start_time: formData.start_time, end_time: formData.end_time }),
       special_price: parseFloat(formData.special_price),
-      message: formData.message || undefined
+      message: formData.message
     });
 
     if (result.success) {
@@ -743,7 +743,7 @@ function EditSpecialPriceForm({ price, futsals, onUpdate, onCancel, setNotificat
     e.preventDefault();
     const updateData: any = {
       special_price: parseFloat(formData.special_price),
-      message: formData.message || undefined
+      message: formData.message
     };
 
     if (price.type === 'date') {
