@@ -10,6 +10,8 @@ interface FutsalAdmin {
   futsal_name: string;
   futsal_id: number;
   created_at: string;
+  is_blocked?: boolean;
+  blocked_until?: string;
 }
 
 export function useFutsalAdmins() {

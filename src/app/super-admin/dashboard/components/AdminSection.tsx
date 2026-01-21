@@ -88,6 +88,7 @@ export function AdminSection({ futsals, superAdminId, isVisible, onToggle }: Adm
         const result = await blockAdmin(id, 'Blocked by super admin');
         if (result.success) {
           setNotification({ message: 'Futsal admin blocked successfully', type: 'success' });
+          refetch(); // Refresh the list to update blocked status
         } else {
           setNotification({ message: result.error || 'Error blocking futsal admin', type: 'info' });
         }
@@ -96,12 +97,20 @@ export function AdminSection({ futsals, superAdminId, isVisible, onToggle }: Adm
   };
 
   const handleUnblockAdmin = async (id: number) => {
-    const result = await unblockAdmin(id);
-    if (result.success) {
-      setNotification({ message: 'Futsal admin unblocked successfully', type: 'success' });
-    } else {
-      setNotification({ message: result.error || 'Error unblocking futsal admin', type: 'info' });
-    }
+    setConfirmModal({
+      isOpen: true,
+      message: 'Are you sure you want to unblock this futsal admin?',
+      onConfirm: async () => {
+        setConfirmModal({ isOpen: false, message: '', onConfirm: () => {} });
+        const result = await unblockAdmin(id);
+        if (result.success) {
+          setNotification({ message: 'Futsal admin unblocked successfully', type: 'success' });
+          refetch(); // Refresh the list to update blocked status
+        } else {
+          setNotification({ message: result.error || 'Error unblocking futsal admin', type: 'info' });
+        }
+      }
+    });
   };
 
   if (!isVisible) {
@@ -212,12 +221,21 @@ export function AdminSection({ futsals, superAdminId, isVisible, onToggle }: Adm
                   >
                     Edit
                   </button>
-                  <button
-                    onClick={() => handleBlockAdmin(admin.id)}
-                    className="bg-yellow-600 hover:bg-yellow-700 text-white px-3 py-1 rounded"
-                  >
-                    Block
-                  </button>
+                  {admin.is_blocked ? (
+                    <button
+                      onClick={() => handleUnblockAdmin(admin.id)}
+                      className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded"
+                    >
+                      Unblock
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => handleBlockAdmin(admin.id)}
+                      className="bg-yellow-600 hover:bg-yellow-700 text-white px-3 py-1 rounded"
+                    >
+                      Block
+                    </button>
+                  )}
                   <button
                     onClick={() => handleDeleteAdmin(admin.id)}
                     className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded"
