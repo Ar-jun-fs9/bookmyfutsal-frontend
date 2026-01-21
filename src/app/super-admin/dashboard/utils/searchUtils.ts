@@ -1,12 +1,13 @@
 // Search and filter utilities for super admin dashboard
 
-export function filterBookings(bookings: any[], searchTerm: string, futsalFilter: string, bookingFilter: 'all' | 'past' | 'today' | 'future' | 'cancelled'): any[] {
+export function filterBookings(bookings: any[], searchTerm: string, futsalFilter: string, bookingFilter: 'all' | 'past' | 'today' | 'future' | 'cancelled', dateStart?: string, dateEnd?: string): any[] {
   return bookings.filter((booking) => {
     const category = categorizeBooking(booking);
     const matchesSearch = searchTerm === '' || booking.first_name.toLowerCase().includes(searchTerm.toLowerCase()) || (booking.user_phone && booking.user_phone.toLowerCase().includes(searchTerm.toLowerCase())) || (booking.team_name && booking.team_name.toLowerCase().includes(searchTerm.toLowerCase()));
     const matchesFutsal = futsalFilter === '' || booking.futsal_id.toString() === futsalFilter;
     const matchesCategory = bookingFilter === 'all' || (bookingFilter === 'cancelled' ? !!booking.cancelled_by : category === bookingFilter);
-    return matchesSearch && matchesFutsal && matchesCategory;
+    const matchesDate = (!dateStart || !dateEnd) || (booking.formatted_date >= dateStart && booking.formatted_date <= dateEnd);
+    return matchesSearch && matchesFutsal && matchesCategory && matchesDate;
   });
 }
 

@@ -132,6 +132,9 @@ export default function FutsalAdminDashboard() {
   const [editingTimeBasedPricing, setEditingTimeBasedPricing] = useState<any | null>(null);
   const [bookingFilter, setBookingFilter] = useState<'all' | 'past' | 'today' | 'future' | 'cancelled'>('all');
   const [searchTerm, setSearchTerm] = useState('');
+  const [dateStart, setDateStart] = useState('');
+  const [dateEnd, setDateEnd] = useState('');
+  const [showDateFilter, setShowDateFilter] = useState(false);
   const [confirmModal, setConfirmModal] = useState<{ isOpen: boolean, message: string, onConfirm: () => void }>({ isOpen: false, message: '', onConfirm: () => { } });
   const [deletedBookings, setDeletedBookings] = useState<number[]>([]);
   const [selectedBookings, setSelectedBookings] = useState<number[]>([]);
@@ -173,6 +176,10 @@ export default function FutsalAdminDashboard() {
         b.user_phone?.includes(searchTerm) ||
         b.team_name?.toLowerCase().includes(searchLower)
       );
+    })
+    .filter((b: any) => {
+      if (!dateStart || !dateEnd) return true;
+      return b.formatted_date >= dateStart && b.formatted_date <= dateEnd;
     });
 
   useEffect(() => {
@@ -960,6 +967,53 @@ export default function FutsalAdminDashboard() {
                       ✕
                     </button>
                   </div>
+
+                  {/* Search by Date Button */}
+                  <div className="flex justify-center mb-2">
+                    <button
+                      onClick={() => setShowDateFilter(!showDateFilter)}
+                      className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium"
+                    >
+                      {showDateFilter ? 'Hide Date Filter' : 'Search by Date'}
+                    </button>
+                  </div>
+
+                  {/* Date Filter Inputs */}
+                  {showDateFilter && (
+                    <div className="flex flex-col space-y-2 md:flex-row md:space-x-4 md:space-y-0 mb-2">
+                      <div className="flex-1">
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
+                        <input
+                          type="date"
+                          value={dateStart}
+                          onChange={(e) => setDateStart(e.target.value)}
+                          className="w-full p-2 border border-gray-400 rounded focus:outline-none focus:ring-0 focus:border-gray-900 focus:border"
+                        />
+                      </div>
+                      <div className="flex-1">
+                        <label className="block text-sm font-medium text-gray-700 mb-1">End Date</label>
+                        <input
+                          type="date"
+                          value={dateEnd}
+                          onChange={(e) => setDateEnd(e.target.value)}
+                          className="w-full p-2 border border-gray-400 rounded focus:outline-none focus:ring-0 focus:border-gray-900 focus:border"
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Total Count when date filter is applied */}
+                  {showDateFilter && dateStart && dateEnd && (
+                    <div className="text-center py-2 bg-blue-50 rounded-lg">
+                      <p className="text-sm font-medium text-blue-800">
+                        Total Bookings from {dateStart} to {dateEnd}: {filteredBookings.filter((b: any) => {
+                          const category = categorizeBooking(b);
+                          return bookingFilter === 'all' || (bookingFilter === 'cancelled' ? !!b.cancelled_by : category === bookingFilter);
+                        }).length}
+                      </p>
+                    </div>
+                  )}
+
                   <div className="space-y-4">
                     {filteredBookings
                       .filter((b: any) => {

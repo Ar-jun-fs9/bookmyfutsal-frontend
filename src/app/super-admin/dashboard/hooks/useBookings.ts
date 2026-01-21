@@ -32,6 +32,8 @@ export function useBookings() {
   const [searchTerm, setSearchTerm] = useState('');
   const [futsalFilter, setFutsalFilter] = useState('');
   const [bookingFilter, setBookingFilter] = useState<'all' | 'past' | 'today' | 'future' | 'cancelled'>('all');
+  const [dateStart, setDateStart] = useState('');
+  const [dateEnd, setDateEnd] = useState('');
 
   const fetchBookings = async () => {
     try {
@@ -60,8 +62,8 @@ export function useBookings() {
   };
 
   const filteredBookings = useMemo(() => {
-    return filterBookings(bookings, searchTerm, futsalFilter, bookingFilter);
-  }, [bookings, searchTerm, futsalFilter, bookingFilter]);
+    return filterBookings(bookings, searchTerm, futsalFilter, bookingFilter, dateStart, dateEnd);
+  }, [bookings, searchTerm, futsalFilter, bookingFilter, dateStart, dateEnd]);
 
   const updateBooking = async (id: number, formData: any) => {
     try {
@@ -185,6 +187,10 @@ export function useBookings() {
     setFutsalFilter,
     bookingFilter,
     setBookingFilter,
+    dateStart,
+    setDateStart,
+    dateEnd,
+    setDateEnd,
     updateBooking,
     deleteBooking,
     cancelBooking,

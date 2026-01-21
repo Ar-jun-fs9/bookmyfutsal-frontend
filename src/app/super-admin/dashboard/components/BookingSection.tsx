@@ -23,6 +23,10 @@ export function BookingSection({ isVisible, onToggle }: BookingSectionProps) {
     setFutsalFilter,
     bookingFilter,
     setBookingFilter,
+    dateStart,
+    setDateStart,
+    dateEnd,
+    setDateEnd,
     deleteBooking,
     cancelBooking,
     bulkDelete
@@ -31,6 +35,7 @@ export function BookingSection({ isVisible, onToggle }: BookingSectionProps) {
   const [editingBooking, setEditingBooking] = useState<any | null>(null);
   const [notification, setNotification] = useState<{message: string, type: 'success' | 'info'} | null>(null);
   const [confirmModal, setConfirmModal] = useState<{isOpen: boolean, message: string, onConfirm: () => void}>({isOpen: false, message: '', onConfirm: () => {}});
+  const [showDateFilter, setShowDateFilter] = useState(false);
 
   // Auto-hide notifications after 2 seconds
   useEffect(() => {
@@ -167,6 +172,40 @@ export function BookingSection({ isVisible, onToggle }: BookingSectionProps) {
           </div>
         </div>
 
+        {/* Search by Date Button */}
+        <div className="flex justify-center">
+          <button
+            onClick={() => setShowDateFilter(!showDateFilter)}
+            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium"
+          >
+            {showDateFilter ? 'Hide Date Filter' : 'Search by Date'}
+          </button>
+        </div>
+
+        {/* Date Filter Inputs */}
+        {showDateFilter && (
+          <div className="flex flex-col space-y-2 md:flex-row md:space-x-4 md:space-y-0">
+            <div className="flex-1">
+              <label className="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
+              <input
+                type="date"
+                value={dateStart}
+                onChange={(e) => setDateStart(e.target.value)}
+                className="w-full p-2 border border-gray-400 rounded focus:outline-none focus:ring-0 focus:border-gray-900 focus:border"
+              />
+            </div>
+            <div className="flex-1">
+              <label className="block text-sm font-medium text-gray-700 mb-1">End Date</label>
+              <input
+                type="date"
+                value={dateEnd}
+                onChange={(e) => setDateEnd(e.target.value)}
+                className="w-full p-2 border border-gray-400 rounded focus:outline-none focus:ring-0 focus:border-gray-900 focus:border"
+              />
+            </div>
+          </div>
+        )}
+
         {/* Filter Buttons */}
         <div className="grid grid-cols-2 gap-3 mb-4 sm:flex sm:flex-wrap sm:gap-3">
           {[
@@ -193,6 +232,15 @@ export function BookingSection({ isVisible, onToggle }: BookingSectionProps) {
             </button>
           ))}
         </div>
+
+        {/* Total Count when date filter is applied */}
+        {showDateFilter && dateStart && dateEnd && (
+          <div className="text-center py-2 bg-blue-50 rounded-lg">
+            <p className="text-sm font-medium text-blue-800">
+              Total Bookings from {dateStart} to {dateEnd}: {filteredBookings.length}
+            </p>
+          </div>
+        )}
 
         {/* Select All and Delete Controls */}
         <div className="flex items-center justify-between mb-4 p-3 bg-gray-50 rounded-lg">
