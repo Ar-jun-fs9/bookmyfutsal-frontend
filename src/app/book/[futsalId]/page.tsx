@@ -728,7 +728,7 @@ export default function BookFutsal() {
             {/* Logo */}
             <div className="flex items-center space-x-3">
               <div onClick={() => document.getElementById('hero')?.scrollIntoView({ behavior: 'smooth' })} className="relative cursor-pointer">
-                <img src="/logo/logo.png" alt="BookMyFutsal" className="h-12 w-12 rounded-lg bg-green-700 shadow-lg ring-2 ring-white" />
+                <img src="/logo/logo.png" alt="BookMyFutsal" className="h-12 w-12 rounded-lg bg-green-900 shadow-lg ring-2 ring-white" />
                 <div className="absolute -top-1 -right-1 w-4 h-4 bg-white rounded-lg animate-pulse"></div>
               </div>
               <Link href="/" className="text-2xl md:text-3xl font-bold text-white drop-shadow-lg">

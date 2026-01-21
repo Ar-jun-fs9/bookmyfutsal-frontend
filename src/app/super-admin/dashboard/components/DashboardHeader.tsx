@@ -10,7 +10,7 @@ export function DashboardHeader({ onLogout }: DashboardHeaderProps) {
           {/* Logo */}
           <div onClick={() => document.getElementById('hero')?.scrollIntoView({ behavior: 'smooth' })} className="flex items-center space-x-3 cursor-pointer">
             <div className="relative">
-              <img src="/logo/logo.png" alt="BookMyFutsal" className="h-12 w-12 rounded-lg bg-green-700 shadow-lg ring-2 ring-white" />
+              <img src="/logo/logo.png" alt="BookMyFutsal" className="h-12 w-12 rounded-lg bg-green-900 shadow-lg ring-2 ring-white" />
               <div className="absolute -top-1 -right-1 w-4 h-4 bg-white rounded-lg animate-pulse"></div>
             </div>
             <h1 className="text-2xl md:text-3xl font-bold text-white drop-shadow-lg">
