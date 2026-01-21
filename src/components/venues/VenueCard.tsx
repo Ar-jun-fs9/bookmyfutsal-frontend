@@ -172,7 +172,7 @@ const VenueCard = memo(function VenueCard({ futsal, index, specialPrices = [] }:
         <div className="absolute inset-0 bg-linear-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
 
         {hasSpecialOffer && (
-          <div className="absolute top-4 left-4 bg-red-600 text-white px-3 py-1 rounded-lg font-bold text-sm animate-bounce">
+          <div className="absolute top-4 left-4 bg-red-600 text-white px-3 py-2 rounded-lg font-bold text-md animate-bounce">
             {offerMessage.toUpperCase()}
           </div>
         )}
