@@ -264,27 +264,358 @@ BookMyFutsal is a comprehensive web platform for booking futsal venues in Nepal.
 
 ## 📡 API Endpoints
 
-### Authentication
+### Authentication & User Management
 
-- `POST /api/users/register` - User registration
-- `POST /api/users/login` - User login
+#### User Authentication
+
+- `POST /api/users/register` - Register new user with email/phone verification
+- `POST /api/users/verify-registration` - Verify email and phone OTP for registration completion
+- `POST /api/users/login` - User login with progressive account blocking
+- `POST /api/users/refresh-token` - Refresh JWT access token
+- `GET /api/users/verify` - Verify JWT token and get user info
+- `POST /api/users/forgot-password` - Send password reset OTP to email
+- `POST /api/users/verify-forgot-otp` - Verify password reset OTP
+- `POST /api/users/reset-password` - Reset user password after OTP verification
+
+#### Futsal Admin Authentication
+
 - `POST /api/futsal-admins/login` - Futsal admin login
+- `POST /api/futsal-admins/forgot-password` - Send password reset OTP
+- `POST /api/futsal-admins/verify-forgot-otp` - Verify password reset OTP
+- `POST /api/futsal-admins/reset-password` - Reset futsal admin password
+
+#### Super Admin Authentication
+
 - `POST /api/superadmin/login` - Super admin login
+- `POST /api/superadmin/forgot-password` - Send password reset OTP
+- `POST /api/superadmin/verify-forgot-otp` - Verify password reset OTP
+- `POST /api/superadmin/reset-password` - Reset super admin password
 
-### Bookings
+#### OTP Verification
 
-- `GET /api/bookings` - Get user bookings
-- `POST /api/bookings` - Create booking
-- `DELETE /api/bookings/cancel/:trackingCode` - Cancel booking
+- `POST /api/otp/send` - Send OTP for various purposes
+- `POST /api/otp/verify` - Verify OTP codes
 
-### Venues
+### Bookings Management
 
-- `GET /api/futsals` - Get all futsal venues
-- `GET /api/futsals/:id` - Get specific futsal details
+#### User Bookings
 
-### Time Slots
+- `GET /api/bookings` - Get authenticated user's bookings
+- `POST /api/bookings` - Create new booking (registered or guest)
+- `PUT /api/bookings/user/:id` - Update user's own booking (max 2 updates)
+- `DELETE /api/bookings/user/:id` - Cancel user's own booking
+- `DELETE /api/bookings/cancel/:trackingCode` - Cancel booking by tracking code (guests)
 
-- `GET /api/time-slots/:futsalId/:date` - Get available time slots
+#### Admin Bookings Management
+
+- `GET /api/bookings/all` - Get all bookings (super admin)
+- `GET /api/bookings/futsal/:futsalId` - Get bookings for specific futsal
+- `PUT /api/bookings/:id` - Update booking (super admin)
+- `PUT /api/bookings/futsal-admin/:id` - Update booking (futsal admin)
+- `DELETE /api/bookings/:id` - Cancel booking (super admin)
+- `DELETE /api/bookings/futsal-admin/:id` - Cancel booking (futsal admin)
+- `DELETE /api/bookings/delete/:id` - Soft delete booking (super admin)
+- `DELETE /api/bookings/futsal-admin/delete/:id` - Soft delete booking (futsal admin)
+- `DELETE /api/bookings/super-admin/bulk-delete` - Bulk delete bookings (super admin)
+- `DELETE /api/bookings/futsal-admin/bulk-delete` - Bulk delete bookings (futsal admin)
+- `DELETE /api/bookings/user/bulk-delete` - Bulk delete user's own bookings
+
+#### Booking Utilities
+
+- `GET /api/bookings/track/:code` - Track booking by tracking code
+- `GET /api/bookings/last-by-phone/:phone` - Get last booking by phone (for guests)
+- `GET /api/bookings/:id` - Get booking details by ID
+
+### Venues & Futsals
+
+#### Public Venue Data
+
+- `GET /api/futsals` - Get all futsal venues with ratings and filters
+- `GET /api/futsals/:id` - Get detailed futsal information
+
+#### Admin Venue Management
+
+- `POST /api/futsals` - Create new futsal venue (super admin)
+- `PUT /api/futsals/:id` - Update futsal venue (super/futsal admin)
+- `DELETE /api/futsals/:id` - Delete futsal venue (super admin)
+
+### Time Slots & Availability
+
+- `GET /api/time-slots/:futsalId/:date` - Get available time slots for specific date
+- `POST /api/time-slots` - Create time slots (admin)
+- `PUT /api/time-slots/:id` - Update time slot status (admin)
+- `DELETE /api/time-slots/:id` - Delete time slots (admin)
+
+### Ratings & Reviews
+
+- `GET /api/ratings/:futsalId` - Get ratings for specific futsal
+- `POST /api/ratings` - Submit rating/review (authenticated users)
+- `PUT /api/ratings/:id` - Update user's own rating (authenticated users)
+- `DELETE /api/ratings/:id` - Delete rating (admin)
+
+### Special Pricing
+
+- `GET /api/special-prices/:futsalId` - Get special prices for futsal
+- `POST /api/special-prices` - Create special price rule (admin)
+- `PUT /api/special-prices/:id` - Update special price rule (admin)
+- `DELETE /api/special-prices/:id` - Delete special price rule (admin)
+
+### User Management (Super Admin)
+
+- `GET /api/users` - Get all registered users
+- `GET /api/users/:id` - Get user details
+- `PUT /api/users/:id` - Update user information
+- `DELETE /api/users/:id` - Delete user account
+- `POST /api/users/:id/block` - Block user account
+- `POST /api/users/:id/unblock` - Unblock user account
+- `GET /api/users/blocked/list` - Get list of blocked users
+
+### Futsal Admin Management (Super Admin)
+
+- `GET /api/futsal-admins` - Get all futsal admins
+- `POST /api/futsal-admins` - Create new futsal admin
+- `PUT /api/futsal-admins/:id` - Update futsal admin
+- `DELETE /api/futsal-admins/:id` - Delete futsal admin
+
+### Feedback & Support
+
+- `GET /api/feedback` - Get user feedback (admin)
+- `POST /api/feedback` - Submit user feedback
+- `DELETE /api/feedback/:id` - Delete feedback entry (admin)
+
+### System Health
+
+- `GET /health` - System health check with database and Redis status
+
+## 🎨 Frontend Architecture
+
+### Technology Stack
+
+#### Core Framework
+
+- **Next.js 16**: React framework with App Router
+- **React 19**: Latest React with concurrent features
+- **TypeScript**: Type-safe JavaScript development
+
+#### State Management
+
+- **Zustand**: Lightweight state management for global state
+- **React Query (TanStack)**: Server state management and caching
+- **React Reducers**: Local component state management
+
+#### UI & Styling
+
+- **Tailwind CSS**: Utility-first CSS framework
+- **Dynamic Imports**: Code splitting for performance
+- **Responsive Design**: Mobile-first approach
+
+#### Data & Communication
+
+- **Socket.io Client**: Real-time bidirectional communication
+- **Fetch API**: RESTful API communication
+- **React Window**: Virtualized lists for performance
+
+### Application Structure
+
+#### Pages (App Router)
+
+- `/` - Home page with venue browsing and booking tracking
+- `/user/login` - User authentication
+- `/user/register` - User registration
+- `/user/dashboard` - User booking management
+- `/futsal-admin/signin` - Futsal admin authentication
+- `/futsal-admin/dashboard` - Futsal admin venue management
+- `/super-admin/signin` - Super admin authentication
+- `/super-admin/dashboard` - System administration
+- `/book/[futsalId]` - Dynamic booking page for specific venue
+
+#### Component Architecture
+
+##### Layout Components
+
+- `Header`: Navigation with responsive mobile menu
+- `Footer`: Site footer with links and information
+- `HeroSection`: Landing page hero with search
+- `TestimonialSection`: Customer testimonials carousel
+- `WhyChooseUs`: Feature highlights section
+
+##### Venue Components
+
+- `VenueCard`: Individual venue display card
+- `VenueCarousel`: Featured venues carousel
+- `VenueGrid`: Virtualized grid of all venues
+- `VirtualizedVenueGrid`: Performance-optimized venue listing
+
+##### Booking Components
+
+- `BookingTracker`: Track bookings by tracking code
+- `BookingForm`: Dynamic booking form with time slot selection
+
+##### Modal Components
+
+- `VideoModal`: Venue promotional video display
+- `RatingModal`: Submit venue ratings and reviews
+- `DetailsModal`: Detailed venue information
+- `LocationModal`: GPS distance calculation
+- `FeedbackModal`: User feedback collection
+- `PriceNotificationModal`: Price change notifications
+
+##### UI Components
+
+- `Notification`: Toast notifications system
+- `Loading`: Loading spinners and skeletons
+
+#### State Management Stores
+
+##### Zustand Stores
+
+- `authStore`: Authentication state (user, admin sessions)
+- `bookingStore`: Booking form and process state
+- `futsalStore`: Venue data and selection state
+- `modalStore`: Modal visibility and data state
+- `notificationStore`: Notification queue management
+- `socketStore`: Real-time connection state
+- `uiStore`: General UI state (loading, errors)
+
+##### React Query Integration
+
+- Venue data fetching with caching
+- Booking operations with optimistic updates
+- Real-time data synchronization
+- Background refetching and invalidation
+
+#### Custom Hooks
+
+##### Data Fetching Hooks
+
+- `useFutsals`: Venue listing with filters and search
+- `useBookings`: User booking management
+- `useTrackBooking`: Booking tracking by code
+- `useRatings`: Venue ratings and reviews
+- `useTimeSlots`: Available time slots for venues
+- `useSpecialPrices`: Dynamic pricing information
+
+##### UI/UX Hooks
+
+- `useVenueCarousel`: Carousel navigation logic
+- `useVenueFilters`: Venue filtering and sorting
+- `useSocketHandler`: Real-time event handling
+- `useBookingTracker`: Booking progress tracking
+
+##### Admin Hooks
+
+- `useFutsalAdmins`: Futsal admin management
+- `useUsers`: User account management
+- `useFeedbacks`: User feedback collection
+- `useSlots`: Time slot administration
+- `useBulkOperations`: Bulk data operations
+
+#### Real-time Features
+
+##### Socket.io Integration
+
+- Live booking updates across admin dashboards
+- Real-time availability changes
+- Instant notifications for booking status
+- Live chat support (future enhancement)
+
+##### Event Types
+
+- `bookingCreated`: New booking notification
+- `bookingUpdated`: Booking modification alerts
+- `bookingDeleted`: Booking removal notifications
+
+### Performance Optimizations
+
+#### Code Splitting
+
+- Dynamic imports for route-based code splitting
+- Component-level lazy loading
+- Modal components loaded on demand
+
+#### Virtualization
+
+- `react-window` for large venue lists
+- Virtual scrolling for smooth performance
+- Memory-efficient rendering
+
+#### Caching Strategy
+
+- React Query for API response caching
+- Image optimization with Next.js
+- Static asset caching headers
+
+#### Responsive Design
+
+- Mobile-first CSS approach
+- Adaptive component rendering
+- Touch-friendly interactions
+
+### Code Quality
+
+- ESLint for code linting
+- Prettier for code formatting
+- TypeScript for type safety
+- Comprehensive error handling
+
+## 🤝 Development Workflow
+
+### Code Quality Standards
+
+- **ESLint**: Code linting with Next.js configuration
+- **TypeScript**: Strict type checking enabled
+- **Prettier**: Code formatting (via ESLint)
+- **Security**: Input validation and sanitization
+- **Performance**: Code splitting and optimization
+
+### API Development Guidelines
+
+- **RESTful Design**: Consistent REST API patterns
+- **Error Handling**: Comprehensive error responses
+- **Rate Limiting**: Multiple rate limit tiers
+- **Authentication**: JWT-based auth with refresh tokens
+- **Validation**: Input sanitization and validation
+- **Logging**: Winston-based logging system
+
+### Database Best Practices
+
+- **Connection Pooling**: pg library connection management
+- **Transactions**: ACID compliance for critical operations
+- **Indexing**: Performance-optimized database indexes
+- **Migrations**: Versioned schema files
+- **Backup**: Regular database backups
+
+### Testing Strategy
+
+- **Unit Tests**: Component and utility function testing
+- **Integration Tests**: API endpoint testing
+- **E2E Tests**: User journey testing (future)
+- **Performance Tests**: Load and stress testing
+
+## 📊 System Monitoring
+
+### Health Checks
+
+- `/health` endpoint for system status
+- Database connectivity monitoring
+- Redis connection status
+- Memory usage tracking
+- Response time metrics
+
+### Logging
+
+- **Winston Logger**: Structured logging
+- **Log Levels**: error, warn, info, debug
+- **Performance Monitoring**: Request timing
+- **Security Events**: Authentication failures
+- **Error Tracking**: Comprehensive error logging
+
+### Analytics
+
+- User behavior tracking
+- Booking conversion metrics
+- System performance metrics
+- Error rate monitoring
 
 ### Code Quality
 
