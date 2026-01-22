@@ -123,6 +123,7 @@ BookMyFutsal is a comprehensive web platform for booking futsal venues in Nepal.
 │       │   │   │   │   │   ├── 📄 ConfirmModal.tsx           # Generic confirmation modal
 │       │   │   │   │   │   ├── 📄 FutsalDetailsModal.tsx     # Modal showing futsal details
 │       │   │   │   │   │   └── 📄 NotificationModal.tsx      # Modal for notifications
+│       │   │   │   │   │   └── 📄 OfferMessageModal.tsx      # Modal for Offer Message
 │       │   │   │   │   ├── 📁 hooks/                         # Custom React hooks
 │       │   │   │   │   │   ├── 📄 useBookings.ts             # Hook for bookings data management
 │       │   │   │   │   │   ├── 📄 useBulkOperations.ts       # Hook for bulk operations logic
