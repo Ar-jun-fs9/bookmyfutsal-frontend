@@ -630,7 +630,7 @@ For questions or support, please contact the development team bookmyfutsal@gmail
 
 ---
 
-**BookMyFutsal** - Making futsal booking easy and secure! ⚽
+**BookMyFutsal** -  Making futsal booking easy and secure! ⚽
 
 <div align="center">
    
