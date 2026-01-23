@@ -1,3 +1,5 @@
+import Link from 'next/link';
+
 export default function Footer() {
   return (
     <footer id="contact" className="bg-linear-to-r from-gray-900 via-green-900 to-blue-900 text-white py-16">
@@ -53,10 +55,10 @@ export default function Footer() {
             <div className="-up delay-200">
               <h4 className="text-lg font-semibold mb-4">Quick Links</h4>
               <ul className="space-y-2">
-                <li><a href="#venues" onClick={(e) => { e.preventDefault(); document.getElementById('venues')?.scrollIntoView({ behavior: 'smooth' }); }} className="text-gray-300 hover:text-white transition-colors duration-300">Venues</a></li>
-                <li><a href="#venues" onClick={(e) => { e.preventDefault(); document.getElementById('venues')?.scrollIntoView({ behavior: 'smooth' }); }} className="text-gray-300 hover:text-white transition-colors duration-300">Bookings</a></li>
-                <li><a href="#about" onClick={(e) => { e.preventDefault(); document.getElementById('about')?.scrollIntoView({ behavior: 'smooth' }); }} className="text-gray-300 hover:text-white transition-colors duration-300">About</a></li>
-                <li><a href="#contact" onClick={(e) => { e.preventDefault(); document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' }); }} className="text-gray-300 hover:text-white transition-colors duration-300">Contact</a></li>
+                <li><Link href="/venues" className="text-gray-300 hover:text-white transition-colors duration-300">Venues</Link></li>
+                <li><Link href="/bookings" className="text-gray-300 hover:text-white transition-colors duration-300">Bookings</Link></li>
+                <li><Link href="/about" className="text-gray-300 hover:text-white transition-colors duration-300">About</Link></li>
+                <li><Link href="/contact" className="text-gray-300 hover:text-white transition-colors duration-300">Contact</Link></li>
               </ul>
             </div>
 
@@ -64,10 +66,10 @@ export default function Footer() {
             <div className="-up delay-400">
               <h4 className="text-lg font-semibold mb-4">Support</h4>
               <ul className="space-y-2">
-                <li><a href="#" className="text-gray-300 hover:text-white transition-colors duration-300">Privacy Policy</a></li>
-                <li><a href="#" className="text-gray-300 hover:text-white transition-colors duration-300">Terms of Service</a></li>
-                <li><a href="#" className="text-gray-300 hover:text-white transition-colors duration-300">Support</a></li>
-                <li><a href="#" className="text-gray-300 hover:text-white transition-colors duration-300">Careers</a></li>
+                <li><Link href="/privacy-policy" className="text-gray-300 hover:text-white transition-colors duration-300">Privacy Policy</Link></li>
+                <li><Link href="/terms-of-service" className="text-gray-300 hover:text-white transition-colors duration-300">Terms of Service</Link></li>
+                <li><Link href="/support" className="text-gray-300 hover:text-white transition-colors duration-300">Support</Link></li>
+                <li><Link href="/careers" className="text-gray-300 hover:text-white transition-colors duration-300">Careers</Link></li>
               </ul>
             </div>
           </div>
@@ -140,10 +142,10 @@ export default function Footer() {
           <div className="-up delay-200">
             <h4 className="text-lg font-semibold mb-4">Quick Links</h4>
             <ul className="space-y-2">
-              <li><a href="#venues" onClick={(e) => { e.preventDefault(); document.getElementById('venues')?.scrollIntoView({ behavior: 'smooth' }); }} className="text-gray-300 hover:text-white transition-colors duration-300">Venues</a></li>
-              <li><a href="#venues" onClick={(e) => { e.preventDefault(); document.getElementById('venues')?.scrollIntoView({ behavior: 'smooth' }); }} className="text-gray-300 hover:text-white transition-colors duration-300">Bookings</a></li>
-              <li><a href="#about" onClick={(e) => { e.preventDefault(); document.getElementById('about')?.scrollIntoView({ behavior: 'smooth' }); }} className="text-gray-300 hover:text-white transition-colors duration-300">About</a></li>
-              <li><a href="#contact" onClick={(e) => { e.preventDefault(); document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' }); }} className="text-gray-300 hover:text-white transition-colors duration-300">Contact</a></li>
+              <li><Link href="/venues" className="text-gray-300 hover:text-white transition-colors duration-300">Venues</Link></li>
+              <li><Link href="/bookings" className="text-gray-300 hover:text-white transition-colors duration-300">Bookings</Link></li>
+              <li><Link href="/about" className="text-gray-300 hover:text-white transition-colors duration-300">About</Link></li>
+              <li><Link href="/contact" className="text-gray-300 hover:text-white transition-colors duration-300">Contact</Link></li>
             </ul>
           </div>
 
@@ -151,10 +153,10 @@ export default function Footer() {
           <div className="-up delay-400">
             <h4 className="text-lg font-semibold mb-4">Support</h4>
             <ul className="space-y-2">
-              <li><a href="#" className="text-gray-300 hover:text-white transition-colors duration-300">Privacy Policy</a></li>
-              <li><a href="#" className="text-gray-300 hover:text-white transition-colors duration-300">Terms of Service</a></li>
-              <li><a href="#" className="text-gray-300 hover:text-white transition-colors duration-300">Support</a></li>
-              <li><a href="#" className="text-gray-300 hover:text-white transition-colors duration-300">Careers</a></li>
+              <li><Link href="/privacy-policy" className="text-gray-300 hover:text-white transition-colors duration-300">Privacy Policy</Link></li>
+              <li><Link href="/terms-of-service" className="text-gray-300 hover:text-white transition-colors duration-300">Terms of Service</Link></li>
+              <li><Link href="/support" className="text-gray-300 hover:text-white transition-colors duration-300">Support</Link></li>
+              <li><Link href="/careers" className="text-gray-300 hover:text-white transition-colors duration-300">Careers</Link></li>
             </ul>
           </div>
 
