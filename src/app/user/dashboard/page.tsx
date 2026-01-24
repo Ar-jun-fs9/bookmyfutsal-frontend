@@ -99,12 +99,13 @@ export default function UserDashboard() {
   const [showCheckboxes, setShowCheckboxes] = useState(false);
   const [showAllFutsals, setShowAllFutsals] = useState(false);
   const [availableShifts, setAvailableShifts] = useState<string[]>([]);
-  const [futsalSpecialPrices, setFutsalSpecialPrices] = useState<{[key: number]: any[]}>({});
+  const [futsalSpecialPrices, setFutsalSpecialPrices] = useState<{ [key: number]: any[] }>({});
   // const [availableSlots, setAvailableSlots] = useState<any[]>([]);
   // const [otpCode, setOtpCode] = useState('');
   // const [loggedInUser, setLoggedInUser] = useState<User | null>(null);
   // const [booking, setBooking] = useState<Booking | null>(null);
   const scrollPositionRef = useRef<number>(0);
+
 
   // Socket handling
   useSocketHandler();
@@ -145,7 +146,7 @@ export default function UserDashboard() {
   // Fetch special prices for all futsals
   useEffect(() => {
     const fetchSpecialPrices = async () => {
-      const prices: {[key: number]: any[]} = {};
+      const prices: { [key: number]: any[] } = {};
       for (const futsal of futsals) {
         try {
           const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/special-prices/${futsal.futsal_id}`);
@@ -553,6 +554,7 @@ export default function UserDashboard() {
   const todayCount = visibleBookings.filter(b => categorizeBooking(b) === 'today').length;
   const futureCount = visibleBookings.filter(b => categorizeBooking(b) === 'future').length;
   const cancelledCount = visibleBookings.filter(b => b.cancelled_by).length;
+  
 
 
   return (
@@ -737,10 +739,11 @@ export default function UserDashboard() {
 
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {filteredFutsals.slice(0, showAllFutsals ? filteredFutsals.length : 6).map((futsal: Futsal, index: number) => {
-                       const currentImageIndex = currentImageIndexes[futsal.futsal_id] || 0;
-                       const images = futsal.images || [];
-                       const currentImage = images[currentImageIndex];
-                       const hasSpecialOffer = futsalSpecialPrices[futsal.futsal_id]?.some(sp => sp.is_offer) || false;
+                      const currentImageIndex = currentImageIndexes[futsal.futsal_id] || 0;
+                      const images = futsal.images || [];
+                      const currentImage = images[currentImageIndex];
+                      const hasSpecialOffer = futsalSpecialPrices[futsal.futsal_id]?.some(sp => sp.is_offer) || false;
+                      const offerMessage = futsalSpecialPrices[futsal.futsal_id]?.find(sp => sp.is_offer && sp.offer_message)?.offer_message || 'Special Offer';
 
                       return (
                         <div
@@ -758,13 +761,18 @@ export default function UserDashboard() {
                               />
                             )}
                             <div className="absolute inset-0 bg-linear-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                  
-                            {hasSpecialOffer && (
+
+                            {/* {hasSpecialOffer && (
                               <div className="absolute top-4 left-4 bg-red-600 text-white px-3 py-1 rounded-lg font-bold text-sm animate-bounce">
                                 SPECIAL OFFER
                               </div>
+                            )} */}
+                            {hasSpecialOffer && (
+                              <div className="absolute top-4 left-4 bg-red-600 text-white px-3 py-1 rounded-lg font-bold text-md animate-bounce">
+                                {offerMessage.toUpperCase()}
+                              </div>
                             )}
-                  
+
                             {/* Navigation Arrows */}
                             {images.length > 1 && (
                               <>
@@ -886,17 +894,18 @@ export default function UserDashboard() {
                               </button>
                               <button
                                 onClick={() => handleDetailsModal(futsal)}
-                                className={`bg-white border-2 border-gray-200 text-gray-700 p-2 rounded-lg hover:bg-gray-50 hover:border-gray-300 transition-all duration-300 relative ${hasSpecialOffer ? 'ring-2 ring-red-500 ring-opacity-75 animate-pulse' : ''}`}
+                                // className={`bg-white border-2 border-gray-200 text-gray-700 p-2 rounded-lg hover:bg-gray-50 hover:border-gray-300 transition-all duration-300 relative ${hasSpecialOffer ? 'ring-2 ring-red-500 ring-opacity-75 animate-pulse' : ''}`}
+                                className={`bg-white border-2 border-gray-200 text-gray-700 p-2 rounded-lg hover:bg-gray-50 hover:border-gray-300 transition-all duration-300 relative`}
                                 title="Details"
                               >
                                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                 </svg>
-                                {futsalSpecialPrices[futsal.futsal_id]?.some(sp => sp.is_offer) && (
+                                {/* {futsalSpecialPrices[futsal.futsal_id]?.some(sp => sp.is_offer) && (
                                   <span className="absolute -top-7 left-1/2 transform -translate-x-1/2 text-[15px] text-red-600 font-bold animate-pulse rounded pointer-events-none whitespace-nowrap">
                                     special offer
                                   </span>
-                                )}
+                                )} */}
                               </button>
                               {futsal.video && (
                                 <button
@@ -1380,7 +1389,7 @@ function DetailsModal({ futsal, onClose }: { futsal: Futsal, onClose: () => void
                             <p className="text-xl font-bold text-yellow-600">
                               Rs. {sp.special_price}
                               <span className="ml-1 text-lg font-medium">/hr</span>
-                              {sp.is_offer && <span className="ml-2 text-red-600 font-bold animate-pulse">special offer</span>}
+                              {sp.is_offer && <span className="ml-2 text-red-600 font-bold animate-pulse">{sp.message}</span>}
                               <span className="text-sm text-yellow-700"> ({details})</span>
                             </p>
 
