@@ -31,9 +31,15 @@ export default function ContactPage() {
 
       if (response.ok) {
         setFormData({ name: '', email: '', subject: '', message: '', phone: '' });
-        showNotification({ message: 'Thank you for your message! We will get back to you soon.', type: 'success' });
+        showNotification({ message: 'Message sent successfully!', type: 'success' });
       } else {
-        showNotification({ message: 'Failed to send message. Please try again.', type: 'info' });
+        const errorData = await response.json().catch(() => ({}));
+        if (errorData.errors && Array.isArray(errorData.errors)) {
+          const errorMessages = errorData.errors.map((err: any) => err.msg).join(', ');
+          showNotification({ message: errorMessages, type: 'info' });
+        } else {
+          showNotification({ message: 'Failed to send message. Please try again.', type: 'info' });
+        }
       }
     } catch (error) {
       console.error('Contact form submission error:', error);
@@ -291,16 +297,17 @@ export default function ContactPage() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 <div>
                   <label htmlFor="phone" className="block text-sm font-semibold text-gray-700 mb-2">
-                    Phone Number
+                    Phone Number *
                   </label>
                   <input
                     type="tel"
                     id="phone"
                     name="phone"
+                    required
                     value={formData.phone}
                     onChange={handleChange}
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-green-400 transition-all"
-                    placeholder="+977-123-456789"
+                    placeholder="1234567890"
                   />
                 </div>
 
