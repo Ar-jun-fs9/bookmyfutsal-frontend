@@ -73,26 +73,49 @@ BookMyFutsal is a comprehensive web platform for booking futsal venues in Nepal.
 │   │   ├── 🖼️ next.svg                   # Next.js logo
 │   │   ├── 🖼️ vercel.svg                 # Vercel logo
 │   │   ├── 🖼️ window.svg                 # Window icon
-│   │   └── 📁 logo/                      # Logo assets
-│   │       └── 🖼️ logo.png               # Application logo
+│   │   ├── 📁 logo/                      # Logo assets
+│   │   │   ├── 🖼️ logo.png               # Application logo
+│   │   │   └── 🖼️ logo1.png              # Alternative logo
+│   │   └── 📁 partners/                  # Partner logo assets
+│   │       ├── 🖼️ partner1.png           # Partner 1 logo
+│   │       ├── 🖼️ partner2.png           # Partner 2 logo
+│   │       ├── 🖼️ partner3.png           # Partner 3 logo
+│   │       ├── 🖼️ partner4.png           # Partner 4 logo
+│   │       ├── 🖼️ partner5.png           # Partner 5 logo
+│   │       └── 🖼️ partner6.png           # Partner 6 logo
 │   └── 📁 src/                           # Source code
 │       ├── 📁 app/                       # Next.js App Router directory
 │       │   ├── 🖼️ favicon.ico            # Browser favicon
 │       │   ├── 🎨 globals.css            # Global CSS styles
 │       │   ├── 📄 layout.tsx             # Root layout component
 │       │   ├── 📄 page.tsx               # Home page component
+│       │   ├── 📄 not-found.tsx          # 404 error page for non-existent routes
 │       │   ├── 📄 providers.tsx          # React context providers setup
 │       │   ├── 📄 socket.tsx             # Socket.io client configuration
+│       │   ├── 📁 about/                 # About page
+│       │   │   └── 📄 page.tsx           # About page component
 │       │   ├── 📁 book/                  # Booking-related pages
 │       │   │   └── 📁 [futsalId]/        # Dynamic route for specific futsal booking
 │       │   │       └── 📄 page.tsx       # Futsal booking page
+│       │   ├── 📁 bookings/              # Bookings tracking page
+│       │   │   └── 📄 page.tsx           # Bookings tracking page
+│       │   ├── 📁 careers/               # Careers page
+│       │   │   └── 📄 page.tsx           # Careers page component
+│       │   ├── 📁 contact/               # Contact page
+│       │   │   └── 📄 page.tsx           # Contact page component
 │       │   ├── 📁 futsal-admin/          # Futsal admin section
-│       │   ├── 📁 dashboard/         # Futsal admin dashboard
-│       │   │   ├── 📄 page.tsx       # Futsal admin dashboard page
-│       │   │   └── 📁 hooks/         # Custom React hooks
-│       │   │       └── 📄 useSpecialPrices.ts # Hook for special prices data
-│       │   └── 📁 signin/            # Futsal admin authentication
-│       │   │   └── 📄 page.tsx       # Futsal admin signin page
+│       │   │   ├── 📁 signin/            # Futsal admin authentication
+│       │   │   │   └── 📄 page.tsx       # Futsal admin signin page
+│       │   │   └── 📁 dashboard/         # Futsal admin dashboard
+│       │   │       └── 📄 page.tsx       # Futsal admin dashboard page
+│       │   ├── 📁 privacy-policy/        # Privacy policy page
+│       │   │   └── 📄 page.tsx           # Privacy policy page
+│       │   ├── 📁 support/               # Support page
+│       │   │   └── 📄 page.tsx           # Support page
+│       │   ├── 📁 terms-of-service/      # Terms of service page
+│       │   │   └── 📄 page.tsx           # Terms of service page
+│       │   ├── 📁 venues/                # Venues listing page
+│       │   │   └── 📄 page.tsx           # Venues listing page
 │       │   ├── 📁 super-admin/           # Super admin section
 │       │   │   ├── 📁 dashboard/         # Super admin dashboard
 │       │   │   │   ├── 📄 page.tsx       # Super admin dashboard page
@@ -101,6 +124,7 @@ BookMyFutsal is a comprehensive web platform for booking futsal venues in Nepal.
 │       │   │   │   │   ├── 📄 BlockedUserSection.tsx    # Blocked users management section
 │       │   │   │   │   ├── 📄 BookingSection.tsx        # Bookings management section
 │       │   │   │   │   ├── 📄 DashboardHeader.tsx       # Dashboard header component
+│       │   │   │   │   ├── 📄 ContactSection.tsx        # Contact messages section
 │       │   │   │   │   ├── 📄 DashboardInfo.tsx         # Dashboard info and profile section
 │       │   │   │   │   ├── 📄 FeedbackSection.tsx       # Feedback and bugs section
 │       │   │   │   │   ├── 📄 FutsalSection.tsx         # Futsals management section
@@ -420,6 +444,14 @@ BookMyFutsal is a comprehensive web platform for booking futsal venues in Nepal.
 #### Pages (App Router)
 
 - `/` - Home page with venue browsing and booking tracking
+- `/about` - About page with company information and team
+- `/bookings` - Bookings tracking page for guests
+- `/careers` - Careers page with job opportunities
+- `/contact` - Contact page with support information
+- `/privacy-policy` - Privacy policy page
+- `/support` - Support page with help resources
+- `/terms-of-service` - Terms of service page
+- `/venues` - Venues listing page with filters
 - `/user/login` - User authentication
 - `/user/register` - User registration
 - `/user/dashboard` - User booking management
@@ -428,6 +460,7 @@ BookMyFutsal is a comprehensive web platform for booking futsal venues in Nepal.
 - `/super-admin/signin` - Super admin authentication
 - `/super-admin/dashboard` - System administration
 - `/book/[futsalId]` - Dynamic booking page for specific venue
+- `/not-found` - 404 error page for non-existent routes
 
 #### Component Architecture
 
@@ -630,7 +663,7 @@ For questions or support, please contact the development team bookmyfutsal@gmail
 
 ---
 
-**BookMyFutsal** -  Making futsal booking easy and secure! ⚽
+**BookMyFutsal** - Making futsal booking easy and secure! ⚽
 
 <div align="center">
    
