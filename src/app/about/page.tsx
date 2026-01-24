@@ -184,7 +184,7 @@ export default function AboutPage() {
                 <img src="/partners/partner1.png" className="w-full h-full object-cover" />
               </div>
               <h3 className="text-xl font-bold text-gray-800 mb-2">Arjun</h3>
-              <p className="text-green-600 font-medium mb-2">CEO</p>
+              <p className="text-green-600 font-medium mb-2">All Rounder</p>
               <p className="text-gray-600 text-sm">
                 Visionary leader passionate about making futsal accessible to everyone through innovative technology solutions.
               </p>
