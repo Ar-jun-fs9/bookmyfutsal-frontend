@@ -14,10 +14,60 @@ export default function ContactPage() {
     phone: ''
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
   const { showNotification } = useNotificationStore();
+
+  const validateForm = () => {
+    const newErrors: any = {};
+
+    // Name validation
+    if (!formData.name.trim()) {
+      newErrors.name = 'Full name is required';
+    } else if (formData.name.length < 2 || formData.name.length > 100) {
+      newErrors.name = 'Name must be between 2 and 100 characters';
+    } else if (!/^[a-zA-Z\s\-'\.]+$/.test(formData.name)) {
+      newErrors.name = 'Name can only contain letters, spaces, hyphens, apostrophes, and periods';
+    }
+
+    // Email validation
+    if (!formData.email.trim()) {
+      newErrors.email = 'Email address is required';
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      newErrors.email = 'Please provide a valid email address';
+    }
+
+    // Subject validation
+    if (!formData.subject.trim()) {
+      newErrors.subject = 'Subject is required';
+    } else if (formData.subject.length < 3 || formData.subject.length > 200) {
+      newErrors.subject = 'Subject must be between 3 and 200 characters';
+    }
+
+    // Message validation
+    if (!formData.message.trim()) {
+      newErrors.message = 'Message is required';
+    } else if (formData.message.length < 10 || formData.message.length > 2000) {
+      newErrors.message = 'Message must be between 10 and 2000 characters';
+    }
+
+    // Phone validation
+    if (!formData.phone.trim()) {
+      newErrors.phone = 'Phone number is required';
+    } else if (!/^9\d{9}$/.test(formData.phone)) {
+      newErrors.phone = 'Phone number must start with 9 and be exactly 10 digits';
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!validateForm()) {
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
@@ -50,10 +100,31 @@ export default function ContactPage() {
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    let value = e.target.value;
+
+    if (e.target.name === 'phone') {
+      // Allow only digits, max 10 characters, and must start with 9
+      value = value.replace(/\D/g, ''); // Remove non-digits
+      if (value.length > 10) {
+        value = value.slice(0, 10);
+      }
+      // Only allow if empty or starts with 9
+      if (value && !value.startsWith('9')) {
+        value = ''; // Reject input that doesn't start with 9
+      }
+    }
+
     setFormData(prev => ({
       ...prev,
-      [e.target.name]: e.target.value
+      [e.target.name]: value
     }));
+    // Clear error for this field
+    if (errors[e.target.name]) {
+      setErrors(prev => ({
+        ...prev,
+        [e.target.name]: ''
+      }));
+    }
   };
 
   return (
@@ -272,9 +343,10 @@ export default function ContactPage() {
                     required
                     value={formData.name}
                     onChange={handleChange}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-green-400 transition-all"
+                    className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-green-400 transition-all ${errors.name ? 'border-red-500' : 'border-gray-300'}`}
                     placeholder="Your full name"
                   />
+                  {errors.name && <p className="mt-1 text-sm text-red-600">{errors.name}</p>}
                 </div>
 
                 <div>
@@ -288,9 +360,10 @@ export default function ContactPage() {
                     required
                     value={formData.email}
                     onChange={handleChange}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-green-400 transition-all"
+                    className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-green-400 transition-all ${errors.email ? 'border-red-500' : 'border-gray-300'}`}
                     placeholder="your.email@example.com"
                   />
+                  {errors.email && <p className="mt-1 text-sm text-red-600">{errors.email}</p>}
                 </div>
               </div>
 
@@ -306,9 +379,10 @@ export default function ContactPage() {
                     required
                     value={formData.phone}
                     onChange={handleChange}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-green-400 transition-all"
-                    placeholder="1234567890"
+                    className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-green-400 transition-all ${errors.phone ? 'border-red-500' : 'border-gray-300'}`}
+                    placeholder="9846875161"
                   />
+                  {errors.phone && <p className="mt-1 text-sm text-red-600">{errors.phone}</p>}
                 </div>
 
               </div>
@@ -323,7 +397,7 @@ export default function ContactPage() {
                   required
                   value={formData.subject}
                   onChange={handleChange}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-green-400 transition-all"
+                  className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-green-400 transition-all ${errors.subject ? 'border-red-500' : 'border-gray-300'}`}
                 >
                   <option value="">Select a subject</option>
                   <option value="booking">Booking Inquiry</option>
@@ -332,6 +406,7 @@ export default function ContactPage() {
                   <option value="feedback">Feedback</option>
                   <option value="other">Other</option>
                 </select>
+                {errors.subject && <p className="mt-1 text-sm text-red-600">{errors.subject}</p>}
               </div>
 
               <div>
@@ -345,9 +420,10 @@ export default function ContactPage() {
                   rows={6}
                   value={formData.message}
                   onChange={handleChange}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-green-400 transition-all resize-none"
+                  className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-green-400 transition-all resize-none ${errors.message ? 'border-red-500' : 'border-gray-300'}`}
                   placeholder="Tell us how we can help you..."
                 />
+                {errors.message && <p className="mt-1 text-sm text-red-600">{errors.message}</p>}
               </div>
 
               <button
