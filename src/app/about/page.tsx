@@ -180,8 +180,9 @@ export default function AboutPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             <div className="text-center">
-              <div className="w-32 h-32 bg-linear-to-r from-green-400 to-blue-500 rounded-full mx-auto mb-4 flex items-center justify-center overflow-hidden">
-                <img src="/partners/partner1.png" className="w-full h-full object-cover" />
+              {/* <div className="w-32 h-32 bg-linear-to-r from-green-400 to-blue-500 rounded-full mx-auto mb-4 flex items-center justify-center overflow-hidden"> */}
+              <div className="w-32 h-32 bg-linear-to-rrounded-full mx-auto mb-4 flex items-center justify-center overflow-hidden">
+                <img src="/partners/arjun.png" className="w-full h-full object-cover" />
               </div>
               <h3 className="text-xl font-bold text-gray-800 mb-2">Hakuna Matata</h3>
               <p className="text-green-600 font-medium mb-2">All Rounder</p>
@@ -191,8 +192,9 @@ export default function AboutPage() {
             </div>
 
             <div className="text-center">
-              <div className="w-32 h-32 bg-linear-to-r from-blue-400 to-purple-500 rounded-full mx-auto mb-4 flex items-center justify-center overflow-hidden">
-                <img src="/partners/partner2.png" className="w-full h-full object-cover" />
+              {/* <div className="w-32 h-32 bg-linear-to-r from-blue-400 to-purple-500 rounded-full mx-auto mb-4 flex items-center justify-center overflow-hidden"> */}
+              <div className="w-32 h-32 bg-linear-to-r rounded-full mx-auto mb-4 flex items-center justify-center overflow-hidden">
+                <img src="/partners/bidesh.png" className="w-full h-full object-cover" />
               </div>
               <h3 className="text-xl font-bold text-gray-800 mb-2">Bidesh</h3>
               <p className="text-blue-600 font-medium mb-2">Chief Technology Officer</p>
@@ -202,8 +204,9 @@ export default function AboutPage() {
             </div>
 
             <div className="text-center">
-              <div className="w-32 h-32 bg-linear-to-r from-purple-400 to-pink-500 rounded-full mx-auto mb-4 flex items-center justify-center overflow-hidden">
-                <img src="/partners/partner3.png" className="w-full h-full object-cover" />
+              {/* <div className="w-32 h-32 bg-linear-to-r from-purple-400 to-pink-500 rounded-full mx-auto mb-4 flex items-center justify-center overflow-hidden"> */}
+              <div className="w-32 h-32 bg-linear-to-r rounded-full mx-auto mb-4 flex items-center justify-center overflow-hidden">
+                <img src="/partners/prawjol.png" className="w-full h-full object-cover" />
               </div>
               <h3 className="text-xl font-bold text-gray-800 mb-2">Prawjol</h3>
               <p className="text-purple-600 font-medium mb-2">Engineering Manager</p>
@@ -213,8 +216,9 @@ export default function AboutPage() {
             </div>
 
             <div className="text-center">
-              <div className="w-32 h-32 bg-linear-to-r from-orange-400 to-red-500 rounded-full mx-auto mb-4 flex items-center justify-center overflow-hidden">
-                <img src="/partners/partner4.png" className="w-full h-full object-cover" />
+              {/* <div className="w-32 h-32 bg-linear-to-r from-orange-400 to-red-500 rounded-full mx-auto mb-4 flex items-center justify-center overflow-hidden"> */}
+               <div className="w-32 h-32 bg-linear-to-r rounded-full mx-auto mb-4 flex items-center justify-center overflow-hidden">
+                <img src="/partners/suman.png" className="w-full h-full object-cover" />
               </div>
               <h3 className="text-xl font-bold text-gray-800 mb-2">Suman</h3>
               <p className="text-orange-600 font-medium mb-2">Software Engineer / Developer</p>
@@ -224,8 +228,9 @@ export default function AboutPage() {
             </div>
 
             <div className="text-center">
-              <div className="w-32 h-32 bg-linear-to-r from-teal-400 to-cyan-500 rounded-full mx-auto mb-4 flex items-center justify-center overflow-hidden">
-                <img src="/partners/partner5.png" className="w-full h-full object-cover" />
+              {/* <div className="w-32 h-32 bg-linear-to-r from-teal-400 to-cyan-500 rounded-full mx-auto mb-4 flex items-center justify-center overflow-hidden"> */}
+              <div className="w-32 h-32 bg-linear-to-r rounded-full mx-auto mb-4 flex items-center justify-center overflow-hidden">
+                <img src="/partners/arpit.png" className="w-full h-full object-cover" />
               </div>
               <h3 className="text-xl font-bold text-gray-800 mb-2">Arpit</h3>
               <p className="text-teal-600 font-medium mb-2">Product Manager</p>
@@ -235,8 +240,9 @@ export default function AboutPage() {
             </div>
 
             <div className="text-center">
-              <div className="w-32 h-32 bg-linear-to-r from-indigo-400 to-purple-500 rounded-full mx-auto mb-4 flex items-center justify-center overflow-hidden">
-                <img src="/partners/partner6.png" className="w-full h-full object-cover" />
+              {/* <div className="w-32 h-32 bg-linear-to-r from-indigo-400 to-purple-500 rounded-full mx-auto mb-4 flex items-center justify-center overflow-hidden"> */}
+               <div className="w-32 h-32 bg-linear-to-r rounded-full mx-auto mb-4 flex items-center justify-center overflow-hidden">
+                <img src="/partners/roshan.png" className="w-full h-full object-cover" />
               </div>
               <h3 className="text-xl font-bold text-gray-800 mb-2">Roshan</h3>
               <p className="text-indigo-600 font-medium mb-2">Quality Assurance Engineer</p>
