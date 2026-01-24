@@ -155,7 +155,7 @@ export default function SupportPage() {
 
                 <div>
                   <h3 className="text-lg font-semibold text-gray-800 mb-2">What if I have a problem with my booking?</h3>
-                  <p className="text-gray-600">Contact our support team immediately at support@bookmyfutsal.com or call +977-123-456789. We'll help resolve any issues.</p>
+                  <p className="text-gray-600">Contact our support team immediately at bookmyfutsal@gmail.com or call +977-123-456789. We'll help resolve any issues.</p>
                 </div>
               </div>
             </div>
@@ -175,7 +175,7 @@ export default function SupportPage() {
                   </div>
                   <div>
                     <p className="font-semibold text-gray-800">Email Support</p>
-                    <p className="text-gray-600">support@bookmyfutsal.com</p>
+                    <p className="text-gray-600">bookmyfutsal@gmail.com</p>
                   </div>
                 </div>
 

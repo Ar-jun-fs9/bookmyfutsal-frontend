@@ -1019,7 +1019,7 @@ export default function UserRegister() {
                     <p><strong>Liability:</strong> BookMyFutsal is not liable for issues arising from venue quality, cancellations, or external factors.</p>
                     <p><strong>Changes to Terms:</strong> We may update these terms at any time. Continued use constitutes acceptance.</p>
                     <p><strong>Governing Law:</strong> These terms are governed by the laws of Nepal.</p>
-                    <p><strong>Contact:</strong> For questions about these terms, contact us at support@bookmyfutsal.com</p>
+                    <p><strong>Contact:</strong> For questions about these terms, contact us at bookmyfutsal@gmail.com</p>
                   </div>
                 </div>
               </div>
@@ -1241,7 +1241,7 @@ export default function UserRegister() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
               <div className="text-center md:text-left">
                 <h5 className="font-semibold mb-2">Contact Us</h5>
-                <p className="text-gray-300 text-sm">📧 support@bookmyfutsal.com</p>
+                <p className="text-gray-300 text-sm">📧 bookmyfutsal@gmail.com</p>
                 <p className="text-gray-300 text-sm">📞 +977-123-456789</p>
               </div>
               <div className="text-center">
