@@ -159,114 +159,96 @@ export default function CareersPage() {
           </div>
         </div>
 
-        {/* Open Positions */}
+        {/* Career Development */}
         <div className="bg-white rounded-2xl shadow-xl p-8 mb-8">
-          <h2 className="text-3xl font-bold text-gray-800 mb-6">Open Positions</h2>
+          <div className="text-center mb-8">
+            <h2 className="text-3xl font-bold bg-linear-to-r from-green-600 to-blue-600 bg-clip-text text-transparent mb-4">
+              Career Development
+            </h2>
+            <p className="text-gray-600 text-lg max-w-3xl mx-auto">
+              We invest in our team's growth through continuous learning, mentorship programs, and opportunities to take on challenging projects.
+            </p>
+          </div>
 
-          <div className="space-y-6">
-            <div className="border border-gray-200 rounded-lg p-6 hover:border-green-300 transition-colors">
-              <div className="flex justify-between items-start mb-4">
-                <div>
-                  <h3 className="text-xl font-bold text-gray-800 mb-1">Senior Frontend Developer</h3>
-                  <p className="text-green-600 font-medium mb-2">Full-time • Kathmandu</p>
-                </div>
-                <span className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium">Active</span>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="text-center">
+              <div className="w-16 h-16 bg-green-100 rounded-full mx-auto mb-4 flex items-center justify-center">
+                <span className="text-2xl">📚</span>
               </div>
-              <p className="text-gray-600 mb-4">
-                We're looking for an experienced React developer to help build the next generation of our booking platform.
-                Experience with Next.js, TypeScript, and modern frontend technologies required.
-              </p>
-              <div className="flex flex-wrap gap-2 mb-4">
-                <span className="bg-gray-100 text-gray-700 px-2 py-1 rounded text-sm">React</span>
-                <span className="bg-gray-100 text-gray-700 px-2 py-1 rounded text-sm">Next.js</span>
-                <span className="bg-gray-100 text-gray-700 px-2 py-1 rounded text-sm">TypeScript</span>
-              </div>
+              <h3 className="text-xl font-bold text-gray-800 mb-2">Learning & Development</h3>
+              <p className="text-gray-600">Access to online courses, conferences, and workshops to keep your skills sharp</p>
             </div>
 
-            <div className="border border-gray-200 rounded-lg p-6 hover:border-green-300 transition-colors">
-              <div className="flex justify-between items-start mb-4">
-                <div>
-                  <h3 className="text-xl font-bold text-gray-800 mb-1">Backend Developer</h3>
-                  <p className="text-green-600 font-medium mb-2">Full-time • Kathmandu</p>
-                </div>
-                <span className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium">Active</span>
+            <div className="text-center">
+              <div className="w-16 h-16 bg-blue-100 rounded-full mx-auto mb-4 flex items-center justify-center">
+                <span className="text-2xl">🎯</span>
               </div>
-              <p className="text-gray-600 mb-4">
-                Join our backend team to build scalable APIs and services. Experience with Node.js, PostgreSQL,
-                and RESTful API design is essential.
-              </p>
-              <div className="flex flex-wrap gap-2 mb-4">
-                <span className="bg-gray-100 text-gray-700 px-2 py-1 rounded text-sm">Node.js</span>
-                <span className="bg-gray-100 text-gray-700 px-2 py-1 rounded text-sm">PostgreSQL</span>
-                <span className="bg-gray-100 text-gray-700 px-2 py-1 rounded text-sm">Express</span>
-              </div>
+              <h3 className="text-xl font-bold text-gray-800 mb-2">Mentorship Program</h3>
+              <p className="text-gray-600">One-on-one mentorship with experienced leaders in your field</p>
             </div>
 
-            <div className="border border-gray-200 rounded-lg p-6 hover:border-green-300 transition-colors">
-              <div className="flex justify-between items-start mb-4">
-                <div>
-                  <h3 className="text-xl font-bold text-gray-800 mb-1">Customer Success Manager</h3>
-                  <p className="text-green-600 font-medium mb-2">Full-time • Kathmandu</p>
-                </div>
-                <span className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium">Active</span>
+            <div className="text-center">
+              <div className="w-16 h-16 bg-purple-100 rounded-full mx-auto mb-4 flex items-center justify-center">
+                <span className="text-2xl">🚀</span>
               </div>
-              <p className="text-gray-600 mb-4">
-                Help our users have the best experience with our platform. Work closely with venue operators
-                and users to ensure smooth operations and satisfaction.
-              </p>
-              <div className="flex flex-wrap gap-2 mb-4">
-                <span className="bg-gray-100 text-gray-700 px-2 py-1 rounded text-sm">Customer Service</span>
-                <span className="bg-gray-100 text-gray-700 px-2 py-1 rounded text-sm">Communication</span>
-                <span className="bg-gray-100 text-gray-700 px-2 py-1 rounded text-sm">Problem Solving</span>
-              </div>
-            </div>
-
-            <div className="border border-gray-200 rounded-lg p-6 hover:border-green-300 transition-colors">
-              <div className="flex justify-between items-start mb-4">
-                <div>
-                  <h3 className="text-xl font-bold text-gray-800 mb-1">Marketing Specialist</h3>
-                  <p className="text-green-600 font-medium mb-2">Full-time • Kathmandu</p>
-                </div>
-                <span className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium">Active</span>
-              </div>
-              <p className="text-gray-600 mb-4">
-                Drive growth and user acquisition for our platform. Experience in digital marketing,
-                social media, and content creation preferred.
-              </p>
-              <div className="flex flex-wrap gap-2 mb-4">
-                <span className="bg-gray-100 text-gray-700 px-2 py-1 rounded text-sm">Digital Marketing</span>
-                <span className="bg-gray-100 text-gray-700 px-2 py-1 rounded text-sm">Social Media</span>
-                <span className="bg-gray-100 text-gray-700 px-2 py-1 rounded text-sm">Content Creation</span>
-              </div>
+              <h3 className="text-xl font-bold text-gray-800 mb-2">Career Progression</h3>
+              <p className="text-gray-600">Clear career paths with regular performance reviews and growth opportunities</p>
             </div>
           </div>
         </div>
 
-        {/* How to Apply */}
+        {/* Work Environment */}
         <div className="bg-linear-to-r from-green-50 to-blue-50 rounded-2xl p-8 mb-8">
-          <div className="text-center">
-            <h2 className="text-3xl font-bold text-gray-800 mb-4">How to Apply</h2>
-            <p className="text-gray-600 text-lg mb-6 max-w-2xl mx-auto">
-              Ready to join our team? Send your resume and a brief cover letter to our HR team.
-              We'll review your application and get back to you within 5 business days.
+          <div className="text-center mb-8">
+            <h2 className="text-3xl font-bold text-gray-800 mb-4">Our Work Environment</h2>
+            <p className="text-gray-600 text-lg max-w-3xl mx-auto">
+              We believe in creating a positive and inclusive workplace where everyone can thrive and contribute their best.
             </p>
+          </div>
 
-            <div className="bg-white rounded-lg p-6 max-w-md mx-auto">
-              <h3 className="text-lg font-semibold text-gray-800 mb-4">Contact Information</h3>
-              <div className="space-y-3 text-left">
-                <p className="flex items-center text-gray-600">
-                  <svg className="w-5 h-5 mr-3 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                  </svg>
-                  careers@bookmyfutsal.com
-                </p>
-                <p className="flex items-center text-gray-600">
-                  <svg className="w-5 h-5 mr-3 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" />
-                  </svg>
-                  +977-123-456789
-                </p>
-              </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="bg-white rounded-lg p-6">
+              <h3 className="text-xl font-bold text-gray-800 mb-4">Flexible Work Culture</h3>
+              <ul className="space-y-3 text-gray-600">
+                <li className="flex items-start">
+                  <span className="text-green-500 mr-2">✓</span>
+                  Remote work options available
+                </li>
+                <li className="flex items-start">
+                  <span className="text-green-500 mr-2">✓</span>
+                  Flexible working hours
+                </li>
+                <li className="flex items-start">
+                  <span className="text-green-500 mr-2">✓</span>
+                  Work-life balance focus
+                </li>
+                <li className="flex items-start">
+                  <span className="text-green-500 mr-2">✓</span>
+                  Unlimited paid time off
+                </li>
+              </ul>
+            </div>
+
+            <div className="bg-white rounded-lg p-6">
+              <h3 className="text-xl font-bold text-gray-800 mb-4">Employee Benefits</h3>
+              <ul className="space-y-3 text-gray-600">
+                <li className="flex items-start">
+                  <span className="text-green-500 mr-2">✓</span>
+                  Health insurance coverage
+                </li>
+                <li className="flex items-start">
+                  <span className="text-green-500 mr-2">✓</span>
+                  Professional development budget
+                </li>
+                <li className="flex items-start">
+                  <span className="text-green-500 mr-2">✓</span>
+                  Team building activities
+                </li>
+                <li className="flex items-start">
+                  <span className="text-green-500 mr-2">✓</span>
+                  Modern equipment and tools
+                </li>
+              </ul>
             </div>
           </div>
         </div>

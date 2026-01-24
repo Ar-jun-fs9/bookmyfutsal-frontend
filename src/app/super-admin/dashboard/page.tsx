@@ -13,6 +13,7 @@ import { BlockedUserSection } from './components/BlockedUserSection';
 import { BookingSection } from './components/BookingSection';
 import { RatingSection } from './components/RatingSection';
 import { FeedbackSection } from './components/FeedbackSection';
+import { ContactSection } from './components/ContactSection';
 import { SlotSection } from './components/SlotSection';
 import { SpecialPriceSection } from './components/SpecialPriceSection';
 import { CreateFutsalForm } from './components/forms/CreateFutsalForm';
@@ -37,6 +38,7 @@ export default function SuperAdminDashboard() {
   const [showSlots, setShowSlots] = useState(false);
   const [showRatings, setShowRatings] = useState(false);
   const [showFeedbacks, setShowFeedbacks] = useState(false);
+  const [showContacts, setShowContacts] = useState(false);
   const [showFutsals, setShowFutsals] = useState(false);
   const [showAdmins, setShowAdmins] = useState(false);
   const [showBlockedUsers, setShowBlockedUsers] = useState(false);
@@ -124,17 +126,24 @@ export default function SuperAdminDashboard() {
                 {showCreateAdmin ? 'Hide' : 'Create Admin'}
               </button>
               <button
+                onClick={() => setShowSlots(!showSlots)}
+                className="bg-linear-to-r from-orange-500 to-orange-600 text-white font-bold py-3 px-4 rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 border border-orange-400/30 hover:border-orange-400/50 text-sm sm:text-base"
+              >
+                {showSlots ? 'Hide' : 'Manage Slots'}
+              </button>
+              <button
                 onClick={() => setShowBookings(!showBookings)}
                 className="bg-linear-to-r from-purple-500 to-purple-600 text-white font-bold py-3 px-4 rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 border border-purple-400/30 hover:border-purple-400/50 text-sm sm:text-base"
               >
                 {showBookings ? 'Hide' : 'Manage Bookings'}
               </button>
               <button
-                onClick={() => setShowSlots(!showSlots)}
-                className="bg-linear-to-r from-orange-500 to-orange-600 text-white font-bold py-3 px-4 rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 border border-orange-400/30 hover:border-orange-400/50 text-sm sm:text-base"
+                onClick={() => setShowSpecialPrices(!showSpecialPrices)}
+                className="bg-linear-to-r from-yellow-500 to-yellow-600 text-white font-bold py-3 px-4 rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 border border-yellow-400/30 hover:border-yellow-400/50 text-sm sm:text-base"
               >
-                {showSlots ? 'Hide' : 'Manage Slots'}
+                {showSpecialPrices ? 'Hide' : 'Special Prices'}
               </button>
+              
               <button
                 onClick={() => setShowRatings(!showRatings)}
                 className="bg-linear-to-r from-pink-500 to-pink-600 text-white font-bold py-3 px-4 rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 border border-pink-400/30 hover:border-pink-400/50 text-sm sm:text-base"
@@ -148,11 +157,12 @@ export default function SuperAdminDashboard() {
                 {showFeedbacks ? 'Hide' : 'Feedback & Bugs'}
               </button>
               <button
-                onClick={() => setShowSpecialPrices(!showSpecialPrices)}
-                className="bg-linear-to-r from-yellow-500 to-yellow-600 text-white font-bold py-3 px-4 rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 border border-yellow-400/30 hover:border-yellow-400/50 text-sm sm:text-base"
+                onClick={() => setShowContacts(!showContacts)}
+                className="bg-linear-to-r from-teal-500 to-teal-600 text-white font-bold py-3 px-4 rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 border border-teal-400/30 hover:border-teal-400/50 text-sm sm:text-base"
               >
-                {showSpecialPrices ? 'Hide' : 'Special Prices'}
+                {showContacts ? 'Hide' : 'Contact Messages'}
               </button>
+              
             </div>
             {showCreateFutsal && <CreateFutsalForm onSuccess={() => {}} setNotification={setNotification} />}
             {showCreateAdmin && <CreateFutsalAdminForm futsals={futsals} superAdminId={user?.id || 0} setNotification={setNotification} onSuccess={fetchFutsalAdmins} />}
@@ -162,9 +172,11 @@ export default function SuperAdminDashboard() {
             <UserSection isVisible={showUsers} onToggle={() => setShowUsers(!showUsers)} />
             <BlockedUserSection isVisible={showBlockedUsers} onToggle={() => setShowBlockedUsers(!showBlockedUsers)} />
             <BookingSection isVisible={showBookings} onToggle={() => setShowBookings(!showBookings)} />
+            <SpecialPriceSection isVisible={showSpecialPrices} onToggle={() => setShowSpecialPrices(!showSpecialPrices)} />
             <RatingSection isVisible={showRatings} onToggle={() => setShowRatings(!showRatings)} />
             <FeedbackSection isVisible={showFeedbacks} onToggle={() => setShowFeedbacks(!showFeedbacks)} />
-            <SpecialPriceSection isVisible={showSpecialPrices} onToggle={() => setShowSpecialPrices(!showSpecialPrices)} />
+            <ContactSection isVisible={showContacts} onToggle={() => setShowContacts(!showContacts)} />
+            
 
           </div>
         </div>

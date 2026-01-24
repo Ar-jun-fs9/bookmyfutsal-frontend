@@ -174,41 +174,74 @@ export default function AboutPage() {
               Meet Our Team
             </h2>
             <p className="text-gray-600 text-lg">
-              The passionate individuals behind BookMyFutsal
+              The passionate individuals driving innovation at BookMyFutsal
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             <div className="text-center">
-              <div className="w-32 h-32 bg-linear-to-r from-green-400 to-blue-500 rounded-full mx-auto mb-4 flex items-center justify-center">
-                <span className="text-4xl text-white font-bold">👨‍💼</span>
+              <div className="w-32 h-32 bg-linear-to-r from-green-400 to-blue-500 rounded-full mx-auto mb-4 flex items-center justify-center overflow-hidden">
+                <img src="/partners/partner1.png" className="w-full h-full object-cover" />
               </div>
-              <h3 className="text-xl font-bold text-gray-800 mb-2">John Doe</h3>
-              <p className="text-green-600 font-medium mb-2">CEO & Founder</p>
+              <h3 className="text-xl font-bold text-gray-800 mb-2">Arjun</h3>
+              <p className="text-green-600 font-medium mb-2">CEO</p>
               <p className="text-gray-600 text-sm">
-                Former professional player with a vision to make futsal accessible to everyone.
+                Visionary leader passionate about making futsal accessible to everyone through innovative technology solutions.
               </p>
             </div>
 
             <div className="text-center">
-              <div className="w-32 h-32 bg-linear-to-r from-blue-400 to-purple-500 rounded-full mx-auto mb-4 flex items-center justify-center">
-                <span className="text-4xl text-white font-bold">👩‍💻</span>
+              <div className="w-32 h-32 bg-linear-to-r from-blue-400 to-purple-500 rounded-full mx-auto mb-4 flex items-center justify-center overflow-hidden">
+                <img src="/partners/partner2.png" className="w-full h-full object-cover" />
               </div>
-              <h3 className="text-xl font-bold text-gray-800 mb-2">Jane Smith</h3>
-              <p className="text-blue-600 font-medium mb-2">CTO</p>
+              <h3 className="text-xl font-bold text-gray-800 mb-2">Bidesh</h3>
+              <p className="text-blue-600 font-medium mb-2">Chief Technology Officer</p>
               <p className="text-gray-600 text-sm">
-                Tech enthusiast ensuring our platform runs smoothly for all users.
+                Technology expert ensuring our platform delivers exceptional performance and user experience.
               </p>
             </div>
 
             <div className="text-center">
-              <div className="w-32 h-32 bg-linear-to-r from-purple-400 to-pink-500 rounded-full mx-auto mb-4 flex items-center justify-center">
-                <span className="text-4xl text-white font-bold">👨‍🎯</span>
+              <div className="w-32 h-32 bg-linear-to-r from-purple-400 to-pink-500 rounded-full mx-auto mb-4 flex items-center justify-center overflow-hidden">
+                <img src="/partners/partner3.png" className="w-full h-full object-cover" />
               </div>
-              <h3 className="text-xl font-bold text-gray-800 mb-2">Mike Johnson</h3>
-              <p className="text-purple-600 font-medium mb-2">Operations Manager</p>
+              <h3 className="text-xl font-bold text-gray-800 mb-2">Prawjol</h3>
+              <p className="text-purple-600 font-medium mb-2">Engineering Manager</p>
               <p className="text-gray-600 text-sm">
-                Ensures all venues meet our high standards for player satisfaction.
+                Experienced engineering leader focused on building scalable solutions and mentoring development teams.
+              </p>
+            </div>
+
+            <div className="text-center">
+              <div className="w-32 h-32 bg-linear-to-r from-orange-400 to-red-500 rounded-full mx-auto mb-4 flex items-center justify-center overflow-hidden">
+                <img src="/partners/partner4.png" className="w-full h-full object-cover" />
+              </div>
+              <h3 className="text-xl font-bold text-gray-800 mb-2">Suman</h3>
+              <p className="text-orange-600 font-medium mb-2">Software Engineer / Developer</p>
+              <p className="text-gray-600 text-sm">
+                Full-stack developer specializing in modern web technologies and creating robust user interfaces.
+              </p>
+            </div>
+
+            <div className="text-center">
+              <div className="w-32 h-32 bg-linear-to-r from-teal-400 to-cyan-500 rounded-full mx-auto mb-4 flex items-center justify-center overflow-hidden">
+                <img src="/partners/partner5.png" className="w-full h-full object-cover" />
+              </div>
+              <h3 className="text-xl font-bold text-gray-800 mb-2">Arpit</h3>
+              <p className="text-teal-600 font-medium mb-2">Product Manager</p>
+              <p className="text-gray-600 text-sm">
+                Product strategist focused on user experience and driving product growth through data-driven decisions.
+              </p>
+            </div>
+
+            <div className="text-center">
+              <div className="w-32 h-32 bg-linear-to-r from-indigo-400 to-purple-500 rounded-full mx-auto mb-4 flex items-center justify-center overflow-hidden">
+                <img src="/partners/partner6.png" className="w-full h-full object-cover" />
+              </div>
+              <h3 className="text-xl font-bold text-gray-800 mb-2">Roshan</h3>
+              <p className="text-indigo-600 font-medium mb-2">Quality Assurance Engineer</p>
+              <p className="text-gray-600 text-sm">
+                Quality assurance specialist ensuring our platform delivers reliable and bug-free experiences to users.
               </p>
             </div>
           </div>

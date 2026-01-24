@@ -398,6 +398,143 @@ export default function VenuesPage() {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+        {/* Venue Categories */}
+        <div className="bg-white rounded-2xl shadow-xl p-8 mb-8">
+          <div className="text-center mb-8">
+            <h2 className="text-3xl font-bold bg-linear-to-r from-green-600 to-blue-600 bg-clip-text text-transparent mb-4">
+              Venue Categories
+            </h2>
+            <p className="text-gray-600 text-lg max-w-3xl mx-auto">
+              Choose from our diverse range of futsal venues, each designed to meet different needs and preferences.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="text-center p-6 bg-linear-to-br from-green-50 to-green-100 rounded-lg hover:shadow-lg transition-all duration-300">
+              <div className="w-16 h-16 bg-green-500 rounded-full mx-auto mb-4 flex items-center justify-center">
+                <span className="text-2xl text-white">🏆</span>
+              </div>
+              <h3 className="text-xl font-bold text-gray-800 mb-2">Premium Courts</h3>
+              <p className="text-gray-600">High-quality facilities with professional-grade equipment and amenities</p>
+            </div>
+
+            <div className="text-center p-6 bg-linear-to-br from-blue-50 to-blue-100 rounded-lg hover:shadow-lg transition-all duration-300">
+              <div className="w-16 h-16 bg-blue-500 rounded-full mx-auto mb-4 flex items-center justify-center">
+                <span className="text-2xl text-white">👥</span>
+              </div>
+              <h3 className="text-xl font-bold text-gray-800 mb-2">Community Centers</h3>
+              <p className="text-gray-600">Affordable venues perfect for casual games and community events</p>
+            </div>
+
+            <div className="text-center p-6 bg-linear-to-br from-purple-50 to-purple-100 rounded-lg hover:shadow-lg transition-all duration-300">
+              <div className="w-16 h-16 bg-purple-500 rounded-full mx-auto mb-4 flex items-center justify-center">
+                <span className="text-2xl text-white">🎓</span>
+              </div>
+              <h3 className="text-xl font-bold text-gray-800 mb-2">Educational Venues</h3>
+              <p className="text-gray-600">School and college facilities available for training and tournaments</p>
+            </div>
+
+            <div className="text-center p-6 bg-linear-to-br from-orange-50 to-orange-100 rounded-lg hover:shadow-lg transition-all duration-300">
+              <div className="w-16 h-16 bg-orange-500 rounded-full mx-auto mb-4 flex items-center justify-center">
+                <span className="text-2xl text-white">🏢</span>
+              </div>
+              <h3 className="text-xl font-bold text-gray-800 mb-2">Indoor Complexes</h3>
+              <p className="text-gray-600">Climate-controlled venues perfect for year-round playing</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Booking Tips */}
+        <div className="bg-linear-to-r from-green-50 to-blue-50 rounded-2xl p-8 mb-8">
+          <div className="text-center mb-8">
+            <h2 className="text-3xl font-bold text-gray-800 mb-4">Booking Tips</h2>
+            <p className="text-gray-600 text-lg max-w-3xl mx-auto">
+              Make the most of your futsal experience with these helpful tips and guidelines.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="bg-white rounded-lg p-6">
+              <h3 className="text-lg font-bold text-gray-800 mb-3 flex items-center">
+                <span className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center text-white text-sm mr-3">1</span>
+                Check Availability Early
+              </h3>
+              <p className="text-gray-600">Popular venues book up quickly, especially on weekends. Check availability at least 24-48 hours in advance.</p>
+            </div>
+
+            <div className="bg-white rounded-lg p-6">
+              <h3 className="text-lg font-bold text-gray-800 mb-3 flex items-center">
+                <span className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white text-sm mr-3">2</span>
+                Read Reviews & Ratings
+              </h3>
+              <p className="text-gray-600">Check user reviews and ratings to ensure the venue meets your expectations for quality and facilities.</p>
+            </div>
+
+            <div className="bg-white rounded-lg p-6">
+              <h3 className="text-lg font-bold text-gray-800 mb-3 flex items-center">
+                <span className="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center text-white text-sm mr-3">3</span>
+                Verify Location & Access
+              </h3>
+              <p className="text-gray-600">Use the location checker to ensure easy access. Consider parking availability and public transport options.</p>
+            </div>
+
+            <div className="bg-white rounded-lg p-6">
+              <h3 className="text-lg font-bold text-gray-800 mb-3 flex items-center">
+                <span className="w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center text-white text-sm mr-3">4</span>
+                Check Operating Hours
+              </h3>
+              <p className="text-gray-600">Confirm the venue's operating hours match your preferred playing time. Some venues have different rates for peak hours.</p>
+            </div>
+
+            <div className="bg-white rounded-lg p-6">
+              <h3 className="text-lg font-bold text-gray-800 mb-3 flex items-center">
+                <span className="w-8 h-8 bg-red-500 rounded-full flex items-center justify-center text-white text-sm mr-3">5</span>
+                Review Cancellation Policy
+              </h3>
+              <p className="text-gray-600">Understand the venue's cancellation policy before booking to avoid any unexpected charges.</p>
+            </div>
+
+            <div className="bg-white rounded-lg p-6">
+              <h3 className="text-lg font-bold text-gray-800 mb-3 flex items-center">
+                <span className="w-8 h-8 bg-teal-500 rounded-full flex items-center justify-center text-white text-sm mr-3">6</span>
+                Bring Required Equipment
+              </h3>
+              <p className="text-gray-600">While many venues provide balls, you may need to bring your own shin guards, water bottles, and appropriate footwear.</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Venue Statistics */}
+        <div className="bg-white rounded-2xl shadow-xl p-8 mb-8">
+          <div className="text-center mb-8">
+            <h2 className="text-3xl font-bold bg-linear-to-r from-green-600 to-blue-600 bg-clip-text text-transparent mb-4">
+              Venue Statistics
+            </h2>
+            <p className="text-gray-600 text-lg">
+              Discover what makes our venues stand out
+            </p>
+          </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            <div className="text-center">
+              <div className="text-3xl font-bold text-green-600 mb-2">{futsals.length}+</div>
+              <p className="text-gray-600">Active Venues</p>
+            </div>
+            <div className="text-center">
+              <div className="text-3xl font-bold text-blue-600 mb-2">24/7</div>
+              <p className="text-gray-600">Support Available</p>
+            </div>
+            <div className="text-center">
+              <div className="text-3xl font-bold text-purple-600 mb-2">4.5★</div>
+              <p className="text-gray-600">Average Rating</p>
+            </div>
+            <div className="text-center">
+              <div className="text-3xl font-bold text-orange-600 mb-2">100%</div>
+              <p className="text-gray-600">Verified Venues</p>
+            </div>
+          </div>
+        </div>
+
         <VenueGrid />
       </main>
 
