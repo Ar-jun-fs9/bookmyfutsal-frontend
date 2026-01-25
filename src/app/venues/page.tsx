@@ -293,7 +293,7 @@ export default function VenuesPage() {
             <Link href="/" className="flex items-center space-x-3 cursor-pointer">
               <div className="relative">
                 <img src="/logo/logo.png" alt="BookMyFutsal" className="h-12 w-12 rounded-lg bg-green-900 shadow-lg ring-2 ring-white" />
-                <div className="absolute -top-1 -right-1 w-4 h-4 bg-white rounded-lg animate-pulse"></div>
+                <div className="absolute -top-1 -right-1 w-4 h-4  rounded-lg animate-pulse"></div>
               </div>
               <h1 className="text-2xl md:text-3xl font-bold text-white drop-shadow-lg">
                 <span className="bg-linear-to-r from-green-400 to-blue-400 bg-clip-text text-transparent">BookMy</span>
@@ -329,13 +329,13 @@ export default function VenuesPage() {
             <div className="hidden md:flex items-center space-x-4">
               <Link
                 href="/user/login"
-                className="px-6 py-2 bg-linear-to-r from-blue-600 to-blue-700 text-white font-bold rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 border border-blue-500/30 hover:border-blue-400/50"
+                className="px-6 py-2 bg-linear-to-r from-blue-600 to-blue-700 text-white font-bold rounded-lg shadow-lg hover: transform hover:scale-105 transition-all duration-300 border border-blue-500/30 hover:border-blue-400/50"
               >
                 Login
               </Link>
               <Link
                 href="/user/register"
-                className="px-6 py-2 bg-linear-to-r from-green-600 to-green-700 text-white font-bold rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 border border-green-500/30 hover:border-green-400/50"
+                className="px-6 py-2 bg-linear-to-r from-green-600 to-green-700 text-white font-bold rounded-lg shadow-lg hover: transform hover:scale-105 transition-all duration-300 border border-green-500/30 hover:border-green-400/50"
               >
                 Sign Up
               </Link>
@@ -369,13 +369,13 @@ export default function VenuesPage() {
                 <div className="flex flex-row space-x-3 pt-4 border-t border-green-500/20">
                   <Link
                     href="/user/login"
-                    className="flex-1 px-4 py-3 bg-linear-to-r from-blue-600 to-blue-700 text-white font-bold rounded-lg text-center shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 border border-blue-500/30"
+                    className="flex-1 px-4 py-3 bg-linear-to-r from-blue-600 to-blue-700 text-white font-bold rounded-lg text-center shadow-lg hover: transform hover:scale-105 transition-all duration-300 border border-blue-500/30"
                   >
                     Login
                   </Link>
                   <Link
                     href="/user/register"
-                    className="flex-1 px-4 py-3 bg-linear-to-r from-green-600 to-green-700 text-white font-bold rounded-lg text-center shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 border border-green-500/30"
+                    className="flex-1 px-4 py-3 bg-linear-to-r from-green-600 to-green-700 text-white font-bold rounded-lg text-center shadow-lg hover: transform hover:scale-105 transition-all duration-300 border border-green-500/30"
                   >
                     Sign Up
                   </Link>
@@ -387,19 +387,20 @@ export default function VenuesPage() {
       </header>
 
       {/* Page Header */}
-      <div className="bg-linear-to-r from-green-600 to-blue-600 text-white py-16">
+      {/* <div className="bg-linear-to-r from-green-600 to-blue-600 text-white py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h1 className="text-4xl md:text-5xl font-bold mb-4">Available Futsal Venues</h1>
           <p className="text-xl text-green-100 max-w-3xl mx-auto">
             Discover and book premium futsal venues across the city. Find the perfect spot for your next game.
           </p>
         </div>
-      </div>
+      </div> */}
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+        <VenueGrid />
         {/* Venue Categories */}
-        <div className="bg-white rounded-2xl shadow-xl p-8 mb-8">
+        <div className=" rounded-2xl  p-8 mb-8">
           <div className="text-center mb-8">
             <h2 className="text-3xl font-bold bg-linear-to-r from-green-600 to-blue-600 bg-clip-text text-transparent mb-4">
               Venue Categories
@@ -410,7 +411,7 @@ export default function VenuesPage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div className="text-center p-6 bg-linear-to-br from-green-50 to-green-100 rounded-lg hover:shadow-lg transition-all duration-300">
+            <div className="text-center p-6 bg-linear-to-br  rounded-lg hover:shadow-lg transition-all duration-300">
               <div className="w-16 h-16 bg-green-500 rounded-full mx-auto mb-4 flex items-center justify-center">
                 <span className="text-2xl text-white">🏆</span>
               </div>
@@ -418,7 +419,7 @@ export default function VenuesPage() {
               <p className="text-gray-600">High-quality facilities with professional-grade equipment and amenities</p>
             </div>
 
-            <div className="text-center p-6 bg-linear-to-br from-blue-50 to-blue-100 rounded-lg hover:shadow-lg transition-all duration-300">
+            <div className="text-center p-6 bg-linear-to-br  rounded-lg hover:shadow-lg transition-all duration-300">
               <div className="w-16 h-16 bg-blue-500 rounded-full mx-auto mb-4 flex items-center justify-center">
                 <span className="text-2xl text-white">👥</span>
               </div>
@@ -426,7 +427,7 @@ export default function VenuesPage() {
               <p className="text-gray-600">Affordable venues perfect for casual games and community events</p>
             </div>
 
-            <div className="text-center p-6 bg-linear-to-br from-purple-50 to-purple-100 rounded-lg hover:shadow-lg transition-all duration-300">
+            <div className="text-center p-6 bg-linear-to-br  rounded-lg hover:shadow-lg transition-all duration-300">
               <div className="w-16 h-16 bg-purple-500 rounded-full mx-auto mb-4 flex items-center justify-center">
                 <span className="text-2xl text-white">🎓</span>
               </div>
@@ -434,7 +435,7 @@ export default function VenuesPage() {
               <p className="text-gray-600">School and college facilities available for training and tournaments</p>
             </div>
 
-            <div className="text-center p-6 bg-linear-to-br from-orange-50 to-orange-100 rounded-lg hover:shadow-lg transition-all duration-300">
+            <div className="text-center p-6 bg-linear-to-br  rounded-lg hover:shadow-lg transition-all duration-300">
               <div className="w-16 h-16 bg-orange-500 rounded-full mx-auto mb-4 flex items-center justify-center">
                 <span className="text-2xl text-white">🏢</span>
               </div>
@@ -445,7 +446,7 @@ export default function VenuesPage() {
         </div>
 
         {/* Booking Tips */}
-        <div className="bg-linear-to-r from-green-50 to-blue-50 rounded-2xl p-8 mb-8">
+        <div className="bg-linear-to-r  rounded-2xl p-8 mb-8">
           <div className="text-center mb-8">
             <h2 className="text-3xl font-bold text-gray-800 mb-4">Booking Tips</h2>
             <p className="text-gray-600 text-lg max-w-3xl mx-auto">
@@ -454,7 +455,7 @@ export default function VenuesPage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <div className="bg-white rounded-lg p-6">
+            <div className=" rounded-lg p-6">
               <h3 className="text-lg font-bold text-gray-800 mb-3 flex items-center">
                 <span className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center text-white text-sm mr-3">1</span>
                 Check Availability Early
@@ -462,7 +463,7 @@ export default function VenuesPage() {
               <p className="text-gray-600">Popular venues book up quickly, especially on weekends. Check availability at least 24-48 hours in advance.</p>
             </div>
 
-            <div className="bg-white rounded-lg p-6">
+            <div className=" rounded-lg p-6">
               <h3 className="text-lg font-bold text-gray-800 mb-3 flex items-center">
                 <span className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white text-sm mr-3">2</span>
                 Read Reviews & Ratings
@@ -470,7 +471,7 @@ export default function VenuesPage() {
               <p className="text-gray-600">Check user reviews and ratings to ensure the venue meets your expectations for quality and facilities.</p>
             </div>
 
-            <div className="bg-white rounded-lg p-6">
+            <div className=" rounded-lg p-6">
               <h3 className="text-lg font-bold text-gray-800 mb-3 flex items-center">
                 <span className="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center text-white text-sm mr-3">3</span>
                 Verify Location & Access
@@ -478,7 +479,7 @@ export default function VenuesPage() {
               <p className="text-gray-600">Use the location checker to ensure easy access. Consider parking availability and public transport options.</p>
             </div>
 
-            <div className="bg-white rounded-lg p-6">
+            <div className=" rounded-lg p-6">
               <h3 className="text-lg font-bold text-gray-800 mb-3 flex items-center">
                 <span className="w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center text-white text-sm mr-3">4</span>
                 Check Operating Hours
@@ -486,7 +487,7 @@ export default function VenuesPage() {
               <p className="text-gray-600">Confirm the venue's operating hours match your preferred playing time. Some venues have different rates for peak hours.</p>
             </div>
 
-            <div className="bg-white rounded-lg p-6">
+            <div className=" rounded-lg p-6">
               <h3 className="text-lg font-bold text-gray-800 mb-3 flex items-center">
                 <span className="w-8 h-8 bg-red-500 rounded-full flex items-center justify-center text-white text-sm mr-3">5</span>
                 Review Cancellation Policy
@@ -494,7 +495,7 @@ export default function VenuesPage() {
               <p className="text-gray-600">Understand the venue's cancellation policy before booking to avoid any unexpected charges.</p>
             </div>
 
-            <div className="bg-white rounded-lg p-6">
+            <div className=" rounded-lg p-6">
               <h3 className="text-lg font-bold text-gray-800 mb-3 flex items-center">
                 <span className="w-8 h-8 bg-teal-500 rounded-full flex items-center justify-center text-white text-sm mr-3">6</span>
                 Bring Required Equipment
@@ -505,7 +506,7 @@ export default function VenuesPage() {
         </div>
 
         {/* Venue Statistics */}
-        <div className="bg-white rounded-2xl shadow-xl p-8 mb-8">
+        <div className=" rounded-2xl  p-8 mb-8">
           <div className="text-center mb-8">
             <h2 className="text-3xl font-bold bg-linear-to-r from-green-600 to-blue-600 bg-clip-text text-transparent mb-4">
               Venue Statistics
@@ -534,8 +535,6 @@ export default function VenuesPage() {
             </div>
           </div>
         </div>
-
-        <VenueGrid />
       </main>
 
       {/* Video Modal */}

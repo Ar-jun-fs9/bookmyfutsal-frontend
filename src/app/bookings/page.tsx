@@ -52,13 +52,13 @@ export default function BookingsPage() {
             <div className="hidden md:flex items-center space-x-4">
               <Link
                 href="/user/login"
-                className="px-6 py-2 bg-linear-to-r from-blue-600 to-blue-700 text-white font-bold rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 border border-blue-500/30 hover:border-blue-400/50"
+                className="px-6 py-2 bg-linear-to-r from-blue-600 to-blue-700 text-white font-bold rounded-lg shadow-lg hover: transform hover:scale-105 transition-all duration-300 border border-blue-500/30 hover:border-blue-400/50"
               >
                 Login
               </Link>
               <Link
                 href="/user/register"
-                className="px-6 py-2 bg-linear-to-r from-green-600 to-green-700 text-white font-bold rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 border border-green-500/30 hover:border-green-400/50"
+                className="px-6 py-2 bg-linear-to-r from-green-600 to-green-700 text-white font-bold rounded-lg shadow-lg hover: transform hover:scale-105 transition-all duration-300 border border-green-500/30 hover:border-green-400/50"
               >
                 Sign Up
               </Link>
@@ -92,13 +92,13 @@ export default function BookingsPage() {
                 <div className="flex flex-row space-x-3 pt-4 border-t border-green-500/20">
                   <Link
                     href="/user/login"
-                    className="flex-1 px-4 py-3 bg-linear-to-r from-blue-600 to-blue-700 text-white font-bold rounded-lg text-center shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 border border-blue-500/30"
+                    className="flex-1 px-4 py-3 bg-linear-to-r from-blue-600 to-blue-700 text-white font-bold rounded-lg text-center shadow-lg hover: transform hover:scale-105 transition-all duration-300 border border-blue-500/30"
                   >
                     Login
                   </Link>
                   <Link
                     href="/user/register"
-                    className="flex-1 px-4 py-3 bg-linear-to-r from-green-600 to-green-700 text-white font-bold rounded-lg text-center shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 border border-green-500/30"
+                    className="flex-1 px-4 py-3 bg-linear-to-r from-green-600 to-green-700 text-white font-bold rounded-lg text-center shadow-lg hover: transform hover:scale-105 transition-all duration-300 border border-green-500/30"
                   >
                     Sign Up
                   </Link>
@@ -110,19 +110,19 @@ export default function BookingsPage() {
       </header>
 
       {/* Page Header */}
-      <div className="bg-linear-to-r from-green-600 to-blue-600 text-white py-16">
+      {/* <div className="bg-linear-to-r from-green-600 to-blue-600 text-white py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h1 className="text-4xl md:text-5xl font-bold mb-4">Book Your Futsal Venue</h1>
           <p className="text-xl text-green-100 max-w-3xl mx-auto">
             Ready to play? Start your booking journey and secure the perfect futsal venue for your game.
           </p>
         </div>
-      </div>
+      </div> */}
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
         {/* Booking Process */}
-        <div className="bg-white rounded-2xl shadow-xl p-8 mb-8">
+        <div className="rounded-2xl  p-8 mb-8">
           <div className="text-center mb-8">
             <h2 className="text-3xl font-bold bg-linear-to-r from-green-600 to-blue-600 bg-clip-text text-transparent mb-4">
               How Booking Works
@@ -168,7 +168,7 @@ export default function BookingsPage() {
         </div>
 
         {/* Booking Benefits */}
-        <div className="bg-linear-to-r from-green-50 to-blue-50 rounded-2xl p-8 mb-8">
+        <div className="bg-linear-to-r rounded-2xl p-8 mb-8">
           <div className="text-center mb-8">
             <h2 className="text-3xl font-bold text-gray-800 mb-4">Why Book With Us?</h2>
             <p className="text-gray-600 text-lg max-w-3xl mx-auto">
@@ -228,7 +228,7 @@ export default function BookingsPage() {
         </div>
 
         {/* Booking FAQ */}
-        <div className="bg-white rounded-2xl shadow-xl p-8 mb-8">
+        <div className="bg-white rounded-2xl  p-8 mb-8">
           <div className="text-center mb-8">
             <h2 className="text-3xl font-bold bg-linear-to-r from-green-600 to-blue-600 bg-clip-text text-transparent mb-4">
               Frequently Asked Questions
@@ -262,7 +262,7 @@ export default function BookingsPage() {
         </div>
 
         {/* Sign In Section */}
-        <div className="bg-white rounded-2xl shadow-xl p-8 text-center">
+        <div className="bg-white rounded-2xl  p-8 text-center">
           <div className="max-w-2xl mx-auto">
             <div className="w-24 h-24 bg-green-100 rounded-full mx-auto mb-6 flex items-center justify-center">
               <svg className="w-12 h-12 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -272,34 +272,34 @@ export default function BookingsPage() {
 
             <h2 className="text-3xl font-bold text-gray-800 mb-4">Start Your Booking</h2>
             <p className="text-gray-600 text-lg mb-8">
-              To view and manage your bookings, you need to sign in to your account. If you don't have an account yet,
-              you can create one for free.
+              Sign in or create an account to manage your bookings.
+              Or browse venues without an account.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
                 href="/user/login"
-                className="bg-linear-to-r from-green-500 to-green-600 text-white font-semibold py-3 px-8 rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 text-center"
+                className="bg-linear-to-r from-green-500 to-green-600 text-white font-semibold py-3 px-8 rounded-lg shadow-lg hover: transform hover:scale-105 transition-all duration-300 text-center"
               >
                 Sign In to View Bookings
               </Link>
               <Link
                 href="/venues"
-                className="bg-white border-2 border-green-500 text-green-600 font-semibold py-3 px-8 rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 text-center"
+                className="bg-white border-2 border-green-500 text-green-600 font-semibold py-3 px-8 rounded-lg shadow-lg hover: transform hover:scale-105 transition-all duration-300 text-center"
               >
                 Browse Venues
               </Link>
             </div>
 
-            <div className="mt-8 p-6 bg-gray-50 rounded-lg">
+            <div className="mt-8 p-6 rounded-lg">
               <h3 className="text-lg font-semibold text-gray-800 mb-4">Don't have an account?</h3>
               <p className="text-gray-600 mb-4">
-                Creating an account is quick and easy. You'll be able to track your bookings, manage payments,
+                Creating an account is quick and easy. You'll be able to track, update your bookings, manage payments,
                 and get exclusive access to special offers.
               </p>
               <Link
                 href="/user/register"
-                className="inline-block bg-linear-to-r from-blue-500 to-blue-600 text-white font-semibold py-2 px-6 rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300"
+                className="inline-block bg-linear-to-r from-blue-500 to-blue-600 text-white font-semibold py-2 px-6 rounded-lg shadow-lg hover: transform hover:scale-105 transition-all duration-300"
               >
                 Create Account
               </Link>

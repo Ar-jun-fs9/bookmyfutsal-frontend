@@ -231,22 +231,22 @@ export default function ContactPage() {
       </header>
 
       {/* Page Header */}
-      <div className="bg-linear-to-r from-green-600 to-blue-600 text-white py-16">
+      {/* <div className="bg-linear-to-r from-green-600 to-blue-600 text-white py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h1 className="text-4xl md:text-5xl font-bold mb-4">Contact Us</h1>
           <p className="text-xl text-green-100 max-w-3xl mx-auto">
             Get in touch with us. We're here to help you with all your futsal booking needs.
           </p>
         </div>
-      </div>
+      </div> */}
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+      <main className="max-w-7xl mx-auto py-8 px-4 mt-5 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
           {/* Contact Information */}
           <div className="space-y-8">
             <div>
-              <h2 className="text-3xl font-bold text-gray-800 mb-6">Get In Touch</h2>
+              <h2 className="text-3xl font-bold text-gray-800 mb-6 text-center">Get In Touch</h2>
               <p className="text-gray-600 text-lg mb-8">
                 Have questions about booking venues, need support, or want to partner with us?
                 We'd love to hear from you.
@@ -327,7 +327,7 @@ export default function ContactPage() {
           </div>
 
           {/* Contact Form */}
-          <div className="bg-white rounded-2xl shadow-xl p-8">
+          <div className="bg-white rounded-2xl p-1 sm:p-8">
             <h2 className="text-2xl font-bold text-gray-800 mb-6">Send us a Message</h2>
 
             <form onSubmit={handleSubmit} className="space-y-6">
