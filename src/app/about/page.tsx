@@ -236,7 +236,7 @@ export default function AboutPage() {
              <div className="text-center">
               {/* <div className="w-32 h-32 bg-linear-to-r from-green-400 to-blue-500 rounded-full mx-auto mb-4 flex items-center justify-center overflow-hidden"> */}
               <div className="w-32 h-32 bg-linear-to-rrounded-full mx-auto mb-4 flex items-center justify-center overflow-hidden">
-                <img src="/partners/arjun.jpeg" className="w-full h-full object-cover" />
+                <img src="/partners/arjun.jpeg" className="w-full h-full object-cover rounded-full" />
               </div>
               <h3 className="text-xl font-bold text-gray-800 mb-2">Hakuna Matata</h3>
               <p className="text-green-600 font-medium mb-2">All Rounder</p>
