@@ -13,6 +13,7 @@ import { formatTime, formatBookingTimeRange, categorizeBooking, formatDate } fro
 import { Notification } from '@/components/ui/Notification';
 import { useSpecialPrices } from '@/hooks/useSpecialPrices';
 import PriceNotificationModal from '@/components/modals/PriceNotificationModal';
+import TermsModal from '@/components/modals/BookingTermsModal';
 
 interface User {
   user_id: number;
@@ -105,6 +106,8 @@ export default function UserDashboard() {
   // const [loggedInUser, setLoggedInUser] = useState<User | null>(null);
   // const [booking, setBooking] = useState<Booking | null>(null);
   const scrollPositionRef = useRef<number>(0);
+  const [acceptTerms, setAcceptTerms] = useState(false);
+  const [showTermsModal, setShowTermsModal] = useState(false);
 
 
   // Socket handling
@@ -2119,6 +2122,7 @@ function LocationModal({ futsal, distance, onClose, showNotification }: { futsal
           </div>
         </div>
       </div>
+
     </div>
   );
 }
@@ -2204,6 +2208,8 @@ function BookingModal({ futsal, user, onClose, onSuccess, setSuccessModal, setCo
   const [currentPrice, setCurrentPrice] = useState<{ normalPrice: number, specialPrice?: { price: number, message?: string }, effectivePrice: number } | null>(null);
   const [specialPrices, setSpecialPrices] = useState<any[]>([]);
   const phone = user?.phone || '';
+  const [acceptTerms, setAcceptTerms] = useState(false);
+  const [showTermsModal, setShowTermsModal] = useState(false);
 
   const fetchPriceForSlot = async (slot: any) => {
     if (step !== 3) return;
@@ -3120,8 +3126,31 @@ function BookingModal({ futsal, user, onClose, onSuccess, setSuccessModal, setCo
                           </div>
                         </div>
 
-                        {/* Action Buttons */}
-                        <div className="flex flex-col sm:flex-row gap-4 pt-6">
+                        {/* Terms and Conditions Checkbox */}
+                        <div className="space-y-3 -mt-2">
+                          <div className="flex items-center mb-5">
+                            <input
+                              type="checkbox"
+                              id="acceptTerms"
+                              checked={acceptTerms}
+                              onChange={(e) => setAcceptTerms(e.target.checked)}
+                              className="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded"
+                            />
+                            <label htmlFor="acceptTerms" className="ml-2 block text-sm text-gray-700">
+                              I accept the{' '}
+                              <button
+                                type="button"
+                                onClick={() => setShowTermsModal(true)}
+                                className="text-green-600 hover:text-green-700 font-semibold underline"
+                              >
+                                Terms & Refund
+                              </button>
+                            </label>
+                          </div>
+                        </div>
+
+                         {/* Action Buttons */}
+                         <div className="flex flex-col sm:flex-row gap-4 pt-6">
                           <button
                             type="button"
                             onClick={async () => {
@@ -3142,7 +3171,8 @@ function BookingModal({ futsal, user, onClose, onSuccess, setSuccessModal, setCo
                           </button>
                           <button
                             type="submit"
-                            className="flex-1 order-1 sm:order-2 bg-linear-to-r from-green-500 to-green-600 text-white font-semibold py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 border border-green-400/30"
+                            disabled={!acceptTerms}
+                            className="flex-1 order-1 sm:order-2 bg-linear-to-r from-green-500 to-green-600 text-white font-semibold py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none border border-green-400/30"
                           >
                             <span className="flex items-center justify-center">
                               Next: Payment
@@ -3339,6 +3369,11 @@ function BookingModal({ futsal, user, onClose, onSuccess, setSuccessModal, setCo
           )}
         </div>
       </div>
+
+      <TermsModal
+        isOpen={showTermsModal}
+        onClose={() => setShowTermsModal(false)}
+      />
     </div>
   );
 }

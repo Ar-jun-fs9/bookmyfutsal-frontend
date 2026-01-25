@@ -12,6 +12,13 @@ interface BookingSectionProps {
   onToggle: () => void;
 }
 
+// --- NEW HELPER FUNCTION ---
+const formatDateTime = (datetime: string) => {
+  if (!datetime) return '-';
+  const d = new Date(datetime);
+  return `${d.toLocaleDateString('en-CA')}, ${d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })}`;
+};
+
 export function BookingSection({ isVisible, onToggle }: BookingSectionProps) {
   const { futsals } = useFutsals();
   const {
@@ -319,7 +326,8 @@ export function BookingSection({ isVisible, onToggle }: BookingSectionProps) {
 
                   <p><strong>Futsal:</strong> {booking.futsal_name}</p>
                   <p><strong>Playing Date:</strong> {booking.formatted_date}</p>
-                  <p><strong>Booked On:</strong> {booking.created_at.split('T')[0]}</p>
+                  {/* <p><strong>Booked On:</strong> {booking.created_at.split('T')[0]}</p> */}
+                  <p><strong>Booked On:</strong> {formatDateTime(booking.created_at)}</p>
                   <p><strong>Time:</strong> {formatTimeRange(booking.time_slot)}</p>
                   <p><strong>Players:</strong> {booking.number_of_players}</p>
                   {booking.team_name && <p><strong>Team:</strong> {booking.team_name}</p>}

@@ -12,6 +12,7 @@ import { useNotificationStore } from "@/stores/notificationStore";
 import { bookingReducer, initialBookingState } from "@/reducers/bookingReducer";
 import { formatTime, formatDate, formatBookingTimeRange, generateTrackingCode } from "@/utils/helpers";
 import PriceNotificationModal from "@/components/modals/PriceNotificationModal";
+import TermsModal from "@/components/modals/BookingTermsModal";
 
 interface Futsal {
   futsal_id: number;
@@ -354,7 +355,9 @@ export default function BookFutsal() {
   const [confirmModal, setConfirmModal] = useState<{ isOpen: boolean, message: string, onConfirm: () => void } | null>(null);
   
   const [lastBooking, setLastBooking] = useState<{guest_name: string, number_of_players: number, team_name?: string} | null>(null);
-  
+  const [acceptTerms, setAcceptTerms] = useState(false);
+  const [showTermsModal, setShowTermsModal] = useState(false);
+
   const fetchLastBooking = async (phone: string) => {
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/bookings/last-by-phone/${phone}`);
@@ -1519,9 +1522,32 @@ export default function BookFutsal() {
                             </div>
                           </div>
                         </div>
-                        
-                        {/* Action Buttons */}
-                        <div className="flex flex-col sm:flex-row gap-4 pt-6">
+
+                        {/* Terms and Conditions Checkbox */}
+                        <div className="space-y-3 -mt-2">
+                          <div className="flex items-center mb-5">
+                            <input
+                              type="checkbox"
+                              id="acceptTerms"
+                              checked={acceptTerms}
+                              onChange={(e) => setAcceptTerms(e.target.checked)}
+                              className="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded"
+                            />
+                            <label htmlFor="acceptTerms" className="ml-2 block text-sm text-gray-700">
+                              I accept the{' '}
+                              <button
+                                type="button"
+                                onClick={() => setShowTermsModal(true)}
+                                className="text-green-600 hover:text-green-700 font-semibold underline"
+                              >
+                                Terms & Refund
+                              </button>
+                            </label>
+                          </div>
+                        </div>
+
+                         {/* Action Buttons */}
+                         <div className="flex flex-col sm:flex-row gap-4 pt-6">
                           <button
                             type="button"
                             onClick={() => {
@@ -1542,7 +1568,8 @@ export default function BookFutsal() {
                           </button>
                           <button
                             type="submit"
-                            className="flex-1 order-1 sm:order-2 bg-linear-to-r from-green-500 to-green-600 text-white font-semibold py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 border border-green-400/30"
+                            disabled={!acceptTerms}
+                            className="flex-1 order-1 sm:order-2 bg-linear-to-r from-green-500 to-green-600 text-white font-semibold py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none border border-green-400/30"
                           >
                             <span className="flex items-center justify-center">
                               Next: OTP Verify
@@ -2328,6 +2355,11 @@ export default function BookFutsal() {
       <PriceNotificationModal
         priceNotification={priceNotification}
         setPriceNotification={setPriceNotification}
+      />
+
+      <TermsModal
+        isOpen={showTermsModal}
+        onClose={() => setShowTermsModal(false)}
       />
 
       {/* Footer */}

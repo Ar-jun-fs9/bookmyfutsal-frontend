@@ -143,7 +143,7 @@ export default function FutsalAdminDashboard() {
   const [selectedRatings, setSelectedRatings] = useState<number[]>([]);
   const [selectAllRatings, setSelectAllRatings] = useState(false);
   const [showRatingCheckboxes, setShowRatingCheckboxes] = useState(false);
-  const [offerMessageModal, setOfferMessageModal] = useState<{isOpen: boolean, price: any, onConfirm: (message: string) => void, existingMessage?: string}>({isOpen: false, price: null, onConfirm: () => {}, existingMessage: ''});
+  const [offerMessageModal, setOfferMessageModal] = useState<{ isOpen: boolean, price: any, onConfirm: (message: string) => void, existingMessage?: string }>({ isOpen: false, price: null, onConfirm: () => { }, existingMessage: '' });
 
   // Reducer for filters
   const [filterState, dispatch] = useReducer(filterReducer, initialFilterState);
@@ -1056,9 +1056,12 @@ export default function FutsalAdminDashboard() {
                                     <strong>Phone:</strong> {b.user_phone}
                                   </p>
                                 )}
-
                                 <p><strong>Playing Date:</strong> {b.formatted_date || b.booking_date?.split('T')[0]}</p>
-                                <p><strong>Booked On:</strong> {b.created_at.split('T')[0]}</p>
+                                {/* <p><strong>Booked On:</strong> {b.created_at.split('T')[0]}</p> */}
+                                <p>
+                                  <strong>Booked On:</strong> {new Date(b.created_at).toLocaleDateString('en-CA')}, {' '}
+                                  {new Date(b.created_at).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })}
+                                </p>
                                 <p><strong>Time:</strong> {formatTimeRange(b.time_slot)}</p>
                                 <p><strong>Players:</strong> {b.number_of_players}</p>
                                 {b.team_name && <p><strong>Team:</strong> {b.team_name}</p>}
@@ -1513,7 +1516,7 @@ export default function FutsalAdminDashboard() {
 
       <OfferMessageModal
         isOpen={offerMessageModal.isOpen}
-        onClose={() => setOfferMessageModal({ isOpen: false, price: null, onConfirm: () => {}, existingMessage: '' })}
+        onClose={() => setOfferMessageModal({ isOpen: false, price: null, onConfirm: () => { }, existingMessage: '' })}
         onConfirm={offerMessageModal.onConfirm}
         initialMessage={offerMessageModal.existingMessage || ''}
       />
@@ -1639,8 +1642,8 @@ function CreateSpecialPriceForm({ futsalId, openingHours, closingHours, onSucces
         </h3>
         <p className="text-gray-600 text-sm">
           {formData.type === 'date' ? 'Set a special price for a specific date' :
-           formData.type === 'recurring' ? 'Set a special price for recurring days' :
-           'Set a special price for specific time ranges'}
+            formData.type === 'recurring' ? 'Set a special price for recurring days' :
+              'Set a special price for specific time ranges'}
         </p>
       </div>
 

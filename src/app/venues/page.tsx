@@ -283,6 +283,7 @@ export default function VenuesPage() {
   const uniqueCities = [...new Set(futsals.map((f: Futsal) => f.city.trim()))].sort() as string[];
   const uniqueLocations = [...new Set(futsals.map((f: Futsal) => f.location.trim()))].sort() as string[];
 
+
   return (
     <div className="min-h-screen bg-linear-to-br from-green-50 via-white to-blue-50">
       {/* Header */}
