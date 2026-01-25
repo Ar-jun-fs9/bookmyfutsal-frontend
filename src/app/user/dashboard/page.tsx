@@ -67,6 +67,7 @@ interface Booking {
   amount_paid: number;
   total_amount: number;
   payment_status: string;
+  booking_type?: string;
   formatted_date?: string;
   update_count?: number;
   created_at: string;
@@ -1054,6 +1055,16 @@ export default function UserDashboard() {
                                 <p><strong>Location:</strong> {booking.location}, {booking.city}</p>
                                 <p><strong>Playing Date:</strong> {new Date(booking.booking_date).toLocaleDateString('en-CA')}</p>
                                 <p><strong>Booked On:</strong> {(() => { const parts = booking.created_at.includes('T') ? booking.created_at.split('T') : booking.created_at.split(' '); const timeStr = parts[1].substring(0,5); const [hours, minutes] = timeStr.split(':').map(Number); const period = hours >= 12 ? 'PM' : 'AM'; const displayHours = hours === 0 ? 12 : hours > 12 ? hours - 12 : hours; const formattedTime = `${displayHours}:${minutes.toString().padStart(2, '0')} ${period}`; return parts[0] + ' ' + formattedTime; })()}</p>
+                                <p><strong>Booking Type:</strong> {(() => {
+                                  const type = booking.booking_type || 'normal';
+                                  switch (type) {
+                                    case 'normal': return 'Normal';
+                                    case 'date': return 'Date-Specific';
+                                    case 'recurring': return 'Recurring';
+                                    case 'time_based': return 'Time-Based';
+                                    default: return 'Normal';
+                                  }
+                                })()}</p>
                                 <p><strong>Time:</strong> {(() => {
                                   const [start, end] = booking.time_slot.split('-');
                                   const startHour = parseInt(start.split(':')[0]);
