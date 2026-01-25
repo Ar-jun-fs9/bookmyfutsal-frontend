@@ -5,7 +5,7 @@ export const Notification = () => {
   const { notification, hideNotification } = useNotificationStore();
 
   useEffect(() => {
-    if (notification && notification.message.includes('Booking cancelled')) {
+    if (notification && (notification.message.includes('Booking cancelled') || notification.message.includes('Booking not found'))) {
       const timer = setTimeout(() => {
         hideNotification();
       }, 2000);
@@ -31,7 +31,7 @@ export const Notification = () => {
           <p className={`text-sm font-medium ${notification.type === 'success' ? 'text-green-800' : 'text-blue-800'}`}>
             {notification.message}
           </p>
-          {!notification.message.includes('Payment successful') && !notification.message.includes('Booking cancelled') && !notification.message.includes('Please enter your 8 digit tracking code') && !notification.message.includes('Please enter 8 digit tracking code') && !notification.message.includes('Message sent successfully') && (
+          {!notification.message.includes('Payment successful') && !notification.message.includes('Booking cancelled') && !notification.message.includes('Please enter your 8 digit tracking code') && !notification.message.includes('Please enter 8 digit tracking code') && !notification.message.includes('Message sent successfully') && !notification.message.includes('Booking not found') && (
             <button
               onClick={hideNotification}
               className="mt-4 px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors duration-200"
