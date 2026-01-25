@@ -1058,15 +1058,14 @@ export default function FutsalAdminDashboard() {
                                 )}
                                 <p><strong>Playing Date:</strong> {b.formatted_date || b.booking_date?.split('T')[0]}</p>
                                 {/* <p><strong>Booked On:</strong> {b.created_at.split('T')[0]}</p> */}
-                                <p>
-                                  <strong>Booked On:</strong> {new Date(b.created_at).toLocaleDateString('en-CA')}, {' '}
-                                  {new Date(b.created_at).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })}
-                                </p>
+                                <p><strong>Booked On:</strong> {(() => { const parts = b.created_at.includes('T') ? b.created_at.split('T') : b.created_at.split(' '); const timeStr = parts[1].substring(0,5); const [hours, minutes] = timeStr.split(':').map(Number); const period = hours >= 12 ? 'PM' : 'AM'; const displayHours = hours === 0 ? 12 : hours > 12 ? hours - 12 : hours; return parts[0] + ' ' + `${displayHours}:${minutes.toString().padStart(2,'0')} ${period}`; })()}</p>
                                 <p><strong>Time:</strong> {formatTimeRange(b.time_slot)}</p>
                                 <p><strong>Players:</strong> {b.number_of_players}</p>
                                 {b.team_name && <p><strong>Team:</strong> {b.team_name}</p>}
                                 <p><strong>Advance:</strong> {b.payment_status}</p>
-                                {b.cancelled_by && b.cancelled_at && <p><strong>Cancelled on:</strong> {new Date(b.cancelled_at).toLocaleDateString('en-CA')}, {new Date(b.cancelled_at).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })}</p>}
+                                {/* {b.cancelled_by && b.cancelled_at && <p><strong>Cancelled on:</strong> {new Date(b.cancelled_at).toLocaleDateString('en-CA')}, {new Date(b.cancelled_at).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })}</p>} */}
+                                {b.cancelled_by && b.cancelled_at && <p><strong>Cancelled on:</strong> {(() => { const parts = b.cancelled_at.includes('T') ? b.cancelled_at.split('T') : b.cancelled_at.split(' '); const timeStr = parts[1].substring(0,5); const [hours, minutes] = timeStr.split(':').map(Number); const period = hours >= 12 ? 'PM' : 'AM'; const displayHours = hours === 0 ? 12 : hours > 12 ? hours - 12 : hours; return parts[0] + ' ' + `${displayHours}:${minutes.toString().padStart(2,'0')} ${period}`; })()}</p>}
+
 
                                 {b.last_updated_by && (
                                   <p><strong>Last Updated By:</strong> {b.last_updated_by}</p>

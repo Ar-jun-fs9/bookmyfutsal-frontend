@@ -357,7 +357,8 @@ export default function BookingTracker() {
               <p><strong>Tracking Code:</strong> {trackedBooking.tracking_code}</p>
               <p><strong>Booked By:</strong> {trackedBooking.guest_name}</p>
               <p><strong>Phone:</strong> {trackedBooking.guest_phone}</p>
-              <p><strong>Booked On:</strong> {trackedBooking.created_at ? trackedBooking.created_at.split('T')[0] : 'N/A'}</p>
+              {/* <p><strong>Booked On:</strong> {trackedBooking.created_at ? trackedBooking.created_at.split('T')[0] : 'N/A'}</p> */}
+              <p><strong>Booked On:</strong> {trackedBooking.created_at ? (() => { const parts = trackedBooking.created_at.includes('T') ? trackedBooking.created_at.split('T') : trackedBooking.created_at.split(' '); const timeStr = parts[1].substring(0,5); const [hours, minutes] = timeStr.split(':').map(Number); const period = hours >= 12 ? 'PM' : 'AM'; const displayHours = hours === 0 ? 12 : hours > 12 ? hours - 12 : hours; return parts[0] + ' ' + `${displayHours}:${minutes.toString().padStart(2,'0')} ${period}`; })() : 'N/A'}</p>
             </div>
             <div className="mt-6 p-4 bg-linear-to-r from-yellow-50 to-orange-50 rounded-xl border border-yellow-200">
               <p className="text-sm text-yellow-800 font-semibold mb-2">⚠️ Reminder: Please arrive 15 minutes before your booking time.</p>

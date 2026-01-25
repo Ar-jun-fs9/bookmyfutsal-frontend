@@ -1547,7 +1547,7 @@ export default function BookFutsal() {
                         </div>
 
                          {/* Action Buttons */}
-                         <div className="flex flex-col sm:flex-row gap-4 pt-6">
+                         <div className="flex flex-col sm:flex-row gap-4 pt-2">
                           <button
                             type="button"
                             onClick={() => {

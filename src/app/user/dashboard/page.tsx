@@ -1043,7 +1043,7 @@ export default function UserDashboard() {
                                 </div>
                                 <p><strong>Location:</strong> {booking.location}, {booking.city}</p>
                                 <p><strong>Playing Date:</strong> {new Date(booking.booking_date).toLocaleDateString('en-CA')}</p>
-                                <p><strong>Booked On:</strong> {booking.created_at.split('T')[0]}</p>
+                                <p><strong>Booked On:</strong> {(() => { const parts = booking.created_at.includes('T') ? booking.created_at.split('T') : booking.created_at.split(' '); const timeStr = parts[1].substring(0,5); const [hours, minutes] = timeStr.split(':').map(Number); const period = hours >= 12 ? 'PM' : 'AM'; const displayHours = hours === 0 ? 12 : hours > 12 ? hours - 12 : hours; const formattedTime = `${displayHours}:${minutes.toString().padStart(2, '0')} ${period}`; return parts[0] + ' ' + formattedTime; })()}</p>
                                 <p><strong>Time:</strong> {(() => {
                                   const [start, end] = booking.time_slot.split('-');
                                   const startHour = parseInt(start.split(':')[0]);
@@ -1058,7 +1058,7 @@ export default function UserDashboard() {
                                 {booking.team_name && <p><strong>Team:</strong> {booking.team_name}</p>}
                                 <p><strong>Paid Amount:</strong> Rs. {booking.amount_paid}</p>
                                 <p><strong>Total Amount:</strong> Rs. {booking.total_amount}</p>
-                                {booking.cancelled_by && booking.cancelled_at && <p><strong>Cancelled on:</strong> {new Date(booking.cancelled_at).toLocaleDateString('en-CA')}, {new Date(booking.cancelled_at).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })}</p>}
+                                {booking.cancelled_by && booking.cancelled_at && <p><strong>Cancelled on:</strong> {(() => { const parts = booking.cancelled_at.includes('T') ? booking.cancelled_at.split('T') : booking.cancelled_at.split(' '); const timeStr = parts[1].substring(0,5); const [hours, minutes] = timeStr.split(':').map(Number); const period = hours >= 12 ? 'PM' : 'AM'; const displayHours = hours === 0 ? 12 : hours > 12 ? hours - 12 : hours; const formattedTime = `${displayHours}:${minutes.toString().padStart(2, '0')} ${period}`; return parts[0] + ' ' + formattedTime; })()}</p>}
                               </div>
                               <div className="flex flex-col items-end space-y-2">
                                 <p className="text-lg font-semibold">Rs. {booking.amount_paid}</p>
@@ -3150,7 +3150,7 @@ function BookingModal({ futsal, user, onClose, onSuccess, setSuccessModal, setCo
                         </div>
 
                          {/* Action Buttons */}
-                         <div className="flex flex-col sm:flex-row gap-4 pt-6">
+                         <div className="flex flex-col sm:flex-row gap-4 pt-2">
                           <button
                             type="button"
                             onClick={async () => {
