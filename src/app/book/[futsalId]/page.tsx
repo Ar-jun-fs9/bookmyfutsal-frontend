@@ -69,6 +69,16 @@ interface Slot {
 
 // Time formatting functions are now imported from helpers.ts
 
+// Calculate advance payment based on price ranges
+function calculateAdvance(price: number): number {
+  if (price >= 1000 && price <= 1200) return 200;
+  if (price >= 1300 && price <= 1500) return 300;
+  if (price >= 1600 && price <= 1800) return 400;
+  if (price >= 1900 && price <= 2000) return 500;
+  // For prices outside defined ranges, use default 100
+  return 100;
+}
+
 export default function BookFutsal() {
   const params = useParams();
   const futsalId = params?.futsalId ? parseInt(params.futsalId as string, 10) : undefined;
@@ -1799,7 +1809,7 @@ export default function BookFutsal() {
                     <h2 className="text-2xl sm:text-3xl font-bold bg-linear-to-r from-green-600 to-blue-600 bg-clip-text text-transparent mb-2">
                       Advance Payment
                     </h2>
-                    <p className="text-gray-600 text-sm">Pay Rs. 100 advance to confirm your booking</p>
+                    <p className="text-gray-600 text-sm">Pay Rs. {calculateAdvance(currentPrice?.effectivePrice || futsal.price_per_hour)} advance to confirm your booking</p>
                   </div>
 
                   {/* Phone Info */}
@@ -1853,7 +1863,7 @@ export default function BookFutsal() {
                       </div>
                       <div className="flex justify-between items-center">
                         <span className="text-gray-600 font-medium">Amount:</span>
-                        <span className="text-green-600 font-bold">Rs. 100</span>
+                        <span className="text-green-600 font-bold">Rs. {calculateAdvance(currentPrice?.effectivePrice || futsal.price_per_hour)}</span>
                       </div>
                       <div className="flex justify-between items-center">
                         <span className="text-gray-600 font-medium">eSewa ID:</span>
@@ -1888,12 +1898,13 @@ export default function BookFutsal() {
 
                         // Create booking immediately after payment
                         try {
+                          const advanceAmount = calculateAdvance(currentPrice?.effectivePrice || futsal.price_per_hour);
                           const bookingResponse = await createBookingMutation.mutateAsync({
                             slot_id: bookingState.selectedSlotIds[0],
                             number_of_players: Number(bookingState.numberOfPlayers) || 5,
                             team_name: bookingState.teamName,
                             payment_status: "paid",
-                            amount_paid: 100,
+                            amount_paid: advanceAmount,
                             otp_verified: true,
                             tracking_code: generateTrackingCode(),
                             guest_name: bookingState.name,
@@ -1919,7 +1930,7 @@ export default function BookFutsal() {
                         <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
                         </svg>
-                        Pay Rs. 100
+                        Pay Rs. {calculateAdvance(currentPrice?.effectivePrice || futsal.price_per_hour)}
                       </span>
                     </button>
                   </div>
