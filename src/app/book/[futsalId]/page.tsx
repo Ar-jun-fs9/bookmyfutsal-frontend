@@ -71,10 +71,11 @@ interface Slot {
 
 // Calculate advance payment based on price ranges
 function calculateAdvance(price: number): number {
-  if (price >= 1000 && price <= 1200) return 200;
-  if (price >= 1300 && price <= 1500) return 300;
-  if (price >= 1600 && price <= 1800) return 400;
-  if (price >= 1900 && price <= 2000) return 500;
+  if (price >= 1000 && price <= 1250) return 200;
+  if (price >= 1300 && price <= 1550) return 300;
+  if (price >= 1600 && price <= 1850) return 400;
+  if (price >= 1900 && price <= 2050) return 500;
+  if (price >= 2100 && price <= 2700) return 700; //added new one with my own
   // For prices outside defined ranges, use default 100
   return 100;
 }
