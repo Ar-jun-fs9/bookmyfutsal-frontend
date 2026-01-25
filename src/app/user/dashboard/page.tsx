@@ -17,10 +17,11 @@ import TermsModal from '@/components/modals/BookingTermsModal';
 
 // Calculate advance payment based on price ranges
 function calculateAdvance(price: number): number {
-  if (price >= 1000 && price <= 1200) return 200;
-  if (price >= 1300 && price <= 1500) return 300;
-  if (price >= 1600 && price <= 1800) return 400;
-  if (price >= 1900 && price <= 2000) return 500;
+  if (price >= 1000 && price <= 1250) return 200;
+  if (price >= 1300 && price <= 1550) return 300;
+  if (price >= 1600 && price <= 1850) return 400;
+  if (price >= 1900 && price <= 2050) return 500;
+  if (price >= 2100 && price <= 2700) return 700; //added new one with my own
   // For prices outside defined ranges, use default 100
   return 100;
 }
@@ -2326,7 +2327,12 @@ function BookingModal({ futsal, user, onClose, onSuccess, setSuccessModal, setCo
     const fetchPrice = async () => {
       if (futsal.futsal_id && selectedDate) {
         try {
-          const url = `${process.env.NEXT_PUBLIC_API_URL}/api/special-prices/price/${futsal.futsal_id}/${selectedDate}`;
+          const selectedSlot = selectedSlotIds.length > 0 ? availableSlots.find(slot => slot.slot_id === selectedSlotIds[0]) : null;
+          const startTime = selectedSlot ? selectedSlot.start_time : undefined;
+
+          const url = startTime
+            ? `${process.env.NEXT_PUBLIC_API_URL}/api/special-prices/price/${futsal.futsal_id}/${selectedDate}?startTime=${startTime}`
+            : `${process.env.NEXT_PUBLIC_API_URL}/api/special-prices/price/${futsal.futsal_id}/${selectedDate}`;
 
           const response = await fetch(url);
           if (response.ok) {
@@ -2337,6 +2343,10 @@ function BookingModal({ futsal, user, onClose, onSuccess, setSuccessModal, setCo
             if (priceData.specialPrice && step === 1) {
               // Date-specific or recurring special price: show only in date step (step 1)
               const message = `Normal: Rs. ${priceData.normalPrice} → ${priceData.specialPrice.message || 'Special Price'}: Rs. ${priceData.specialPrice.price}`;
+              setPriceNotification({ isOpen: true, message });
+            } else if (priceData.timeBasedPrice && startTime && step === 3) {
+              // Time-based special price: show only in time slot step (step 3)
+              const message = `Normal: Rs. ${priceData.normalPrice} → ${priceData.timeBasedPrice.message || 'Time-Based Price'}: Rs. ${priceData.timeBasedPrice.price}`;
               setPriceNotification({ isOpen: true, message });
             } else if (step === 2 || step === 4) {
               // Close modal in other steps to prevent it from staying open
@@ -2350,7 +2360,7 @@ function BookingModal({ futsal, user, onClose, onSuccess, setSuccessModal, setCo
     };
 
     fetchPrice();
-  }, [futsal.futsal_id, selectedDate, step]);
+  }, [futsal.futsal_id, selectedDate, step, selectedSlotIds, availableSlots]);
 
   // Check slot status before allowing selection
   const checkSlotStatus = async (slotId: number): Promise<string> => {
@@ -3463,7 +3473,12 @@ function UpdateBookingModal({ booking, onClose, onSuccess, setSuccessModal, show
     const fetchPrice = async () => {
       if (futsalId && selectedDate) {
         try {
-          const url = `${process.env.NEXT_PUBLIC_API_URL}/api/special-prices/price/${futsalId}/${selectedDate}`;
+          const selectedSlot = selectedSlotIds.length > 0 ? availableSlots.find(slot => slot.slot_id === selectedSlotIds[0]) : null;
+          const startTime = selectedSlot ? selectedSlot.start_time : undefined;
+
+          const url = startTime
+            ? `${process.env.NEXT_PUBLIC_API_URL}/api/special-prices/price/${futsalId}/${selectedDate}?startTime=${startTime}`
+            : `${process.env.NEXT_PUBLIC_API_URL}/api/special-prices/price/${futsalId}/${selectedDate}`;
 
           const response = await fetch(url);
           if (response.ok) {
@@ -3473,6 +3488,10 @@ function UpdateBookingModal({ booking, onClose, onSuccess, setSuccessModal, show
             if (priceData.specialPrice && step === 1) {
               // Date-specific or recurring special price: show only in date step (step 1)
               const message = `Normal: Rs. ${priceData.normalPrice} → ${priceData.specialPrice.message || 'Special Price'}: Rs. ${priceData.specialPrice.price}`;
+              setPriceNotification({ isOpen: true, message });
+            } else if (priceData.timeBasedPrice && startTime && step === 3) {
+              // Time-based special price: show only in time slot step (step 3)
+              const message = `Normal: Rs. ${priceData.normalPrice} → ${priceData.timeBasedPrice.message || 'Time-Based Price'}: Rs. ${priceData.timeBasedPrice.price}`;
               setPriceNotification({ isOpen: true, message });
             } else if (step === 2) {
               // Close modal in other steps to prevent it from staying open
@@ -3486,7 +3505,7 @@ function UpdateBookingModal({ booking, onClose, onSuccess, setSuccessModal, show
     };
 
     fetchPrice();
-  }, [futsalId, selectedDate, step, setPriceNotification]);
+  }, [futsalId, selectedDate, step, setPriceNotification, selectedSlotIds, availableSlots]);
 
   useEffect(() => {
     const fetchFutsal = async () => {
