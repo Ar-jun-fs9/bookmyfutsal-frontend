@@ -364,8 +364,8 @@ export default function BookFutsal() {
   const [otpCountdown, setOtpCountdown] = useState(0);
   const [esewaPhone, setEsewaPhone] = useState('');
   const [confirmModal, setConfirmModal] = useState<{ isOpen: boolean, message: string, onConfirm: () => void } | null>(null);
-  
-  const [lastBooking, setLastBooking] = useState<{guest_name: string, number_of_players: number, team_name?: string} | null>(null);
+
+  const [lastBooking, setLastBooking] = useState<{ guest_name: string, number_of_players: number, team_name?: string } | null>(null);
   const [acceptTerms, setAcceptTerms] = useState(false);
   const [showTermsModal, setShowTermsModal] = useState(false);
 
@@ -385,7 +385,7 @@ export default function BookFutsal() {
       console.error('Error fetching last booking:', error);
     }
   };
-  
+
   // Load booking progress from localStorage on mount
   useEffect(() => {
     const saved = localStorage.getItem(storageKey);
@@ -1183,8 +1183,8 @@ export default function BookFutsal() {
                             dispatch({ type: 'SET_SELECTED_SHIFT', payload: newShift });
                           }}
                           className={`relative p-6 border-2 rounded-xl transition-all duration-300 transform hover:scale-105 ${bookingState.selectedShift === shift
-                              ? "bg-linear-to-br from-green-500 to-green-600 border-green-500 text-white shadow-lg"
-                              : "bg-white border-gray-200 hover:border-green-300 hover:shadow-md"
+                            ? "bg-linear-to-br from-green-500 to-green-600 border-green-500 text-white shadow-lg"
+                            : "bg-white border-gray-200 hover:border-green-300 hover:shadow-md"
                             }`}
                         >
                           {bookingState.selectedShift === shift && (
@@ -1338,16 +1338,16 @@ export default function BookFutsal() {
                                 slot.status === "disabled") && !bookingState.selectedSlotIds.includes(slot.slot_id)
                             }
                             className={`relative p-4 border-2 rounded-xl text-center transition-all duration-300 transform hover:scale-105 ${bookingState.selectedSlotIds.includes(slot.slot_id)
-                                ? "bg-linear-to-br from-green-500 to-green-600 border-green-500 text-white shadow-lg"
-                                : slot.display_status === "booked"
-                                  ? "bg-red-50 border-red-300 cursor-not-allowed opacity-60"
-                                  : slot.display_status === "expired"
-                                    ? "bg-yellow-50 border-yellow-300 cursor-not-allowed opacity-60"
-                                    : slot.status === "disabled"
-                                      ? "bg-gray-50 border-gray-300 cursor-not-allowed opacity-60"
-                                      : slot.status === "pending"
-                                        ? "bg-orange-50 border-orange-300 hover:border-green-300 hover:shadow-md"
-                                        : "bg-white border-gray-200 hover:border-green-300 hover:shadow-md"
+                              ? "bg-linear-to-br from-green-500 to-green-600 border-green-500 text-white shadow-lg"
+                              : slot.display_status === "booked"
+                                ? "bg-red-50 border-red-300 cursor-not-allowed opacity-60"
+                                : slot.display_status === "expired"
+                                  ? "bg-yellow-50 border-yellow-300 cursor-not-allowed opacity-60"
+                                  : slot.status === "disabled"
+                                    ? "bg-gray-50 border-gray-300 cursor-not-allowed opacity-60"
+                                    : slot.status === "pending"
+                                      ? "bg-orange-50 border-orange-300 hover:border-green-300 hover:shadow-md"
+                                      : "bg-white border-gray-200 hover:border-green-300 hover:shadow-md"
                               }`}
                           >
                             {bookingState.selectedSlotIds.includes(slot.slot_id) && (
@@ -1358,11 +1358,11 @@ export default function BookFutsal() {
                               </div>
                             )}
                             <div className={`font-bold text-sm mb-1 ${bookingState.selectedSlotIds.includes(slot.slot_id) ? 'text-white' :
-                                slot.display_status === "booked" ? 'text-red-600' :
-                                  slot.display_status === "expired" ? 'text-yellow-600' :
-                                    slot.status === "disabled" ? 'text-gray-600' :
-                                      slot.status === "pending" ? 'text-orange-400' :
-                                        'text-gray-800'
+                              slot.display_status === "booked" ? 'text-red-600' :
+                                slot.display_status === "expired" ? 'text-yellow-600' :
+                                  slot.status === "disabled" ? 'text-gray-600' :
+                                    slot.status === "pending" ? 'text-orange-400' :
+                                      'text-gray-800'
                               }`}>
                               {(() => {
                                 const startHour = parseInt(slot.start_time.split(':')[0]);
@@ -1375,11 +1375,11 @@ export default function BookFutsal() {
                               })()}
                             </div>
                             <div className={`text-sm ${bookingState.selectedSlotIds.includes(slot.slot_id) ? 'text-white' :
-                                slot.display_status === "booked" ? 'text-red-500' :
-                                  slot.display_status === "expired" ? 'text-yellow-500' :
-                                    slot.status === "disabled" ? 'text-gray-500' :
-                                      slot.status === "pending" ? 'text-orange-600' :
-                                        'text-gray-600'
+                              slot.display_status === "booked" ? 'text-red-500' :
+                                slot.display_status === "expired" ? 'text-yellow-500' :
+                                  slot.status === "disabled" ? 'text-gray-500' :
+                                    slot.status === "pending" ? 'text-orange-600' :
+                                      'text-gray-600'
                               }`}>
                               {bookingState.selectedSlotIds.includes(slot.slot_id)
                                 ? "✅ Selected"
@@ -1557,8 +1557,8 @@ export default function BookFutsal() {
                           </div>
                         </div>
 
-                         {/* Action Buttons */}
-                         <div className="flex flex-col sm:flex-row gap-4 pt-2">
+                        {/* Action Buttons */}
+                        <div className="flex flex-col sm:flex-row gap-4 pt-2">
                           <button
                             type="button"
                             onClick={() => {
@@ -2120,6 +2120,26 @@ export default function BookFutsal() {
                           <div className="flex justify-between items-start">
                             <span className="text-gray-600 font-medium">Playing Date:</span>
                             <span className="text-gray-800 font-semibold text-right ml-2">{formatDate(bookingState.booking.booking_date)}</span>
+                          </div>
+                          <div className="flex justify-between items-start">
+                            <span className="text-gray-600 font-medium">Booking Type:</span>
+                            <span className="text-gray-800 font-semibold text-right ml-2">
+                              {(() => {
+                                const type = booking.booking_type || 'normal';
+                                switch (type) {
+                                  case 'normal':
+                                    return 'Normal';
+                                  case 'date':
+                                    return 'Date-Specific';
+                                  case 'recurring':
+                                    return 'Recurring';
+                                  case 'time_based':
+                                    return 'Time-Based';
+                                  default:
+                                    return 'Normal';
+                                }
+                              })()}
+                            </span>
                           </div>
                           <div className="flex justify-between items-start">
                             <span className="text-gray-600 font-medium">Booked On:</span>

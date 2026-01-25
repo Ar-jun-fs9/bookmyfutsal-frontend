@@ -354,6 +354,16 @@ export default function BookingTracker() {
               {trackedBooking.team_name && <p><strong>Team:</strong> {trackedBooking.team_name}</p>}
               <p><strong>Amount Paid:</strong> Rs. {trackedBooking.amount_paid}</p>
               {totalAmount !== null && <p><strong>Total Amount:</strong> Rs. {totalAmount}</p>}
+              <p><strong>Booking Type:</strong> {(() => {
+                                  const type = trackedBooking.booking_type || 'normal';
+                                  switch (type) {
+                                    case 'normal': return 'Normal';
+                                    case 'date': return 'Date-Specific';
+                                    case 'recurring': return 'Recurring';
+                                    case 'time_based': return 'Time-Based';
+                                    default: return 'Normal';
+                                  }
+                                })()}</p>
               <p><strong>Tracking Code:</strong> {trackedBooking.tracking_code}</p>
               <p><strong>Booked By:</strong> {trackedBooking.guest_name}</p>
               <p><strong>Phone:</strong> {trackedBooking.guest_phone}</p>
