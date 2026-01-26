@@ -170,7 +170,7 @@ export default function SuperAdminWallet() {
       <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
         <div className="px-4 py-6 sm:px-0">
           {/* Futsal Selection */}
-          <div className=" rounded-lg p-6 mb-6 shadow-lg">
+          <div className=" rounded-lg p-2 mb-6 shadow-lg md:p-6">
             <h2 className="text-xl font-semibold mb-4 bg-linear-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">
               Select Futsal
             </h2>
@@ -191,7 +191,7 @@ export default function SuperAdminWallet() {
           </div>
 
           {/* Date Filter */}
-          <div className="rounded-lg p-6 mb-6 shadow-lg">
+          <div className="rounded-lg p-2 mb-6 shadow-lg md:p-6">
             <h2 className="text-xl font-semibold mb-4 bg-linear-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">
               Filter by Date Range
             </h2>

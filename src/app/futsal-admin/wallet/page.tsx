@@ -141,7 +141,7 @@ export default function FutsalAdminWallet() {
       <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
         <div className="px-4 py-6 sm:px-0">
           {/* Date Filter */}
-          <div className=" rounded-lg p-6 mb-6 shadow-lg">
+          <div className=" rounded-lg p-2 mb-6 shadow-lg md:p-6">
             <h2 className="text-xl font-semibold mb-4 bg-linear-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">
               Filter by Date Range
             </h2>
@@ -228,7 +228,7 @@ export default function FutsalAdminWallet() {
 
           {/* Bookings Table */}
           <div className=" rounded-lg shadow-lg overflow-hidden">
-            <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+            <div className="px-2 py-4 border-b border-gray-200 flex justify-between items-center md:px-6">
               <h2 className="text-xl font-semibold bg-linear-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">
                 Booking Details
               </h2>
@@ -237,14 +237,14 @@ export default function FutsalAdminWallet() {
                   onClick={() => setShowRecords(!showRecords)}
                   className="bg-green-100 hover:bg-green-200 text-green-700 px-3 py-1 rounded-md text-sm font-medium transition-colors duration-200"
                 >
-                  {showRecords ? 'Hide' : 'Show'} Records
+                  {showRecords ? 'Hide' : 'Show Records'}
                 </button>
                 {showRecords && (
                   <button
                     onClick={() => setShowBookingId(!showBookingId)}
                     className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-1 rounded-md text-sm font-medium transition-colors duration-200"
                   >
-                    {showBookingId ? 'Hide' : 'Show'} Booking ID
+                    {showBookingId ? 'Hide' : 'Show ID'} 
                   </button>
                 )}
               </div>
