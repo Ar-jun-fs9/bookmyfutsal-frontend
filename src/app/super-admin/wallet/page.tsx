@@ -281,8 +281,8 @@ export default function SuperAdminWallet() {
 
           {/* Bookings Table */}
           <div className="rounded-lg shadow-lg overflow-hidden">
-            <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
-              <h2 className="text-xl font-semibold bg-linear-to-r from-green-600 to-blue-600 bg-clip-text text-transparent pl-3.5 md:pl-0">
+            <div className="px-5.5 py-4 border-b border-gray-200 flex justify-between items-center">
+              <h2 className="text-xl font-semibold bg-linear-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">
                 Booking Details
               </h2>
               <div className="flex space-x-2">
@@ -290,14 +290,14 @@ export default function SuperAdminWallet() {
                   onClick={() => setShowRecords(!showRecords)}
                   className="bg-green-100 hover:bg-green-200 text-green-700 px-3 py-1 rounded-md text-sm font-medium transition-colors duration-200"
                 >
-                  {showRecords ? 'Hide' : 'Show'} Records
+                  {showRecords ? 'Hide' : 'Show Records'} 
                 </button>
                 {showRecords && (
                   <button
                     onClick={() => setShowBookingId(!showBookingId)}
                     className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-1 rounded-md text-sm font-medium transition-colors duration-200"
                   >
-                    {showBookingId ? 'Hide' : 'Show'} Booking ID
+                    {showBookingId ? 'Hide' : 'Show ID'} 
                   </button>
                 )}
               </div>
