@@ -107,19 +107,19 @@ export default function VenueGrid() {
 
       {/* Filter Controls */}
       <div className="mb-6 flex justify-between items-center">
-        <div className="flex items-center space-x-4">
+        <div className="flex items-center space-x-2 md:space-x-4">
           <button
             onClick={() => updateFilter('showFilters', !filterState.showFilters)}
             className="bg-linear-to-r from-green-500 to-green-600 text-white font-semibold py-2 px-4 rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 text-sm"
           >
-            {filterState.showFilters ? '🔽 Hide Filters' : '🔍 Show Filters'}
+            {filterState.showFilters ? '🔽 Hide' : '🔍 Show Filters'}
           </button>
           {filterState.showFilters && (
             <button
               onClick={clearFilters}
               className="bg-linear-to-r from-red-500 to-red-600 text-white font-semibold py-2 px-4 rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 text-sm"
             >
-              🗑️ Clear Filters
+              🗑️ Clear
             </button>
           )}
         </div>

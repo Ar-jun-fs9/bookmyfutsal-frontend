@@ -53,6 +53,8 @@ interface Futsal {
   total_ratings?: number;
   game_format?: string;
   facilities?: string[];
+  created_at: string;
+  special_prices?: any[];
 }
 
 interface Booking {
@@ -552,7 +554,14 @@ export default function UserDashboard() {
       const matchesName = !filterState.selectedName || futsal.name === filterState.selectedName;
       const matchesCity = !filterState.selectedCity || futsal.city === filterState.selectedCity;
       const matchesLocation = !filterState.selectedLocation || futsal.location === filterState.selectedLocation;
-      return matchesSearch && matchesName && matchesCity && matchesLocation;
+      const thirtyDaysAgo = new Date();
+      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+      const matchesAge = filterState.selectedAge === 'all' ||
+        (filterState.selectedAge === 'new' && new Date(futsal.created_at) > thirtyDaysAgo) ||
+        (filterState.selectedAge === 'old' && new Date(futsal.created_at) <= thirtyDaysAgo);
+      const matchesOffer = filterState.selectedOffer === 'all' ||
+        (filterState.selectedOffer === 'offers' && futsal.special_prices && futsal.special_prices.length > 0);
+      return matchesSearch && matchesName && matchesCity && matchesLocation && matchesAge && matchesOffer;
     })
     .sort((a: Futsal, b: Futsal) => {
       if (filterState.sortByRating === 'highest') {
@@ -682,29 +691,63 @@ export default function UserDashboard() {
                       Choose from our premium futsal venues. Book now and experience the thrill of the game.
                     </p>
                   </div>
-                  {/* Filter Toggle Button */}
-                  <div className="mb-6 text-left">
-                    <button
-                      onClick={() => dispatch({ type: 'SET_SHOW_FILTERS', payload: !filterState.showFilters })}
-                      className="bg-linear-to-r from-green-500 to-green-600 text-white font-semibold py-2 px-4 rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 text-sm"
-                    >
-                      {filterState.showFilters ? '🔽 Hide Filters' : '🔍 Show Filters'}
-                    </button>
-                    {filterState.showFilters && (
-                      <button
-                        onClick={() => dispatch({ type: 'CLEAR_FILTERS' })}
-                        className="ml-4 bg-linear-to-r from-red-500 to-red-600 text-white font-semibold py-2 px-4 rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 text-sm"
-                      >
-                        🗑️ Clear Filters
-                      </button>
-                    )}
-                  </div>
 
+                  {/* Filter Controls */}
+                  <div className="mb-6 flex justify-between items-center">
+                    <div className="flex items-center space-x-2 md:space-x-4">
+                      <button
+                        onClick={() => dispatch({ type: 'SET_SHOW_FILTERS', payload: !filterState.showFilters })}
+                        className="bg-linear-to-r from-green-500 to-green-600 text-white font-semibold py-2 px-4 rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 text-sm"
+                      >
+                        {filterState.showFilters ? '🔽 Hide' : '🔍 Show Filters'}
+                      </button>
+                      {filterState.showFilters && (
+                        <button
+                          onClick={() => dispatch({ type: 'CLEAR_FILTERS' })}
+                          className="bg-linear-to-r from-red-500 to-red-600 text-white font-semibold py-2 px-4 rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 text-sm"
+                        >
+                          🗑️ Clear
+                        </button>
+                      )}
+                    </div>
+                    <div className="flex space-x-2">
+                      <button
+                        onClick={() => dispatch({ type: 'SET_SELECTED_AGE', payload: 'all' })}
+                        className={`py-2 px-4 rounded-lg font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 text-sm ${
+                          filterState.selectedAge === 'all'
+                            ? 'bg-linear-to-r from-green-500 to-green-600 text-white'
+                            : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                        }`}
+                      >
+                        All
+                      </button>
+                      <button
+                        onClick={() => dispatch({ type: 'SET_SELECTED_AGE', payload: 'old' })}
+                        className={`py-2 px-4 rounded-lg font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 text-sm ${
+                          filterState.selectedAge === 'old'
+                            ? 'bg-linear-to-r from-green-500 to-green-600 text-white'
+                            : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                        }`}
+                      >
+                        Old
+                      </button>
+                      <button
+                        onClick={() => dispatch({ type: 'SET_SELECTED_AGE', payload: 'new' })}
+                        className={`py-2 px-4 rounded-lg font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 text-sm ${
+                          filterState.selectedAge === 'new'
+                            ? 'bg-linear-to-r from-green-500 to-green-600 text-white'
+                            : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                        }`}
+                      >
+                        New
+                      </button>
+                    </div>
+                  </div>
                   {/* Filters */}
                   {filterState.showFilters && (
                     <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-6 ">
                       <h3 className="text-xl font-bold mb-6 bg-linear-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">Filter & Search Futsals</h3>
-                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-6">
                         {/* Search Bar */}
                         <div className="lg:col-span-2">
                           <label className="block text-sm font-semibold text-gray-800 mb-2">🔍 Search</label>
@@ -759,6 +802,19 @@ export default function UserDashboard() {
                             {uniqueLocations.map((location: string) => (
                               <option key={location} value={location}>{location}</option>
                             ))}
+                          </select>
+                        </div>
+
+                        {/* Offers Filter */}
+                        <div>
+                          <label className="block text-sm font-semibold text-gray-800 mb-2">🎁 Offers</label>
+                          <select
+                            value={filterState.selectedOffer}
+                            onChange={(e) => dispatch({ type: 'SET_SELECTED_OFFER', payload: e.target.value as 'all' | 'offers' })}
+                            className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none focus:ring-2 focus:ring-green-400/50 focus:border-green-400/50 transition-all text-sm"
+                          >
+                            <option value="all">All</option>
+                            <option value="offers">With Offers</option>
                           </select>
                         </div>
                       </div>

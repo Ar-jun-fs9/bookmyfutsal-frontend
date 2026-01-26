@@ -7,6 +7,8 @@ export interface FilterState {
   sortByPrice: 'none' | 'low-to-high' | 'high-to-low';
   showFilters: boolean;
   bookingFilter: 'all' | 'past' | 'today' | 'future' | 'cancelled';
+  selectedAge: 'all' | 'old' | 'new';
+  selectedOffer: 'all' | 'offers';
 }
 
 export type FilterAction =
@@ -18,6 +20,8 @@ export type FilterAction =
   | { type: 'SET_SORT_BY_PRICE'; payload: 'none' | 'low-to-high' | 'high-to-low' }
   | { type: 'SET_SHOW_FILTERS'; payload: boolean }
   | { type: 'SET_BOOKING_FILTER'; payload: 'all' | 'past' | 'today' | 'future' | 'cancelled' }
+  | { type: 'SET_SELECTED_AGE'; payload: 'all' | 'old' | 'new' }
+  | { type: 'SET_SELECTED_OFFER'; payload: 'all' | 'offers' }
   | { type: 'CLEAR_FILTERS' }
   | { type: 'RESET' };
 
@@ -30,6 +34,8 @@ export const initialFilterState: FilterState = {
   sortByPrice: 'none',
   showFilters: false,
   bookingFilter: 'all',
+  selectedAge: 'all',
+  selectedOffer: 'all',
 };
 
 export const filterReducer = (state: FilterState, action: FilterAction): FilterState => {
@@ -50,6 +56,10 @@ export const filterReducer = (state: FilterState, action: FilterAction): FilterS
       return { ...state, showFilters: action.payload };
     case 'SET_BOOKING_FILTER':
       return { ...state, bookingFilter: action.payload };
+    case 'SET_SELECTED_AGE':
+      return { ...state, selectedAge: action.payload };
+    case 'SET_SELECTED_OFFER':
+      return { ...state, selectedOffer: action.payload };
     case 'CLEAR_FILTERS':
       return {
         ...state,
@@ -59,6 +69,8 @@ export const filterReducer = (state: FilterState, action: FilterAction): FilterS
         selectedLocation: '',
         sortByRating: 'none',
         sortByPrice: 'none',
+        selectedAge: 'all',
+        selectedOffer: 'all',
       };
     case 'RESET':
       return initialFilterState;
