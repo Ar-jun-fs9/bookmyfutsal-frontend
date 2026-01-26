@@ -321,6 +321,7 @@ function CreateSpecialPriceForm({ futsals, onSuccess, setNotification }: any) {
     recurring_days: [] as string[],
     start_time: '',
     end_time: '',
+    special_date: '',
     special_price: '',
     message: ''
   });
@@ -384,7 +385,7 @@ function CreateSpecialPriceForm({ futsals, onSuccess, setNotification }: any) {
       type: formData.type,
       ...(formData.type === 'date' ? { special_dates: formData.special_dates } :
           formData.type === 'recurring' ? { recurring_days: formData.recurring_days } :
-          { start_time: formData.start_time, end_time: formData.end_time }),
+          { start_time: formData.start_time, end_time: formData.end_time, special_date: formData.special_date || undefined }),
       special_price: parseFloat(formData.special_price),
       message: formData.message
     });
@@ -404,7 +405,8 @@ function CreateSpecialPriceForm({ futsals, onSuccess, setNotification }: any) {
       special_dates: [],
       recurring_days: [],
       start_time: '',
-      end_time: ''
+      end_time: '',
+      special_date: ''
     });
   };
 
@@ -682,6 +684,26 @@ function CreateSpecialPriceForm({ futsals, onSuccess, setNotification }: any) {
           ) : (
             <p className="text-sm text-gray-500">Please select a futsal first to see time options.</p>
           )}
+
+          <div className="relative">
+            <label htmlFor="specialDate" className="block text-sm font-semibold text-gray-700 mb-2">
+              📅 Choose Date (Optional)
+            </label>
+            <div className="relative">
+              <input
+                id="specialDate"
+                type="date"
+                value={formData.special_date}
+                onChange={(e) => setFormData({ ...formData, special_date: e.target.value })}
+                className="w-full px-4 py-3 pl-12 bg-white border border-gray-200 rounded-lg text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-400/50 focus:border-green-400/50 transition-all duration-300 font-medium text-sm"
+              />
+              <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-green-500">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+              </div>
+            </div>
+          </div>
         </div>
       )}
 
