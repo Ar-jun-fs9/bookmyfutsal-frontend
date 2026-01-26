@@ -582,7 +582,7 @@ export default function UserDashboard() {
   const todayCount = visibleBookings.filter(b => categorizeBooking(b) === 'today').length;
   const futureCount = visibleBookings.filter(b => categorizeBooking(b) === 'future').length;
   const cancelledCount = visibleBookings.filter(b => b.cancelled_by).length;
-  
+
 
 
   return (
@@ -674,8 +674,14 @@ export default function UserDashboard() {
 
               {showBooking ? (
                 <div className="space-y-6">
-                  <h4 className="text-2xl font-semibold text-gray-900 text-center">Available Futsals</h4>
-
+                  <div className="text-center mb-7 -up">
+                    <h2 className="text-4xl md:text-5xl font-bold bg-linear-to-r from-green-600 to-blue-600 bg-clip-text text-transparent mb-4">
+                      Available Futsals
+                    </h2>
+                    <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+                      Choose from our premium futsal venues. Book now and experience the thrill of the game.
+                    </p>
+                  </div>
                   {/* Filter Toggle Button */}
                   <div className="mb-6 text-left">
                     <button
@@ -1091,7 +1097,7 @@ export default function UserDashboard() {
                                 </div>
                                 <p><strong>Location:</strong> {booking.location}, {booking.city}</p>
                                 <p><strong>Playing Date:</strong> {new Date(booking.booking_date).toLocaleDateString('en-CA')}</p>
-                                <p><strong>Booked On:</strong> {(() => { const parts = booking.created_at.includes('T') ? booking.created_at.split('T') : booking.created_at.split(' '); const timeStr = parts[1].substring(0,5); const [hours, minutes] = timeStr.split(':').map(Number); const period = hours >= 12 ? 'PM' : 'AM'; const displayHours = hours === 0 ? 12 : hours > 12 ? hours - 12 : hours; const formattedTime = `${displayHours}:${minutes.toString().padStart(2, '0')} ${period}`; return parts[0] + ' ' + formattedTime; })()}</p>
+                                <p><strong>Booked On:</strong> {(() => { const parts = booking.created_at.includes('T') ? booking.created_at.split('T') : booking.created_at.split(' '); const timeStr = parts[1].substring(0, 5); const [hours, minutes] = timeStr.split(':').map(Number); const period = hours >= 12 ? 'PM' : 'AM'; const displayHours = hours === 0 ? 12 : hours > 12 ? hours - 12 : hours; const formattedTime = `${displayHours}:${minutes.toString().padStart(2, '0')} ${period}`; return parts[0] + ' ' + formattedTime; })()}</p>
                                 <p><strong>Booking Type:</strong> {(() => {
                                   const type = booking.booking_type || 'normal';
                                   switch (type) {
@@ -1116,7 +1122,7 @@ export default function UserDashboard() {
                                 {booking.team_name && <p><strong>Team:</strong> {booking.team_name}</p>}
                                 <p><strong>Paid Amount:</strong> Rs. {booking.amount_paid}</p>
                                 <p><strong>Total Amount:</strong> Rs. {booking.total_amount}</p>
-                                {booking.cancelled_by && booking.cancelled_at && <p><strong>Cancelled on:</strong> {(() => { const parts = booking.cancelled_at.includes('T') ? booking.cancelled_at.split('T') : booking.cancelled_at.split(' '); const timeStr = parts[1].substring(0,5); const [hours, minutes] = timeStr.split(':').map(Number); const period = hours >= 12 ? 'PM' : 'AM'; const displayHours = hours === 0 ? 12 : hours > 12 ? hours - 12 : hours; const formattedTime = `${displayHours}:${minutes.toString().padStart(2, '0')} ${period}`; return parts[0] + ' ' + formattedTime; })()}</p>}
+                                {booking.cancelled_by && booking.cancelled_at && <p><strong>Cancelled on:</strong> {(() => { const parts = booking.cancelled_at.includes('T') ? booking.cancelled_at.split('T') : booking.cancelled_at.split(' '); const timeStr = parts[1].substring(0, 5); const [hours, minutes] = timeStr.split(':').map(Number); const period = hours >= 12 ? 'PM' : 'AM'; const displayHours = hours === 0 ? 12 : hours > 12 ? hours - 12 : hours; const formattedTime = `${displayHours}:${minutes.toString().padStart(2, '0')} ${period}`; return parts[0] + ' ' + formattedTime; })()}</p>}
                               </div>
                               <div className="flex flex-col items-end space-y-2">
                                 <p className="text-lg font-semibold">Rs. {booking.amount_paid}</p>
@@ -3217,8 +3223,8 @@ function BookingModal({ futsal, user, onClose, onSuccess, setSuccessModal, setCo
                           </div>
                         </div>
 
-                         {/* Action Buttons */}
-                         <div className="flex flex-col sm:flex-row gap-4 pt-2">
+                        {/* Action Buttons */}
+                        <div className="flex flex-col sm:flex-row gap-4 pt-2">
                           <button
                             type="button"
                             onClick={async () => {
