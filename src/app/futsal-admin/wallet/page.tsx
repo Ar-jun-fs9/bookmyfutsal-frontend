@@ -31,6 +31,7 @@ export default function FutsalAdminWallet() {
   const [filteredStartDate, setFilteredStartDate] = useState('');
   const [filteredEndDate, setFilteredEndDate] = useState('');
   const [showBookingId, setShowBookingId] = useState(false);
+  const [showRecords, setShowRecords] = useState(false);
   const [admin, setAdmin] = useState<any>(null);
 
   useEffect(() => {
@@ -231,118 +232,130 @@ export default function FutsalAdminWallet() {
               <h2 className="text-xl font-semibold bg-linear-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">
                 Booking Details
               </h2>
-              <button
-                onClick={() => setShowBookingId(!showBookingId)}
-                className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-1 rounded-md text-sm font-medium transition-colors duration-200"
-              >
-                {showBookingId ? 'Hide' : 'Show'} Booking ID
-              </button>
+              <div className="flex space-x-2">
+                <button
+                  onClick={() => setShowRecords(!showRecords)}
+                  className="bg-green-100 hover:bg-green-200 text-green-700 px-3 py-1 rounded-md text-sm font-medium transition-colors duration-200"
+                >
+                  {showRecords ? 'Hide' : 'Show'} Records
+                </button>
+                {showRecords && (
+                  <button
+                    onClick={() => setShowBookingId(!showBookingId)}
+                    className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-1 rounded-md text-sm font-medium transition-colors duration-200"
+                  >
+                    {showBookingId ? 'Hide' : 'Show'} Booking ID
+                  </button>
+                )}
+              </div>
             </div>
 
-            {loading ? (
-              <div className="p-6">
-                <div className="animate-pulse">
-                  <div className="h-4 bg-gray-200 rounded w-full mb-4"></div>
-                  <div className="h-4 bg-gray-200 rounded w-5/6 mb-4"></div>
-                  <div className="h-4 bg-gray-200 rounded w-4/6 mb-4"></div>
-                  <div className="h-4 bg-gray-200 rounded w-full mb-4"></div>
-                  <div className="h-4 bg-gray-200 rounded w-3/6"></div>
+            {showRecords && (
+              loading ? (
+                <div className="p-6">
+                  <div className="animate-pulse">
+                    <div className="h-4 bg-gray-200 rounded w-full mb-4"></div>
+                    <div className="h-4 bg-gray-200 rounded w-5/6 mb-4"></div>
+                    <div className="h-4 bg-gray-200 rounded w-4/6 mb-4"></div>
+                    <div className="h-4 bg-gray-200 rounded w-full mb-4"></div>
+                    <div className="h-4 bg-gray-200 rounded w-3/6"></div>
+                  </div>
                 </div>
-              </div>
-            ) : (
-              <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
-                  <tr>
-                    {showBookingId && (
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Booking ID
-                      </th>
-                    )}
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Booking Date
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Total Price
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Advance Paid
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Special Price
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      5% Commission
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Admin Receivable
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {walletData?.bookings.map((booking) => {
-                    const totalAmount = parseFloat(booking.total_amount as any);
-                    const commission = totalAmount * 0.05;
-                    const adminReceivable = totalAmount - commission;
-
-                    return (
-                      <tr key={booking.booking_id} className={booking.cancelled_by ? 'bg-red-50' : ''}>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="min-w-full divide-y divide-gray-200">
+                    <thead className="bg-gray-50">
+                      <tr>
                         {showBookingId && (
-                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                            {booking.booking_id}
-                          </td>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Booking ID
+                          </th>
                         )}
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          {formatDate(booking.booking_date)}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          {formatCurrency(totalAmount)}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          {formatCurrency(parseFloat(booking.amount_paid as any))}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          {booking.booking_type !== 'normal' ? 'Yes' : 'No'}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-red-600">
-                          {formatCurrency(commission)}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-green-600">
-                          {formatCurrency(adminReceivable)}
-                        </td>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Booking Date
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Total Price
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Advance Paid
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Special Price
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          5% Commission
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Admin Receivable
+                        </th>
                       </tr>
-                    );
-                  })}
-                </tbody>
-                {walletData && walletData.bookings.length > 0 && (
-                  <tfoot className="bg-gray-50">
-                    <tr>
-                      <td colSpan={showBookingId ? 2 : 1} className="px-6 py-4 text-sm font-medium text-gray-900">
-                        Grand Total
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900">
-                        {formatCurrency(walletData.bookings.reduce((sum, b) => sum + parseFloat(b.total_amount as any), 0))}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900">
-                        {formatCurrency(walletData.totalAdvance)}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        -
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-red-600">
-                        {formatCurrency(walletData.totalCommission)}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-green-600">
-                        {formatCurrency(walletData.totalReceivable)}
-                      </td>
-                    </tr>
-                  </tfoot>
-                )}
-              </table>
-              </div>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-gray-200">
+                      {walletData?.bookings.map((booking) => {
+                        const totalAmount = parseFloat(booking.total_amount as any);
+                        const commission = totalAmount * 0.05;
+                        const adminReceivable = totalAmount - commission;
+
+                        return (
+                          <tr key={booking.booking_id} className={booking.cancelled_by ? 'bg-red-50' : ''}>
+                            {showBookingId && (
+                              <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                {booking.booking_id}
+                              </td>
+                            )}
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                              {formatDate(booking.booking_date)}
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                              {formatCurrency(totalAmount)}
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                              {formatCurrency(parseFloat(booking.amount_paid as any))}
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                              {booking.booking_type !== 'normal' ? 'Yes' : 'No'}
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-red-600">
+                              {formatCurrency(commission)}
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-green-600">
+                              {formatCurrency(adminReceivable)}
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                    {walletData && walletData.bookings.length > 0 && (
+                      <tfoot className="bg-gray-50">
+                        <tr>
+                          <td colSpan={showBookingId ? 2 : 1} className="px-6 py-4 text-sm font-medium text-gray-900">
+                            Grand Total
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900">
+                            {formatCurrency(walletData.bookings.reduce((sum, b) => sum + parseFloat(b.total_amount as any), 0))}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900">
+                            {formatCurrency(walletData.totalAdvance)}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            -
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-red-600">
+                            {formatCurrency(walletData.totalCommission)}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-green-600">
+                            {formatCurrency(walletData.totalReceivable)}
+                          </td>
+                        </tr>
+                      </tfoot>
+                    )}
+                  </table>
+                </div>
+              )
             )}
 
-            {walletData && walletData.bookings.length === 0 && (
+            {showRecords && walletData && walletData.bookings.length === 0 && (
               <div className="text-center py-12">
                 <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
