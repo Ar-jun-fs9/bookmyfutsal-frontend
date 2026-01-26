@@ -2371,6 +2371,7 @@ function BookingModal({ futsal, user, onClose, onSuccess, setSuccessModal, setCo
   const [loading, setLoading] = useState(false);
   const [currentPrice, setCurrentPrice] = useState<{ normalPrice: number, specialPrice?: { price: number, message?: string }, effectivePrice: number } | null>(null);
   const [specialPrices, setSpecialPrices] = useState<any[]>([]);
+  const [firstSelectedSpecialPrice, setFirstSelectedSpecialPrice] = useState<any>(null);
   const phone = user?.phone || '';
   const [acceptTerms, setAcceptTerms] = useState(false);
   const [showTermsModal, setShowTermsModal] = useState(false);
@@ -2408,6 +2409,7 @@ function BookingModal({ futsal, user, onClose, onSuccess, setSuccessModal, setCo
       setNumberOfPlayers(data.numberOfPlayers || '5');
       setTeamName(data.teamName || '');
       setEsewaPhone(data.esewaPhone || user?.phone || '');
+      setFirstSelectedSpecialPrice(data.firstSelectedSpecialPrice || null);
     }
   }, []);
 
@@ -2421,9 +2423,10 @@ function BookingModal({ futsal, user, onClose, onSuccess, setSuccessModal, setCo
       numberOfPlayers,
       teamName,
       esewaPhone,
+      firstSelectedSpecialPrice,
     };
     sessionStorage.setItem('userBookingProgress', JSON.stringify(progress));
-  }, [step, selectedDate, selectedShift, selectedSlotIds, numberOfPlayers, teamName, esewaPhone]);
+  }, [step, selectedDate, selectedShift, selectedSlotIds, numberOfPlayers, teamName, esewaPhone, firstSelectedSpecialPrice]);
 
   // Clear progress on unmount (modal close)
   useEffect(() => {
@@ -2486,10 +2489,6 @@ function BookingModal({ futsal, user, onClose, onSuccess, setSuccessModal, setCo
               // Date-specific or recurring special price: show only in date step (step 1)
               const message = `Normal: Rs. ${priceData.normalPrice} → ${priceData.specialPrice.message || 'Special Price'}: Rs. ${priceData.specialPrice.price}`;
               setPriceNotification({ isOpen: true, message });
-            } else if (priceData.timeBasedPrice && startTime && step === 3) {
-              // Time-based special price: show only in time slot step (step 3)
-              const message = `Normal: Rs. ${priceData.normalPrice} → ${priceData.timeBasedPrice.message || 'Time-Based Price'}: Rs. ${priceData.timeBasedPrice.price}`;
-              setPriceNotification({ isOpen: true, message });
             } else if (step === 2 || step === 4) {
               // Close modal in other steps to prevent it from staying open
               setPriceNotification(null);
@@ -2543,8 +2542,32 @@ function BookingModal({ futsal, user, onClose, onSuccess, setSuccessModal, setCo
           setSelectedSlotIds(prev => [...prev, slot.slot_id]);
           // Update local to pending
           setAvailableSlots(prev => prev.map(s => s.slot_id === slot.slot_id ? { ...s, display_status: 'pending' } : s));
-          // Fetch price and show notification if special
-          fetchPriceForSlot(slot);
+
+          // Handle special price alert
+          try {
+            const url = `${process.env.NEXT_PUBLIC_API_URL}/api/special-prices/price/${futsal.futsal_id}/${selectedDate}?startTime=${slot.start_time}`;
+            const response = await fetch(url);
+            if (response.ok) {
+              const priceData = await response.json();
+              if (priceData.timeBasedPrice) {
+                if (selectedSlotIds.length === 0) {
+                  // First selection
+                  setFirstSelectedSpecialPrice(priceData.timeBasedPrice);
+                  const message = `Normal Price: Rs. ${priceData.normalPrice} → Time-Based Price: Rs. ${priceData.timeBasedPrice.price}`;
+                  setPriceNotification({ isOpen: true, message });
+                } else {
+                  // Additional selection
+                  if (firstSelectedSpecialPrice && priceData.timeBasedPrice.price !== firstSelectedSpecialPrice.price) {
+                    // Different special price
+                    const message = `Normal Price: Rs. ${priceData.normalPrice} → ${priceData.timeBasedPrice.message || 'Time-Based Price'}: Rs. ${priceData.timeBasedPrice.price}`;
+                    setPriceNotification({ isOpen: true, message });
+                  }
+                }
+              }
+            }
+          } catch (error) {
+            console.error('Error fetching price for slot:', error);
+          }
         } else {
           // Reservation failed
           if (reserveData.status === 'pending') {
@@ -2594,6 +2617,7 @@ function BookingModal({ futsal, user, onClose, onSuccess, setSuccessModal, setCo
         await Promise.all(selectedSlotIds.map(slotId => releaseSlotReservation(slotId)));
         setSelectedSlotIds([]);
       }
+      setFirstSelectedSpecialPrice(null);
       setStep(2);
     }
   };
@@ -2605,6 +2629,7 @@ function BookingModal({ futsal, user, onClose, onSuccess, setSuccessModal, setCo
         await Promise.all(selectedSlotIds.map(slotId => releaseSlotReservation(slotId)));
         setSelectedSlotIds([]);
       }
+      setFirstSelectedSpecialPrice(null);
       try {
         const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/time-slots/futsal/${futsal.futsal_id}/date/${selectedDate}/shift/${selectedShift}`);
         if (response.ok) {
