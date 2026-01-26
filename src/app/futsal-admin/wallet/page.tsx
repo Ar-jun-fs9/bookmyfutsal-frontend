@@ -138,8 +138,8 @@ export default function FutsalAdminWallet() {
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto sm:px-6 py-6 lg:px-8">
-        <div className="px-4 py-6 sm:px-0">
+      <main className="max-w-7xl mx-auto sm:px-6 py-4 lg:px-8">
+        <div className="px-4 sm:px-0">
           {/* Date Filter */}
           <div className=" rounded-lg p-2 mb-6 shadow-lg md:p-6">
             <h2 className="text-xl font-semibold mb-4 bg-linear-to-r from-green-600 to-blue-600 bg-clip-text text-transparent text-center">

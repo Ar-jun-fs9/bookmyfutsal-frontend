@@ -167,8 +167,8 @@ export default function SuperAdminWallet() {
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto">
-        <div className="px-4 sm:px-0 py-6">
+      <main className="max-w-7xl mx-auto sm:px-6 py-2 lg:px-8">
+        <div className="px-4 sm:px-0 py-2">
           {/* Futsal Selection */}
           <div className=" rounded-lg p-2 mb-6 shadow-lg md:p-6">
             <h2 className="text-xl font-semibold mb-4 bg-linear-to-r from-green-600 to-blue-600 bg-clip-text text-transparent text-center">
