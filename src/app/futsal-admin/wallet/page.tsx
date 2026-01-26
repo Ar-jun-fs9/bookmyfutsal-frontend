@@ -193,7 +193,7 @@ export default function FutsalAdminWallet() {
 
           {/* Summary Cards */}
           {loading ? (
-            <div className="grid grid-cols-1 md:grid-cols-5 gap-6 mb-6">
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-4 md:gap-6 mb-6">
               {[1, 2, 3, 4, 5].map((i) => (
                 <div key={i} className="bg-white rounded-lg p-6 shadow-lg border-l-4 border-gray-300 animate-pulse">
                   <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
@@ -202,7 +202,7 @@ export default function FutsalAdminWallet() {
               ))}
             </div>
           ) : walletData && (
-            <div className="grid grid-cols-1 md:grid-cols-5 gap-6 mb-6">
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-4 md:gap-6 mb-6">
               <div className="bg-white rounded-lg p-6 shadow-lg border-l-4 border-green-500">
                 <h3 className="text-sm font-medium text-gray-500">Total Income</h3>
                 <p className="text-2xl font-bold text-green-600">{formatCurrency(walletData.totalIncome)}</p>
