@@ -129,7 +129,7 @@ export default function VenueGrid() {
             className={`py-2 px-4 rounded-lg font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 text-sm ${
               filterState.selectedAge === 'all'
                 ? 'bg-linear-to-r from-green-500 to-green-600 text-white'
-                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                : 'bg-gray-200 text-gray-700 hover:bg-gray-300 hover:shadow-xl hover:scale-105'
             }`}
           >
             All
@@ -139,7 +139,7 @@ export default function VenueGrid() {
             className={`py-2 px-4 rounded-lg font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 text-sm ${
               filterState.selectedAge === 'old'
                 ? 'bg-linear-to-r from-green-500 to-green-600 text-white'
-                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                : 'bg-gray-200 text-gray-700 hover:bg-gray-300 hover:shadow-xl hover:scale-105'
             }`}
           >
             Old
@@ -149,7 +149,7 @@ export default function VenueGrid() {
             className={`py-2 px-4 rounded-lg font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 text-sm ${
               filterState.selectedAge === 'new'
                 ? 'bg-linear-to-r from-green-500 to-green-600 text-white'
-                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                : 'bg-gray-200 text-gray-700 hover:bg-gray-300 hover:shadow-xl hover:scale-105'
             }`}
           >
             New
