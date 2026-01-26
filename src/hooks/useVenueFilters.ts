@@ -20,6 +20,8 @@ interface Futsal {
   total_ratings?: number;
   game_format?: string;
   facilities?: string[];
+  created_at: string;
+  special_prices?: any[];
 }
 
 interface FilterState {
@@ -30,6 +32,8 @@ interface FilterState {
   sortByRating: 'none' | 'highest' | 'lowest';
   sortByPrice: 'none' | 'low-to-high' | 'high-to-low';
   showFilters: boolean;
+  selectedAge: 'all' | 'old' | 'new';
+  selectedOffer: 'all' | 'offers';
 }
 
 const initialFilterState: FilterState = {
@@ -40,6 +44,8 @@ const initialFilterState: FilterState = {
   sortByRating: 'none',
   sortByPrice: 'none',
   showFilters: false,
+  selectedAge: 'all',
+  selectedOffer: 'all',
 };
 
 export function useVenueFilters() {
@@ -57,7 +63,14 @@ export function useVenueFilters() {
         const matchesName = !filterState.selectedName || futsal.name === filterState.selectedName;
         const matchesCity = !filterState.selectedCity || futsal.city === filterState.selectedCity;
         const matchesLocation = !filterState.selectedLocation || futsal.location === filterState.selectedLocation;
-        return matchesSearch && matchesName && matchesCity && matchesLocation;
+        const thirtyDaysAgo = new Date();
+        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+        const matchesAge = filterState.selectedAge === 'all' ||
+          (filterState.selectedAge === 'new' && new Date(futsal.created_at) > thirtyDaysAgo) ||
+          (filterState.selectedAge === 'old' && new Date(futsal.created_at) <= thirtyDaysAgo);
+        const matchesOffer = filterState.selectedOffer === 'all' ||
+          (filterState.selectedOffer === 'offers' && futsal.special_prices && futsal.special_prices.length > 0);
+        return matchesSearch && matchesName && matchesCity && matchesLocation && matchesAge && matchesOffer;
       })
       .sort((a: Futsal, b: Futsal) => {
         if (filterState.sortByRating === 'highest') {

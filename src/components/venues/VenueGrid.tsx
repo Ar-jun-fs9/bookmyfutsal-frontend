@@ -22,6 +22,8 @@ interface Futsal {
   total_ratings?: number;
   game_format?: string;
   facilities?: string[];
+  created_at: string;
+  special_prices?: any[];
 }
 
 export default function VenueGrid() {
@@ -103,29 +105,63 @@ export default function VenueGrid() {
         </p>
       </div>
 
-      {/* Filter Toggle Button */}
-      <div className="mb-6 text-left">
-        <button
-          onClick={() => updateFilter('showFilters', !filterState.showFilters)}
-          className="bg-linear-to-r from-green-500 to-green-600 text-white font-semibold py-2 px-4 rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 text-sm"
-        >
-          {filterState.showFilters ? '🔽 Hide Filters' : '🔍 Show Filters'}
-        </button>
-        {filterState.showFilters && (
+      {/* Filter Controls */}
+      <div className="mb-6 flex justify-between items-center">
+        <div className="flex items-center space-x-4">
           <button
-            onClick={clearFilters}
-            className="ml-4 bg-linear-to-r from-red-500 to-red-600 text-white font-semibold py-2 px-4 rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 text-sm"
+            onClick={() => updateFilter('showFilters', !filterState.showFilters)}
+            className="bg-linear-to-r from-green-500 to-green-600 text-white font-semibold py-2 px-4 rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 text-sm"
           >
-            🗑️ Clear Filters
+            {filterState.showFilters ? '🔽 Hide Filters' : '🔍 Show Filters'}
           </button>
-        )}
+          {filterState.showFilters && (
+            <button
+              onClick={clearFilters}
+              className="bg-linear-to-r from-red-500 to-red-600 text-white font-semibold py-2 px-4 rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 text-sm"
+            >
+              🗑️ Clear Filters
+            </button>
+          )}
+        </div>
+        <div className="flex space-x-2">
+          <button
+            onClick={() => updateFilter('selectedAge', 'all')}
+            className={`py-2 px-4 rounded-lg font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 text-sm ${
+              filterState.selectedAge === 'all'
+                ? 'bg-linear-to-r from-green-500 to-green-600 text-white'
+                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+            }`}
+          >
+            All
+          </button>
+          <button
+            onClick={() => updateFilter('selectedAge', 'old')}
+            className={`py-2 px-4 rounded-lg font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 text-sm ${
+              filterState.selectedAge === 'old'
+                ? 'bg-linear-to-r from-green-500 to-green-600 text-white'
+                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+            }`}
+          >
+            Old
+          </button>
+          <button
+            onClick={() => updateFilter('selectedAge', 'new')}
+            className={`py-2 px-4 rounded-lg font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 text-sm ${
+              filterState.selectedAge === 'new'
+                ? 'bg-linear-to-r from-green-500 to-green-600 text-white'
+                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+            }`}
+          >
+            New
+          </button>
+        </div>
       </div>
 
       {/* Filters */}
       {filterState.showFilters && (
         <div className="mb-8 bg-white rounded-2xl shadow-xl border border-gray-100 p-6 ">
           <h3 className="text-xl font-bold mb-6 bg-linear-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">Filter & Search Futsals</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-6">
             {/* Search Bar */}
             <div className="lg:col-span-2">
               <label className="block text-sm font-semibold text-gray-800 mb-2">🔍 Search</label>
@@ -180,6 +216,19 @@ export default function VenueGrid() {
                 {uniqueLocations.map((location) => (
                   <option key={location} value={location}>{location}</option>
                 ))}
+              </select>
+            </div>
+
+            {/* Offers Filter */}
+            <div>
+              <label className="block text-sm font-semibold text-gray-800 mb-2">🎁 Offers</label>
+              <select
+                value={filterState.selectedOffer}
+                onChange={(e) => updateFilter('selectedOffer', e.target.value as 'all' | 'offers')}
+                className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none focus:ring-2 focus:ring-green-400/50 focus:border-green-400/50 transition-all text-sm"
+              >
+                <option value="all">All</option>
+                <option value="offers">With Offers</option>
               </select>
             </div>
           </div>
