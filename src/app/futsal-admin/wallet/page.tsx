@@ -142,7 +142,7 @@ export default function FutsalAdminWallet() {
         <div className="px-4 py-6 sm:px-0">
           {/* Date Filter */}
           <div className=" rounded-lg p-2 mb-6 shadow-lg md:p-6">
-            <h2 className="text-xl font-semibold mb-4 bg-linear-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">
+            <h2 className="text-xl font-semibold mb-4 bg-linear-to-r from-green-600 to-blue-600 bg-clip-text text-transparent text-center">
               Filter by Date Range
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
