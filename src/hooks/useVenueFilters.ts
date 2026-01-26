@@ -53,6 +53,49 @@ export function useVenueFilters() {
   const [filterState, setFilterState] = useState<FilterState>(initialFilterState);
   const [showAllFutsals, setShowAllFutsals] = useState(false);
 
+  // Calculate ranking score for a futsal
+  const calculateRankingScore = (futsal: Futsal): number => {
+    let score = 0;
+
+    // 1. Highest offer discount (0-100%)
+    let maxDiscount = 0;
+    if (futsal.special_prices && futsal.special_prices.length > 0) {
+      for (const sp of futsal.special_prices) {
+        if (sp.special_price < futsal.price_per_hour) {
+          const discount = ((futsal.price_per_hour - sp.special_price) / futsal.price_per_hour) * 100;
+          maxDiscount = Math.max(maxDiscount, discount);
+        }
+      }
+    }
+    score += maxDiscount * 1000; // Weight: 1000
+
+    // 2. Rating (0-5)
+    const rating = futsal.average_rating || 0;
+    score += rating * 100; // Weight: 100
+
+    // 3. Number of reviews
+    const reviews = futsal.total_ratings || 0;
+    score += reviews * 10; // Weight: 10
+
+    // 4. Competitive pricing (lower price is better, normalize)
+    const priceScore = Math.max(0, 1000 - futsal.price_per_hour); // Assuming max price 1000, higher score for lower price
+    score += priceScore;
+
+    // 5. Facilities count (parking, lighting, washrooms)
+    let facilitiesCount = 0;
+    const keyFacilities = ['Parking facilities', 'Night lighting', 'Washrooms / drinking water'];
+    if (futsal.facilities) {
+      for (const facility of keyFacilities) {
+        if (futsal.facilities.includes(facility)) {
+          facilitiesCount++;
+        }
+      }
+    }
+    score += facilitiesCount * 50; // Weight: 50 per facility
+
+    return score;
+  };
+
   const filteredFutsals = useMemo(() => {
     return futsals
       .filter((futsal: Futsal) => {
@@ -73,20 +116,21 @@ export function useVenueFilters() {
         return matchesSearch && matchesName && matchesCity && matchesLocation && matchesAge && matchesOffer;
       })
       .sort((a: Futsal, b: Futsal) => {
-        if (filterState.sortByRating === 'highest') {
-          return (b.average_rating || 0) - (a.average_rating || 0);
-        }
-        if (filterState.sortByRating === 'lowest') {
-          return (a.average_rating || 0) - (b.average_rating || 0);
-        }
-        if (filterState.sortByPrice === 'low-to-high') {
-          return a.price_per_hour - b.price_per_hour;
-        }
-        if (filterState.sortByPrice === 'high-to-low') {
-          return b.price_per_hour - a.price_per_hour;
-        }
-        return 0;
-      });
+         if (filterState.sortByRating === 'highest') {
+           return (b.average_rating || 0) - (a.average_rating || 0);
+         }
+         if (filterState.sortByRating === 'lowest') {
+           return (a.average_rating || 0) - (b.average_rating || 0);
+         }
+         if (filterState.sortByPrice === 'low-to-high') {
+           return a.price_per_hour - b.price_per_hour;
+         }
+         if (filterState.sortByPrice === 'high-to-low') {
+           return b.price_per_hour - a.price_per_hour;
+         }
+         // Default: sort by ranking score descending
+         return calculateRankingScore(b) - calculateRankingScore(a);
+       });
   }, [futsals, filterState]);
 
   // Get unique options for dropdowns
