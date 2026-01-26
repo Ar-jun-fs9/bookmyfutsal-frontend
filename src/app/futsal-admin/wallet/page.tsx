@@ -229,7 +229,7 @@ export default function FutsalAdminWallet() {
           {/* Bookings Table */}
           <div className=" rounded-lg shadow-lg overflow-hidden">
             <div className="px-2 py-4 border-b border-gray-200 flex justify-between items-center md:px-6">
-              <h2 className="text-xl font-semibold bg-linear-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">
+              <h2 className="text-xl font-semibold bg-linear-to-r from-green-600 to-blue-600 bg-clip-text text-transparent pl-4 md:pl-0">
                 Booking Details
               </h2>
               <div className="flex space-x-2">
