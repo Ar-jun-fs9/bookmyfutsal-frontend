@@ -268,8 +268,9 @@ export default function FutsalAdminWallet() {
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
                   {walletData?.bookings.map((booking) => {
-                    const commission = booking.total_amount * 0.05;
-                    const adminReceivable = booking.total_amount - commission;
+                    const totalAmount = parseFloat(booking.total_amount as any);
+                    const commission = totalAmount * 0.05;
+                    const adminReceivable = totalAmount - commission;
 
                     return (
                       <tr key={booking.booking_id} className={booking.cancelled_by ? 'bg-red-50' : ''}>
@@ -280,10 +281,10 @@ export default function FutsalAdminWallet() {
                           {formatDate(booking.booking_date)}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          {formatCurrency(booking.total_amount)}
+                          {formatCurrency(totalAmount)}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          {formatCurrency(booking.amount_paid)}
+                          {formatCurrency(parseFloat(booking.amount_paid as any))}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                           {booking.booking_type !== 'normal' ? 'Yes' : 'No'}
@@ -305,7 +306,7 @@ export default function FutsalAdminWallet() {
                         Grand Total
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900">
-                        {formatCurrency(walletData.bookings.reduce((sum, b) => sum + b.total_amount, 0))}
+                        {formatCurrency(walletData.bookings.reduce((sum, b) => sum + parseFloat(b.total_amount as any), 0))}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900">
                         {formatCurrency(walletData.totalAdvance)}
