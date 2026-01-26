@@ -4,6 +4,13 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/stores/authStore';
 
+interface Futsal {
+  futsal_id: number;
+  name: string;
+  location: string;
+  city: string;
+}
+
 interface WalletBooking {
   booking_id: number;
   booking_date: string;
@@ -11,6 +18,7 @@ interface WalletBooking {
   amount_paid: number;
   booking_type: string;
   cancelled_by?: string;
+  futsal_name?: string;
 }
 
 interface WalletData {
@@ -21,7 +29,7 @@ interface WalletData {
   totalReceivable: number;
 }
 
-export default function FutsalAdminWallet() {
+export default function SuperAdminWallet() {
   const router = useRouter();
   const { role, hydrated, tokens } = useAuthStore();
   const [walletData, setWalletData] = useState<WalletData | null>(null);
@@ -32,20 +40,23 @@ export default function FutsalAdminWallet() {
   const [filteredEndDate, setFilteredEndDate] = useState('');
   const [showBookingId, setShowBookingId] = useState(false);
   const [showRecords, setShowRecords] = useState(false);
+  const [selectedFutsalId, setSelectedFutsalId] = useState<string>('all');
+  const [futsals, setFutsals] = useState<Futsal[]>([]);
   const [admin, setAdmin] = useState<any>(null);
 
   useEffect(() => {
     if (hydrated) {
-      if (role !== 'futsal_admin') {
-        router.push('/futsal-admin/signin');
+      if (role !== 'super_admin') {
+        router.push('/super-admin/signin');
         return;
       }
 
-      const storedUser = sessionStorage.getItem('futsal_admin');
+      const storedUser = sessionStorage.getItem('superadmin');
       if (storedUser) {
         setAdmin(JSON.parse(storedUser));
+        fetchFutsals();
       } else {
-        router.push('/futsal-admin/signin');
+        router.push('/super-admin/signin');
         return;
       }
     }
@@ -55,7 +66,24 @@ export default function FutsalAdminWallet() {
     if (admin) {
       fetchWalletData();
     }
-  }, [admin, filteredStartDate, filteredEndDate]);
+  }, [admin, filteredStartDate, filteredEndDate, selectedFutsalId]);
+
+  const fetchFutsals = async () => {
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/futsals`, {
+        headers: {
+          'Authorization': `Bearer ${tokens?.accessToken}`,
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setFutsals(data);
+      }
+    } catch (error) {
+      console.error('Error fetching futsals:', error);
+    }
+  };
 
   const fetchWalletData = async () => {
     if (!admin) return;
@@ -65,8 +93,9 @@ export default function FutsalAdminWallet() {
       const params = new URLSearchParams();
       if (filteredStartDate) params.append('startDate', filteredStartDate);
       if (filteredEndDate) params.append('endDate', filteredEndDate);
+      if (selectedFutsalId !== 'all') params.append('futsalId', selectedFutsalId);
 
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/futsal-admins/${admin.id}/wallet?${params}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/superadmin/wallet?${params}`, {
         headers: {
           'Authorization': `Bearer ${tokens?.accessToken}`,
         },
@@ -124,7 +153,7 @@ export default function FutsalAdminWallet() {
         <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 flex justify-between items-center">
           <div className="flex items-center space-x-4">
             <button
-              onClick={() => router.push('/futsal-admin/dashboard')}
+              onClick={() => router.push('/super-admin/dashboard')}
               className="bg-transparent text-white font-bold py-2 px-3 rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 border border-white/20 hover:border-white/40"
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -132,7 +161,7 @@ export default function FutsalAdminWallet() {
               </svg>
             </button>
             <h1 className="text-3xl font-bold text-white drop-shadow-lg">
-              Wallet - {admin?.futsal_name || ''}
+              Super Admin Wallet
             </h1>
           </div>
         </div>
@@ -140,8 +169,29 @@ export default function FutsalAdminWallet() {
 
       <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
         <div className="px-4 py-6 sm:px-0">
-          {/* Date Filter */}
+          {/* Futsal Selection */}
           <div className=" rounded-lg p-6 mb-6 shadow-lg">
+            <h2 className="text-xl font-semibold mb-4 bg-linear-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">
+              Select Futsal
+            </h2>
+            <div className="max-w-md">
+              <select
+                value={selectedFutsalId}
+                onChange={(e) => setSelectedFutsalId(e.target.value)}
+                className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+              >
+                <option value="all">All Futsals</option>
+                {futsals.map((futsal) => (
+                  <option key={futsal.futsal_id} value={futsal.futsal_id.toString()}>
+                    {futsal.name} - {futsal.location}, {futsal.city}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          {/* Date Filter */}
+          <div className="rounded-lg p-6 mb-6 shadow-lg">
             <h2 className="text-xl font-semibold mb-4 bg-linear-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">
               Filter by Date Range
             </h2>
@@ -186,6 +236,9 @@ export default function FutsalAdminWallet() {
               <div className="mt-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
                 <p className="text-sm text-blue-800">
                   Showing bookings from <strong>{filteredStartDate ? formatDate(filteredStartDate) : 'beginning'}</strong> to <strong>{filteredEndDate ? formatDate(filteredEndDate) : 'end'}</strong>
+                  {selectedFutsalId !== 'all' && (
+                    <span> for <strong>{futsals.find(f => f.futsal_id.toString() === selectedFutsalId)?.name}</strong></span>
+                  )}
                 </p>
               </div>
             )}
@@ -195,7 +248,7 @@ export default function FutsalAdminWallet() {
           {loading ? (
             <div className="grid grid-cols-2 md:grid-cols-5 gap-4 md:gap-6 mb-6">
               {[1, 2, 3, 4, 5].map((i) => (
-                <div key={i} className=" rounded-lg p-6 shadow-lg border-l-4 border-gray-300 animate-pulse">
+                <div key={i} className="rounded-lg p-6 shadow-lg border-l-4 border-gray-300 animate-pulse">
                   <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
                   <div className="h-8 bg-gray-200 rounded w-1/2"></div>
                 </div>
@@ -203,23 +256,23 @@ export default function FutsalAdminWallet() {
             </div>
           ) : walletData && (
             <div className="grid grid-cols-2 md:grid-cols-5 gap-4 md:gap-6 mb-6">
-              <div className=" rounded-lg p-6 shadow-lg border-l-4 border-green-500">
+              <div className="rounded-lg p-6 shadow-lg border-l-4 border-green-500">
                 <h3 className="text-sm font-medium text-gray-500">Total Income</h3>
                 <p className="text-2xl font-bold text-green-600">{formatCurrency(walletData.totalIncome)}</p>
               </div>
-              <div className=" rounded-lg p-6 shadow-lg border-l-4 border-blue-500">
-                <h3 className="text-sm font-medium text-gray-500">Total Commission (5%)</h3>
+              <div className="rounded-lg p-6 shadow-lg border-l-4 border-blue-500">
+                <h3 className="text-sm font-medium text-gray-500">Total Commission (5% super admin receivable)</h3>
                 <p className="text-2xl font-bold text-blue-600">{formatCurrency(walletData.totalCommission)}</p>
               </div>
-              <div className=" rounded-lg p-6 shadow-lg border-l-4 border-yellow-500">
+              <div className="rounded-lg p-6 shadow-lg border-l-4 border-yellow-500">
                 <h3 className="text-sm font-medium text-gray-500">Total Advance</h3>
                 <p className="text-2xl font-bold text-yellow-600">{formatCurrency(walletData.totalAdvance)}</p>
               </div>
-              <div className=" rounded-lg p-6 shadow-lg border-l-4 border-purple-500">
+              <div className="rounded-lg p-6 shadow-lg border-l-4 border-purple-500">
                 <h3 className="text-sm font-medium text-gray-500">Admin Receivable</h3>
                 <p className="text-2xl font-bold text-purple-600">{formatCurrency(walletData.totalReceivable)}</p>
               </div>
-              <div className=" rounded-lg p-6 shadow-lg border-l-4 border-indigo-500">
+              <div className="rounded-lg p-6 shadow-lg border-l-4 border-indigo-500">
                 <h3 className="text-sm font-medium text-gray-500">Total Bookings</h3>
                 <p className="text-2xl font-bold text-indigo-600">{walletData.bookings.length}</p>
               </div>
@@ -227,7 +280,7 @@ export default function FutsalAdminWallet() {
           )}
 
           {/* Bookings Table */}
-          <div className=" rounded-lg shadow-lg overflow-hidden">
+          <div className="rounded-lg shadow-lg overflow-hidden">
             <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
               <h2 className="text-xl font-semibold bg-linear-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">
                 Booking Details
@@ -272,6 +325,9 @@ export default function FutsalAdminWallet() {
                           </th>
                         )}
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Futsal
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                           Booking Date
                         </th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -304,6 +360,9 @@ export default function FutsalAdminWallet() {
                                 {booking.booking_id}
                               </td>
                             )}
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                              {booking.futsal_name}
+                            </td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                               {formatDate(booking.booking_date)}
                             </td>
@@ -329,7 +388,7 @@ export default function FutsalAdminWallet() {
                     {walletData && walletData.bookings.length > 0 && (
                       <tfoot className="bg-gray-50">
                         <tr>
-                          <td colSpan={showBookingId ? 2 : 1} className="px-6 py-4 text-sm font-medium text-gray-900">
+                          <td colSpan={showBookingId ? 3 : 2} className="px-6 py-4 text-sm font-medium text-gray-900">
                             Grand Total
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900">
@@ -362,7 +421,7 @@ export default function FutsalAdminWallet() {
                 </svg>
                 <h3 className="mt-2 text-sm font-medium text-gray-900">No bookings found</h3>
                 <p className="mt-1 text-sm text-gray-500">
-                  {filteredStartDate || filteredEndDate ? 'Try adjusting your date filter or clear the filter to see all bookings.' : 'No bookings available for this futsal.'}
+                  {filteredStartDate || filteredEndDate ? 'Try adjusting your date filter or clear the filter to see all bookings.' : 'No bookings available for the selected futsal.'}
                 </p>
               </div>
             )}
