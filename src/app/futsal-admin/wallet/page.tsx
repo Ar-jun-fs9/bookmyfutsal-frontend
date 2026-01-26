@@ -30,6 +30,7 @@ export default function FutsalAdminWallet() {
   const [endDate, setEndDate] = useState('');
   const [filteredStartDate, setFilteredStartDate] = useState('');
   const [filteredEndDate, setFilteredEndDate] = useState('');
+  const [showBookingId, setShowBookingId] = useState(false);
   const [admin, setAdmin] = useState<any>(null);
 
   useEffect(() => {
@@ -191,8 +192,8 @@ export default function FutsalAdminWallet() {
 
           {/* Summary Cards */}
           {loading ? (
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
-              {[1, 2, 3, 4].map((i) => (
+            <div className="grid grid-cols-1 md:grid-cols-5 gap-6 mb-6">
+              {[1, 2, 3, 4, 5].map((i) => (
                 <div key={i} className="bg-white rounded-lg p-6 shadow-lg border-l-4 border-gray-300 animate-pulse">
                   <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
                   <div className="h-8 bg-gray-200 rounded w-1/2"></div>
@@ -200,7 +201,7 @@ export default function FutsalAdminWallet() {
               ))}
             </div>
           ) : walletData && (
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+            <div className="grid grid-cols-1 md:grid-cols-5 gap-6 mb-6">
               <div className="bg-white rounded-lg p-6 shadow-lg border-l-4 border-green-500">
                 <h3 className="text-sm font-medium text-gray-500">Total Income</h3>
                 <p className="text-2xl font-bold text-green-600">{formatCurrency(walletData.totalIncome)}</p>
@@ -217,15 +218,25 @@ export default function FutsalAdminWallet() {
                 <h3 className="text-sm font-medium text-gray-500">Admin Receivable</h3>
                 <p className="text-2xl font-bold text-purple-600">{formatCurrency(walletData.totalReceivable)}</p>
               </div>
+              <div className="bg-white rounded-lg p-6 shadow-lg border-l-4 border-indigo-500">
+                <h3 className="text-sm font-medium text-gray-500">Total Bookings</h3>
+                <p className="text-2xl font-bold text-indigo-600">{walletData.bookings.length}</p>
+              </div>
             </div>
           )}
 
           {/* Bookings Table */}
           <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-            <div className="px-6 py-4 border-b border-gray-200">
+            <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
               <h2 className="text-xl font-semibold bg-linear-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">
                 Booking Details
               </h2>
+              <button
+                onClick={() => setShowBookingId(!showBookingId)}
+                className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-1 rounded-md text-sm font-medium transition-colors duration-200"
+              >
+                {showBookingId ? 'Hide' : 'Show'} Booking ID
+              </button>
             </div>
 
             {loading ? (
@@ -243,9 +254,11 @@ export default function FutsalAdminWallet() {
               <table className="min-w-full divide-y divide-gray-200">
                 <thead className="bg-gray-50">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Booking ID
-                    </th>
+                    {showBookingId && (
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Booking ID
+                      </th>
+                    )}
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Booking Date
                     </th>
@@ -274,9 +287,11 @@ export default function FutsalAdminWallet() {
 
                     return (
                       <tr key={booking.booking_id} className={booking.cancelled_by ? 'bg-red-50' : ''}>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                          {booking.booking_id}
-                        </td>
+                        {showBookingId && (
+                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                            {booking.booking_id}
+                          </td>
+                        )}
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                           {formatDate(booking.booking_date)}
                         </td>
@@ -302,7 +317,7 @@ export default function FutsalAdminWallet() {
                 {walletData && walletData.bookings.length > 0 && (
                   <tfoot className="bg-gray-50">
                     <tr>
-                      <td colSpan={2} className="px-6 py-4 text-sm font-medium text-gray-900">
+                      <td colSpan={showBookingId ? 2 : 1} className="px-6 py-4 text-sm font-medium text-gray-900">
                         Grand Total
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900">
