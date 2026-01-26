@@ -66,21 +66,22 @@ export function DashboardHeader({ onLogout }: DashboardHeaderProps) {
                       </svg>
                       Wallet
                     </button>
+                    <button
+                      onClick={() => {
+                        setShowSettingsMenu(false);
+                        onLogout();
+                      }}
+                      className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+                    >
+                      <svg className="w-4 h-4 mr-2 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                      </svg>
+                      Logout
+                    </button>
                   </div>
                 </div>
               )}
             </div>
-
-            {/* Logout Button */}
-            <button
-              onClick={onLogout}
-              className="bg-transparent sm:bg-linear-to-r sm:from-red-500 sm:to-red-600 text-white font-bold py-0 px-0 sm:py-2.5 sm:px-6 rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 border-transparent sm:border-red-400/30 hover:border-transparent sm:hover:border-red-400/50"
-            >
-              <svg className="w-6 h-6 mr-0 sm:mr-2 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-              </svg>
-              <span className="hidden sm:inline">Logout</span>
-            </button>
           </div>
         </div>
       </div>
