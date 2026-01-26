@@ -52,13 +52,13 @@ export default function CareersPage() {
             <div className="hidden md:flex items-center space-x-4">
               <Link
                 href="/user/login"
-                className="px-6 py-2 bg-linear-to-r from-blue-600 to-blue-700 text-white font-bold rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 border border-blue-500/30 hover:border-blue-400/50"
+                className="px-6 py-2 bg-linear-to-r from-blue-600 to-blue-700 text-white font-bold rounded-lg shadow-lg hover: transform hover:scale-105 transition-all duration-300 border border-blue-500/30 hover:border-blue-400/50"
               >
                 Login
               </Link>
               <Link
                 href="/user/register"
-                className="px-6 py-2 bg-linear-to-r from-green-600 to-green-700 text-white font-bold rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 border border-green-500/30 hover:border-green-400/50"
+                className="px-6 py-2 bg-linear-to-r from-green-600 to-green-700 text-white font-bold rounded-lg shadow-lg hover: transform hover:scale-105 transition-all duration-300 border border-green-500/30 hover:border-green-400/50"
               >
                 Sign Up
               </Link>
@@ -92,13 +92,13 @@ export default function CareersPage() {
                 <div className="flex flex-row space-x-3 pt-4 border-t border-green-500/20">
                   <Link
                     href="/user/login"
-                    className="flex-1 px-4 py-3 bg-linear-to-r from-blue-600 to-blue-700 text-white font-bold rounded-lg text-center shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 border border-blue-500/30"
+                    className="flex-1 px-4 py-3 bg-linear-to-r from-blue-600 to-blue-700 text-white font-bold rounded-lg text-center shadow-lg hover: transform hover:scale-105 transition-all duration-300 border border-blue-500/30"
                   >
                     Login
                   </Link>
                   <Link
                     href="/user/register"
-                    className="flex-1 px-4 py-3 bg-linear-to-r from-green-600 to-green-700 text-white font-bold rounded-lg text-center shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 border border-green-500/30"
+                    className="flex-1 px-4 py-3 bg-linear-to-r from-green-600 to-green-700 text-white font-bold rounded-lg text-center shadow-lg hover: transform hover:scale-105 transition-all duration-300 border border-green-500/30"
                   >
                     Sign Up
                   </Link>
@@ -110,10 +110,10 @@ export default function CareersPage() {
       </header>
 
       {/* Page Header */}
-      <div className="bg-linear-to-r from-green-600 to-blue-600 text-white py-16">
+      <div className="bg-linear-to-r from-green-600 to-blue-600 bg-clip-text text-transparent py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h1 className="text-4xl md:text-5xl font-bold mb-4">Join Our Team</h1>
-          <p className="text-xl text-green-100 max-w-3xl mx-auto">
+          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
             Be part of revolutionizing the futsal booking industry. We're looking for passionate individuals to join our growing team.
           </p>
         </div>
@@ -122,7 +122,7 @@ export default function CareersPage() {
       {/* Main Content */}
       <main className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
         {/* Why Join Us */}
-        <div className="bg-white rounded-2xl shadow-xl p-8 mb-8">
+        <div className="bg-white rounded-2xl  p-8 mb-8">
           <div className="text-center mb-8">
             <h2 className="text-3xl font-bold bg-linear-to-r from-green-600 to-blue-600 bg-clip-text text-transparent mb-4">
               Why Join BookMyFutsal?
@@ -160,7 +160,7 @@ export default function CareersPage() {
         </div>
 
         {/* Career Development */}
-        <div className="bg-white rounded-2xl shadow-xl p-8 mb-8">
+        <div className="bg-white rounded-2xl  p-8 mb-8">
           <div className="text-center mb-8">
             <h2 className="text-3xl font-bold bg-linear-to-r from-green-600 to-blue-600 bg-clip-text text-transparent mb-4">
               Career Development
@@ -254,7 +254,7 @@ export default function CareersPage() {
         </div>
 
         {/* Company Culture */}
-        <div className="bg-white rounded-2xl shadow-xl p-8">
+        <div className="bg-white rounded-2xl  p-8">
           <div className="text-center mb-8">
             <h2 className="text-3xl font-bold bg-linear-to-r from-green-600 to-blue-600 bg-clip-text text-transparent mb-4">
               Our Culture

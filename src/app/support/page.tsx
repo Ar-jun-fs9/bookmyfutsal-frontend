@@ -52,13 +52,13 @@ export default function SupportPage() {
             <div className="hidden md:flex items-center space-x-4">
               <Link
                 href="/user/login"
-                className="px-6 py-2 bg-linear-to-r from-blue-600 to-blue-700 text-white font-bold rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 border border-blue-500/30 hover:border-blue-400/50"
+                className="px-6 py-2 bg-linear-to-r from-blue-600 to-blue-700 text-white font-bold rounded-lg shadow-lg hover: transform hover:scale-105 transition-all duration-300 border border-blue-500/30 hover:border-blue-400/50"
               >
                 Login
               </Link>
               <Link
                 href="/user/register"
-                className="px-6 py-2 bg-linear-to-r from-green-600 to-green-700 text-white font-bold rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 border border-green-500/30 hover:border-green-400/50"
+                className="px-6 py-2 bg-linear-to-r from-green-600 to-green-700 text-white font-bold rounded-lg shadow-lg hover: transform hover:scale-105 transition-all duration-300 border border-green-500/30 hover:border-green-400/50"
               >
                 Sign Up
               </Link>
@@ -92,13 +92,13 @@ export default function SupportPage() {
                 <div className="flex flex-row space-x-3 pt-4 border-t border-green-500/20">
                   <Link
                     href="/user/login"
-                    className="flex-1 px-4 py-3 bg-linear-to-r from-blue-600 to-blue-700 text-white font-bold rounded-lg text-center shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 border border-blue-500/30"
+                    className="flex-1 px-4 py-3 bg-linear-to-r from-blue-600 to-blue-700 text-white font-bold rounded-lg text-center shadow-lg hover: transform hover:scale-105 transition-all duration-300 border border-blue-500/30"
                   >
                     Login
                   </Link>
                   <Link
                     href="/user/register"
-                    className="flex-1 px-4 py-3 bg-linear-to-r from-green-600 to-green-700 text-white font-bold rounded-lg text-center shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 border border-green-500/30"
+                    className="flex-1 px-4 py-3 bg-linear-to-r from-green-600 to-green-700 text-white font-bold rounded-lg text-center shadow-lg hover: transform hover:scale-105 transition-all duration-300 border border-green-500/30"
                   >
                     Sign Up
                   </Link>
@@ -110,10 +110,10 @@ export default function SupportPage() {
       </header>
 
       {/* Page Header */}
-      <div className="bg-linear-to-r from-green-600 to-blue-600 text-white py-16">
+      <div className="bg-linear-to-r from-green-600 to-blue-600 bg-clip-text text-transparent py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h1 className="text-4xl md:text-5xl font-bold mb-4">Support Center</h1>
-          <p className="text-xl text-green-100 max-w-3xl mx-auto">
+          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
             Get help with your bookings, account, and any questions you might have.
           </p>
         </div>
@@ -124,7 +124,7 @@ export default function SupportPage() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* FAQ Section */}
           <div className="lg:col-span-2 space-y-6">
-            <div className="bg-white rounded-2xl shadow-xl p-8">
+            <div className="bg-white rounded-2xl  p-8">
               <h2 className="text-3xl font-bold text-gray-800 mb-6">Frequently Asked Questions</h2>
 
               <div className="space-y-4">
@@ -163,7 +163,7 @@ export default function SupportPage() {
 
           {/* Contact Support */}
           <div className="space-y-6">
-            <div className="bg-white rounded-2xl shadow-xl p-8">
+            <div className="bg-white rounded-2xl  p-8">
               <h2 className="text-2xl font-bold text-gray-800 mb-6">Contact Support</h2>
 
               <div className="space-y-4">
@@ -208,7 +208,7 @@ export default function SupportPage() {
               <div className="mt-6">
                 <Link
                   href="/contact"
-                  className="w-full bg-linear-to-r from-green-500 to-green-600 text-white font-semibold py-3 px-6 rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 text-center block"
+                  className="w-full bg-linear-to-r from-green-500 to-green-600 text-white font-semibold py-3 px-6 rounded-lg shadow-lg hover: transform hover:scale-105 transition-all duration-300 text-center block"
                 >
                   Contact Us
                 </Link>
@@ -216,7 +216,7 @@ export default function SupportPage() {
             </div>
 
             {/* Quick Links */}
-            <div className="bg-white rounded-2xl shadow-xl p-8">
+            <div className="bg-white rounded-2xl  p-8">
               <h2 className="text-2xl font-bold text-gray-800 mb-6">Quick Links</h2>
 
               <div className="space-y-3">
