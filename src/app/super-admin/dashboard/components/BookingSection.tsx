@@ -359,7 +359,7 @@ export function BookingSection({ isVisible, onToggle }: BookingSectionProps) {
                     </span>
                   )}
 
-                  <div className="flex space-x-2">
+                  <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
                     <button
                       onClick={() => setEditingBooking(booking)}
                       disabled={isPastBooking || !!booking.cancelled_by}
@@ -397,7 +397,7 @@ export function BookingSection({ isVisible, onToggle }: BookingSectionProps) {
                         onClick={() => setViewingOriginalBooking(booking)}
                         className="bg-linear-to-r from-blue-600 to-blue-700 text-white px-3 py-1 rounded text-sm hover:shadow-lg transform hover:scale-105 transition-all duration-300"
                       >
-                        View Original Booking
+                        Org
                       </button>
                     )}
                   </div>
