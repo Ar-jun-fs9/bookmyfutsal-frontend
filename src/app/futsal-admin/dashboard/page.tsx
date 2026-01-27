@@ -3805,7 +3805,7 @@ function ViewOriginalBookingModal({ booking, onClose, showNotification }: { book
           if (response.ok) {
             // Remove from local state
             setHistory(history.filter(h => h.history_id !== historyId));
-            showNotification({ message: 'History entry removed successfully', type: 'success' });
+            showNotification({ message: 'History deleted successfully', type: 'success' });
           } else {
             showNotification({ message: 'Error removing history entry', type: 'info' });
           }

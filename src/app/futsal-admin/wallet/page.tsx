@@ -208,7 +208,7 @@ export default function FutsalAdminWallet() {
                 <p className="text-2xl font-bold text-green-600">{formatCurrency(walletData.totalIncome)}</p>
               </div>
               <div className=" rounded-lg p-6 shadow-lg border-l-4 border-blue-500">
-                <h3 className="text-sm font-medium text-gray-500">Total Commission Pay (5%)</h3>
+                <h3 className="text-sm font-medium text-gray-500">T. Com Payable (5%)</h3>
                 <p className="text-2xl font-bold text-blue-600">{formatCurrency(walletData.totalCommission)}</p>
               </div>
               <div className=" rounded-lg p-6 shadow-lg border-l-4 border-yellow-500">
@@ -216,7 +216,7 @@ export default function FutsalAdminWallet() {
                 <p className="text-2xl font-bold text-yellow-600">{formatCurrency(walletData.totalAdvance)}</p>
               </div>
               <div className=" rounded-lg p-6 shadow-lg border-l-4 border-orange-500">
-                <h3 className="text-sm font-medium text-gray-500">Total Advance Receivable</h3>
+                <h3 className="text-sm font-medium text-gray-500">T. Adv Receivable</h3>
                 <p className="text-2xl font-bold text-orange-600">{formatCurrency(walletData.totalAdvance - walletData.totalCommission)}</p>
               </div>
               <div className=" rounded-lg p-6 shadow-lg border-l-4 border-purple-500">
