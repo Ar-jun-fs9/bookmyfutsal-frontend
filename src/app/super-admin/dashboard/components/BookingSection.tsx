@@ -435,6 +435,7 @@ export function BookingSection({ isVisible, onToggle }: BookingSectionProps) {
         <ViewOriginalBookingModal
           booking={viewingOriginalBooking}
           onClose={() => setViewingOriginalBooking(null)}
+          setNotification={setNotification}
         />
       )}
     </div>
@@ -442,14 +443,20 @@ export function BookingSection({ isVisible, onToggle }: BookingSectionProps) {
 }
 
 // View Original Booking Modal Component
-function ViewOriginalBookingModal({ booking, onClose }: { booking: any, onClose: () => void }) {
+function ViewOriginalBookingModal({ booking, onClose, setNotification }: { booking: any, onClose: () => void, setNotification: (notification: { message: string, type: 'success' | 'info' } | null) => void }) {
   const [history, setHistory] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [confirmModal, setConfirmModal] = useState<{isOpen: boolean, message: string, onConfirm: () => void}>({isOpen: false, message: '', onConfirm: () => {}});
 
   useEffect(() => {
     const fetchHistory = async () => {
       try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/bookings/history/${booking.booking_id}`);
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/bookings/history/${booking.booking_id}`, {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
+            'Content-Type': 'application/json'
+          }
+        });
         if (response.ok) {
           const data = await response.json();
           setHistory(data.history);
@@ -463,6 +470,36 @@ function ViewOriginalBookingModal({ booking, onClose }: { booking: any, onClose:
 
     fetchHistory();
   }, [booking.booking_id]);
+
+  const handleRemoveHistory = (historyId: number) => {
+    setConfirmModal({
+      isOpen: true,
+      message: 'Are you sure you want to permanently delete this history entry?',
+      onConfirm: async () => {
+        setConfirmModal({ isOpen: false, message: '', onConfirm: () => {} });
+        try {
+          const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/bookings/history/super-admin/${historyId}`, {
+            method: 'DELETE',
+            headers: {
+              'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
+              'Content-Type': 'application/json'
+            }
+          });
+
+          if (response.ok) {
+            // Remove from local state
+            setHistory(history.filter(h => h.history_id !== historyId));
+            setNotification({ message: 'History entry deleted successfully', type: 'success' });
+          } else {
+            setNotification({ message: 'Error deleting history entry', type: 'info' });
+          }
+        } catch (error) {
+          console.error('Error deleting history entry:', error);
+          setNotification({ message: 'Error deleting history entry', type: 'info' });
+        }
+      }
+    });
+  };
 
   const formatTimeRange = (timeString: string): string => {
     const [startTime, endTime] = timeString.split('-');
@@ -573,11 +610,7 @@ function ViewOriginalBookingModal({ booking, onClose }: { booking: any, onClose:
                         {version.user_phone && <span> | <strong>Phone:</strong> {version.user_phone}</span>}
                       </div>
                       <button
-                        onClick={() => {
-                          // Remove this version from history
-                          // This would require a backend endpoint to delete from booking_history
-                          alert('Remove functionality would require backend implementation');
-                        }}
+                        onClick={() => handleRemoveHistory(version.history_id)}
                         className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-sm transition-colors"
                       >
                         Remove
@@ -590,6 +623,37 @@ function ViewOriginalBookingModal({ booking, onClose }: { booking: any, onClose:
           )}
         </div>
       </div>
+
+      {/* Confirmation Modal */}
+      {confirmModal.isOpen && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="max-w-sm w-full bg-white rounded-2xl shadow-2xl border border-red-200 p-6 transform transition-all duration-300">
+            <div className="text-center">
+              <div className="inline-flex items-center justify-center w-12 h-12 rounded-lg mb-4 bg-red-100">
+                <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                </svg>
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">Confirm Action</h3>
+              <p className="text-sm text-gray-600 mb-6">{confirmModal.message}</p>
+              <div className="flex flex-col sm:flex-row gap-3">
+                <button
+                  onClick={() => setConfirmModal({ isOpen: false, message: '', onConfirm: () => {} })}
+                  className="flex-1 bg-gray-100 text-gray-700 font-semibold py-2 px-4 rounded-lg hover:bg-gray-200 transition-all duration-300"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={confirmModal.onConfirm}
+                  className="flex-1 bg-red-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-red-700 transition-all duration-300"
+                >
+                  Confirm
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
