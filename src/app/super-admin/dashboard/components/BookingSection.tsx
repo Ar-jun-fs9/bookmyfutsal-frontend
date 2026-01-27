@@ -6,6 +6,7 @@ import { categorizeBooking, formatTimeRange, formatDate } from '../utils/booking
 import { ConfirmModal } from './modals/ConfirmModal';
 import { NotificationModal } from './modals/NotificationModal';
 import { EditBookingForm } from './forms/EditBookingForm';
+import { useAuthStore } from '@/stores/authStore';
 
 interface BookingSectionProps {
   isVisible: boolean;
@@ -447,15 +448,18 @@ function ViewOriginalBookingModal({ booking, onClose, setNotification }: { booki
   const [history, setHistory] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [confirmModal, setConfirmModal] = useState<{isOpen: boolean, message: string, onConfirm: () => void}>({isOpen: false, message: '', onConfirm: () => {}});
+  const { tokens } = useAuthStore();
 
   useEffect(() => {
     const fetchHistory = async () => {
       try {
+        const headers: any = { 'Content-Type': 'application/json' };
+        if (tokens?.accessToken) {
+          headers['Authorization'] = `Bearer ${tokens.accessToken}`;
+        }
+
         const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/bookings/history/${booking.booking_id}`, {
-          headers: {
-            'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
-            'Content-Type': 'application/json'
-          }
+          headers
         });
         if (response.ok) {
           const data = await response.json();
@@ -469,7 +473,7 @@ function ViewOriginalBookingModal({ booking, onClose, setNotification }: { booki
     };
 
     fetchHistory();
-  }, [booking.booking_id]);
+  }, [booking.booking_id, tokens]);
 
   const handleRemoveHistory = (historyId: number) => {
     setConfirmModal({
@@ -478,12 +482,14 @@ function ViewOriginalBookingModal({ booking, onClose, setNotification }: { booki
       onConfirm: async () => {
         setConfirmModal({ isOpen: false, message: '', onConfirm: () => {} });
         try {
+          const headers: any = { 'Content-Type': 'application/json' };
+          if (tokens?.accessToken) {
+            headers['Authorization'] = `Bearer ${tokens.accessToken}`;
+          }
+
           const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/bookings/history/super-admin/${historyId}`, {
             method: 'DELETE',
-            headers: {
-              'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
-              'Content-Type': 'application/json'
-            }
+            headers
           });
 
           if (response.ok) {
