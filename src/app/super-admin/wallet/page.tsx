@@ -246,8 +246,8 @@ export default function SuperAdminWallet() {
 
           {/* Summary Cards */}
           {loading ? (
-            <div className="grid grid-cols-2 md:grid-cols-5 gap-4 md:gap-6 mb-6">
-              {[1, 2, 3, 4, 5].map((i) => (
+            <div className="grid grid-cols-2 md:grid-cols-6 gap-4 md:gap-6 mb-6">
+              {[1, 2, 3, 4, 5, 6].map((i) => (
                 <div key={i} className="rounded-lg p-6 shadow-lg border-l-4 border-gray-300 animate-pulse">
                   <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
                   <div className="h-8 bg-gray-200 rounded w-1/2"></div>
@@ -255,18 +255,22 @@ export default function SuperAdminWallet() {
               ))}
             </div>
           ) : walletData && (
-            <div className="grid grid-cols-2 md:grid-cols-5 gap-4 md:gap-6 mb-6">
+            <div className="grid grid-cols-2 md:grid-cols-6 gap-4 md:gap-6 mb-6">
               <div className="rounded-lg p-6 shadow-lg border-l-4 border-green-500">
                 <h3 className="text-sm font-medium text-gray-500">Total Income</h3>
                 <p className="text-2xl font-bold text-green-600">{formatCurrency(walletData.totalIncome)}</p>
               </div>
               <div className="rounded-lg p-6 shadow-lg border-l-4 border-blue-500">
-                <h3 className="text-sm font-medium text-gray-500">Total Commission (5% super admin receivable)</h3>
+                <h3 className="text-sm font-medium text-gray-500">Total Commission rec (5%)</h3>
                 <p className="text-2xl font-bold text-blue-600">{formatCurrency(walletData.totalCommission)}</p>
               </div>
               <div className="rounded-lg p-6 shadow-lg border-l-4 border-yellow-500">
                 <h3 className="text-sm font-medium text-gray-500">Total Advance</h3>
                 <p className="text-2xl font-bold text-yellow-600">{formatCurrency(walletData.totalAdvance)}</p>
+              </div>
+              <div className="rounded-lg p-6 shadow-lg border-l-4 border-orange-500">
+                <h3 className="text-sm font-medium text-gray-500">Total Advance Payable</h3>
+                <p className="text-2xl font-bold text-orange-600">{formatCurrency(walletData.totalAdvance - walletData.totalCommission)}</p>
               </div>
               <div className="rounded-lg p-6 shadow-lg border-l-4 border-purple-500">
                 <h3 className="text-sm font-medium text-gray-500">Admin Receivable</h3>
