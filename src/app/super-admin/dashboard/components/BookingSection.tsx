@@ -367,10 +367,10 @@ export function BookingSection({ isVisible, onToggle }: BookingSectionProps) {
                   {booking.team_name && <p><strong>Team:</strong> {booking.team_name}</p>}
                   <p><strong>Advance:</strong> {booking.payment_status}</p>
                   {/* {booking.cancelled_by && booking.cancelled_at && <p><strong>Cancelled on:</strong> {new Date(booking.cancelled_at).toLocaleDateString('en-CA')}, {new Date(booking.cancelled_at).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })}</p>} */}
-                  {booking.cancelled_by && booking.cancelled_at && <p><strong>Cancelled on:</strong> {(() => { const parts = booking.cancelled_at.includes('T') ? booking.cancelled_at.split('T') : booking.cancelled_at.split(' '); const timeStr = parts[1].substring(0,5); const [hours, minutes] = timeStr.split(':').map(Number); const period = hours >= 12 ? 'PM' : 'AM'; const displayHours = hours === 0 ? 12 : hours > 12 ? hours - 12 : hours; return parts[0] + ' ' + `${displayHours}:${minutes.toString().padStart(2,'0')} ${period}`; })()}</p>}
                   {booking.update_count > 0 && booking.last_updated_by && (
                     <p><strong>Last Updated By:</strong> {booking.last_updated_by} ({booking.update_count})</p>
                   )}
+                  {booking.cancelled_by && booking.cancelled_at && <p><strong>Cancelled on:</strong> {(() => { const parts = booking.cancelled_at.includes('T') ? booking.cancelled_at.split('T') : booking.cancelled_at.split(' '); const timeStr = parts[1].substring(0,5); const [hours, minutes] = timeStr.split(':').map(Number); const period = hours >= 12 ? 'PM' : 'AM'; const displayHours = hours === 0 ? 12 : hours > 12 ? hours - 12 : hours; return parts[0] + ' ' + `${displayHours}:${minutes.toString().padStart(2,'0')} ${period}`; })()}</p>}
                 </div>
 
                 <div className="flex flex-col items-end space-y-2">
