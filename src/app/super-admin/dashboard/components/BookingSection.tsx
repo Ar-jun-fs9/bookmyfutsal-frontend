@@ -480,6 +480,13 @@ function ViewOriginalBookingModal({ booking, onClose, setNotification }: { booki
   const { tokens } = useAuthStore();
 
   useEffect(() => {
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, []);
+
+  useEffect(() => {
     if (booking.history) {
       setHistory(booking.history);
       setLoading(false);
