@@ -1121,8 +1121,8 @@ export default function FutsalAdminDashboard() {
                                 {b.cancelled_by && b.cancelled_at && <p><strong>Cancelled on:</strong> {(() => { const parts = b.cancelled_at.includes('T') ? b.cancelled_at.split('T') : b.cancelled_at.split(' '); const timeStr = parts[1].substring(0,5); const [hours, minutes] = timeStr.split(':').map(Number); const period = hours >= 12 ? 'PM' : 'AM'; const displayHours = hours === 0 ? 12 : hours > 12 ? hours - 12 : hours; return parts[0] + ' ' + `${displayHours}:${minutes.toString().padStart(2,'0')} ${period}`; })()}</p>}
 
 
-                                {b.last_updated_by && (
-                                  <p><strong>Last Updated By:</strong> {b.last_updated_by}</p>
+                                {b.update_count > 0 && b.last_updated_by && (
+                                  <p><strong>Last Updated By:</strong> {b.last_updated_by} ({b.update_count})</p>
                                 )}
                               </div>
 
