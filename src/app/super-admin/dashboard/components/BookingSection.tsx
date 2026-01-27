@@ -38,6 +38,8 @@ export function BookingSection({ isVisible, onToggle }: BookingSectionProps) {
   const [notification, setNotification] = useState<{message: string, type: 'success' | 'info'} | null>(null);
   const [confirmModal, setConfirmModal] = useState<{isOpen: boolean, message: string, onConfirm: () => void}>({isOpen: false, message: '', onConfirm: () => {}});
   const [showDateFilter, setShowDateFilter] = useState(false);
+  const [historyCache, setHistoryCache] = useState<Record<number, any[]>>({});
+  const { tokens } = useAuthStore();
 
   // Auto-hide notifications after 2 seconds
   useEffect(() => {
@@ -48,6 +50,33 @@ export function BookingSection({ isVisible, onToggle }: BookingSectionProps) {
       return () => clearTimeout(timer);
     }
   }, [notification]);
+
+  // Prefetch booking histories
+  useEffect(() => {
+    const fetchHistories = async () => {
+      const bookingsToFetch = filteredBookings.filter((b: any) => b.update_count > 0 && !historyCache[b.booking_id]);
+      for (const booking of bookingsToFetch) {
+        try {
+          const headers: any = { 'Content-Type': 'application/json' };
+          if (tokens?.accessToken) {
+            headers['Authorization'] = `Bearer ${tokens.accessToken}`;
+          }
+          const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/bookings/history/${booking.booking_id}`, {
+            headers
+          });
+          if (response.ok) {
+            const data = await response.json();
+            setHistoryCache(prev => ({ ...prev, [booking.booking_id]: data.history }));
+          }
+        } catch (error) {
+          console.error('Error prefetching history:', error);
+        }
+      }
+    };
+    if (filteredBookings.length > 0 && tokens) {
+      fetchHistories();
+    }
+  }, [filteredBookings, tokens, historyCache]);
 
   const handleDeleteBooking = (id: number) => {
     setConfirmModal({
@@ -394,7 +423,7 @@ export function BookingSection({ isVisible, onToggle }: BookingSectionProps) {
                     )}
                     {booking.update_count > 0 && (
                       <button
-                        onClick={() => setViewingOriginalBooking(booking)}
+                        onClick={() => setViewingOriginalBooking({ booking, history: historyCache[booking.booking_id] || [] })}
                         className="bg-linear-to-r from-blue-600 to-blue-700 text-white px-3 py-1 rounded text-sm hover:shadow-lg transform hover:scale-105 transition-all duration-300"
                       >
                         Org
@@ -445,11 +474,17 @@ export function BookingSection({ isVisible, onToggle }: BookingSectionProps) {
 
 // View Original Booking Modal Component
 function ViewOriginalBookingModal({ booking, onClose, setNotification }: { booking: any, onClose: () => void, setNotification: (notification: { message: string, type: 'success' | 'info' } | null) => void }) {
-  const [history, setHistory] = useState<any[]>([]);
+  const [history, setHistory] = useState<any[]>(booking.history || []);
+  const [loading, setLoading] = useState(booking.history ? false : true);
   const [confirmModal, setConfirmModal] = useState<{isOpen: boolean, message: string, onConfirm: () => void}>({isOpen: false, message: '', onConfirm: () => {}});
   const { tokens } = useAuthStore();
 
   useEffect(() => {
+    if (booking.history) {
+      setHistory(booking.history);
+      setLoading(false);
+      return;
+    }
     const fetchHistory = async () => {
       try {
         const headers: any = { 'Content-Type': 'application/json' };
@@ -466,11 +501,13 @@ function ViewOriginalBookingModal({ booking, onClose, setNotification }: { booki
         }
       } catch (error) {
         console.error('Error fetching booking history:', error);
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchHistory();
-  }, [booking.booking_id, tokens]);
+  }, [booking.booking_id, booking.history, tokens]);
 
   const handleRemoveHistory = (historyId: number) => {
     setConfirmModal({
@@ -534,7 +571,11 @@ function ViewOriginalBookingModal({ booking, onClose, setNotification }: { booki
         </div>
 
         <div className="p-6 max-h-[70vh] overflow-y-auto">
-          {history.length === 0 ? (
+          {loading ? (
+            <div className="text-center py-8">
+              <p className="text-gray-600">Loading history...</p>
+            </div>
+          ) : history.length === 0 ? (
             <div className="text-center py-8">
               <p className="text-gray-600">No booking history found.</p>
             </div>

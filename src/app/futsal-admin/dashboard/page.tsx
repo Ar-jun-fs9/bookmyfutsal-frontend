@@ -146,6 +146,7 @@ export default function FutsalAdminDashboard() {
   const [selectAllRatings, setSelectAllRatings] = useState(false);
   const [showRatingCheckboxes, setShowRatingCheckboxes] = useState(false);
   const [offerMessageModal, setOfferMessageModal] = useState<{ isOpen: boolean, price: any, onConfirm: (message: string) => void, existingMessage?: string }>({ isOpen: false, price: null, onConfirm: () => { }, existingMessage: '' });
+  const [historyCache, setHistoryCache] = useState<Record<number, any[]>>({});
 
   // Reducer for filters
   const [filterState, dispatch] = useReducer(filterReducer, initialFilterState);
@@ -206,6 +207,33 @@ export default function FutsalAdminDashboard() {
       setDeletedBookings(JSON.parse(storedHidden));
     }
   }, [role, hydrated, router]);
+
+  // Prefetch booking histories
+  useEffect(() => {
+    const fetchHistories = async () => {
+      const bookingsToFetch = filteredBookings.filter((b: any) => b.update_count > 0 && !historyCache[b.booking_id]);
+      for (const booking of bookingsToFetch) {
+        try {
+          const headers: any = { 'Content-Type': 'application/json' };
+          if (tokens?.accessToken) {
+            headers['Authorization'] = `Bearer ${tokens.accessToken}`;
+          }
+          const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/bookings/history/${booking.booking_id}`, {
+            headers
+          });
+          if (response.ok) {
+            const data = await response.json();
+            setHistoryCache(prev => ({ ...prev, [booking.booking_id]: data.history }));
+          }
+        } catch (error) {
+          console.error('Error prefetching history:', error);
+        }
+      }
+    };
+    if (filteredBookings.length > 0 && tokens) {
+      fetchHistories();
+    }
+  }, [filteredBookings, tokens, historyCache]);
 
   // Prevent background scrolling when modals are open
   useEffect(() => {
@@ -1192,7 +1220,7 @@ export default function FutsalAdminDashboard() {
                                   )}
                                   {b.update_count > 0 && (
                                     <button
-                                      onClick={() => setViewingOriginalBooking(b)}
+                                      onClick={() => setViewingOriginalBooking({ booking: b, history: historyCache[b.booking_id] || [] })}
                                       className="bg-linear-to-r from-blue-600 to-blue-700 text-white px-3 py-1 rounded text-sm hover:shadow-lg transform hover:scale-105 transition-all duration-300"
                                     >
                                       Org
@@ -3722,11 +3750,17 @@ function EditRatingForm({ rating, onUpdate, onCancel }: { rating: any, onUpdate:
 
 // View Original Booking Modal Component
 function ViewOriginalBookingModal({ booking, onClose, showNotification }: { booking: any, onClose: () => void, showNotification: (notification: { message: string, type: 'success' | 'info' }) => void }) {
-  const [history, setHistory] = useState<any[]>([]);
+  const [history, setHistory] = useState<any[]>(booking.history || []);
+  const [loading, setLoading] = useState(booking.history ? false : true);
   const { tokens } = useAuthStore();
   const [confirmModal, setConfirmModal] = useState<{ isOpen: boolean, message: string, onConfirm: () => void }>({ isOpen: false, message: '', onConfirm: () => { } });
 
   useEffect(() => {
+    if (booking.history) {
+      setHistory(booking.history);
+      setLoading(false);
+      return;
+    }
     const fetchHistory = async () => {
       try {
         const headers: any = { 'Content-Type': 'application/json' };
@@ -3743,11 +3777,13 @@ function ViewOriginalBookingModal({ booking, onClose, showNotification }: { book
         }
       } catch (error) {
         console.error('Error fetching booking history:', error);
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchHistory();
-  }, [booking.booking_id, tokens]);
+  }, [booking.booking_id, booking.history, tokens]);
 
   const handleRemoveHistory = (historyId: number) => {
     setConfirmModal({
@@ -3804,7 +3840,11 @@ function ViewOriginalBookingModal({ booking, onClose, showNotification }: { book
         </div>
 
         <div className="p-6 max-h-[70vh] overflow-y-auto">
-          {history.length === 0 ? (
+          {loading ? (
+            <div className="text-center py-8">
+              <p className="text-gray-600">Loading history...</p>
+            </div>
+          ) : history.length === 0 ? (
             <div className="text-center py-8">
               <p className="text-gray-600">No booking history found.</p>
             </div>
