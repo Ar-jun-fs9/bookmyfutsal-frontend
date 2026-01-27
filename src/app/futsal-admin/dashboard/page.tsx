@@ -119,6 +119,7 @@ export default function FutsalAdminDashboard() {
   const [editingFutsal, setEditingFutsal] = useState(false);
   const [editingAdmin, setEditingAdmin] = useState(false);
   const [editingBooking, setEditingBooking] = useState<any | null>(null);
+  const [viewingOriginalBooking, setViewingOriginalBooking] = useState<any | null>(null);
   const [editingRating, setEditingRating] = useState<any | null>(null);
   const [creatingRating, setCreatingRating] = useState(false);
   const [showFutsalInfo, setShowFutsalInfo] = useState(false);
@@ -1189,6 +1190,14 @@ export default function FutsalAdminDashboard() {
                                       Delete
                                     </button>
                                   )}
+                                  {b.update_count > 0 && (
+                                    <button
+                                      onClick={() => setViewingOriginalBooking(b)}
+                                      className="bg-linear-to-r from-blue-600 to-blue-700 text-white px-3 py-1 rounded text-sm hover:shadow-lg transform hover:scale-105 transition-all duration-300"
+                                    >
+                                      View Original Booking
+                                    </button>
+                                  )}
                                 </div>
                               </div>
                             </div>
@@ -1503,6 +1512,14 @@ export default function FutsalAdminDashboard() {
             }} onCancel={() => setEditingBooking(null)} adminId={admin!.id} setNotification={showNotification} />
           </div>
         </div>
+      )}
+
+      {/* View Original Booking Modal */}
+      {viewingOriginalBooking && (
+        <ViewOriginalBookingModal
+          booking={viewingOriginalBooking}
+          onClose={() => setViewingOriginalBooking(null)}
+        />
       )}
 
       {/* Edit Rating Modal */}
@@ -3698,6 +3715,152 @@ function EditRatingForm({ rating, onUpdate, onCancel }: { rating: any, onUpdate:
           </button>
         </div>
       </form>
+    </div>
+  );
+}
+
+// View Original Booking Modal Component
+function ViewOriginalBookingModal({ booking, onClose }: { booking: any, onClose: () => void }) {
+  const [history, setHistory] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchHistory = async () => {
+      try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/bookings/history/${booking.booking_id}`);
+        if (response.ok) {
+          const data = await response.json();
+          setHistory(data.history);
+        }
+      } catch (error) {
+        console.error('Error fetching booking history:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchHistory();
+  }, [booking.booking_id]);
+
+  const formatTimeRange = (timeString: string): string => {
+    const [startTime, endTime] = timeString.split('-');
+    return `${formatTimeSlot(startTime)}-${formatTimeSlot(endTime)}`;
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
+        <div className="p-6 border-b border-gray-200">
+          <div className="flex justify-between items-center">
+            <h2 className="text-2xl font-bold text-gray-900">Booking History</h2>
+            <button
+              onClick={onClose}
+              className="text-gray-400 hover:text-gray-600 transition-colors"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <div className="p-6 max-h-[70vh] overflow-y-auto">
+          {loading ? (
+            <div className="text-center py-8">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+              <p className="mt-2 text-gray-600">Loading booking history...</p>
+            </div>
+          ) : history.length === 0 ? (
+            <div className="text-center py-8">
+              <p className="text-gray-600">No booking history found.</p>
+            </div>
+          ) : (
+            <div className="space-y-6">
+              {history.map((version, index) => (
+                <div key={version.history_id} className="border border-gray-200 rounded-lg p-4">
+                  <div className="flex justify-between items-start mb-4">
+                    <h3 className="text-lg font-semibold text-gray-900">
+                      Version {version.version_number}
+                      {version.version_number === 1 && " (Original)"}
+                    </h3>
+                    <span className="text-sm text-gray-500">
+                      Stored: {new Date(version.stored_at).toLocaleString()}
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4 text-sm">
+                    <div>
+                      <strong>Futsal:</strong> {version.futsal_name}
+                    </div>
+                    <div>
+                      <strong>Location:</strong> {version.location}, {version.city}
+                    </div>
+                    <div>
+                      <strong>Playing Date:</strong> {version.formatted_date}
+                    </div>
+                    <div>
+                      <strong>Booked On:</strong> {(() => {
+                        const parts = version.created_at.includes('T') ? version.created_at.split('T') : version.created_at.split(' ');
+                        const timeStr = parts[1].substring(0,5);
+                        const [hours, minutes] = timeStr.split(':').map(Number);
+                        const period = hours >= 12 ? 'PM' : 'AM';
+                        const displayHours = hours === 0 ? 12 : hours > 12 ? hours - 12 : hours;
+                        return parts[0] + ' ' + `${displayHours}:${minutes.toString().padStart(2,'0')} ${period}`;
+                      })()}
+                    </div>
+                    <div>
+                      <strong>Booking Type:</strong> {(() => {
+                        const type = version.booking_type || 'normal';
+                        switch (type) {
+                          case 'normal': return 'Normal';
+                          case 'date': return 'Date-Specific';
+                          case 'recurring': return 'Recurring';
+                          case 'time_based': return 'Time-Based';
+                          default: return 'Normal';
+                        }
+                      })()}
+                    </div>
+                    <div>
+                      <strong>Time:</strong> {formatTimeRange(version.time_slot)}
+                    </div>
+                    <div>
+                      <strong>Players:</strong> {version.number_of_players}
+                    </div>
+                    <div>
+                      <strong>Team:</strong> {version.team_name || 'N/A'}
+                    </div>
+                    <div>
+                      <strong>Paid Amount:</strong> Rs. {version.amount_paid}
+                    </div>
+                    <div>
+                      <strong>Total Amount:</strong> Rs. {version.total_amount}
+                    </div>
+                  </div>
+
+                  <div className="mt-4 pt-4 border-t border-gray-200">
+                    <div className="flex justify-between items-center">
+                      <div className="text-sm text-gray-600">
+                        <strong>User:</strong> {version.first_name}
+                        {version.user_phone && <span> | <strong>Phone:</strong> {version.user_phone}</span>}
+                      </div>
+                      <button
+                        onClick={() => {
+                          // Remove this version from history
+                          // This would require a backend endpoint to delete from booking_history
+                          alert('Remove functionality would require backend implementation');
+                        }}
+                        className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-sm transition-colors"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   );
 }
