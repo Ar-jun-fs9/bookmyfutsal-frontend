@@ -50,6 +50,12 @@ export function useBookings() {
         setError(null);
       } else if (response.status === 401) {
         setError('Unauthorized');
+      } else if (response.status === 429) {
+        setError('Rate limit exceeded. Please wait before retrying.');
+        // Auto-retry after 30 seconds
+        setTimeout(() => {
+          fetchBookings();
+        }, 30000);
       } else {
         setError('Failed to fetch bookings');
       }
@@ -147,6 +153,17 @@ export function useBookings() {
     if (tokens?.accessToken) {
       fetchBookings();
     }
+  }, [tokens?.accessToken]);
+
+  // Auto-refresh every 10 minutes to prevent stale data and rate limits
+  useEffect(() => {
+    if (!tokens?.accessToken) return;
+
+    const interval = setInterval(() => {
+      fetchBookings();
+    }, 10 * 60 * 1000); // 10 minutes
+
+    return () => clearInterval(interval);
   }, [tokens?.accessToken]);
 
   // Real-time updates via socket

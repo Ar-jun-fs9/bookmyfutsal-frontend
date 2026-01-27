@@ -154,7 +154,7 @@ export default function FutsalAdminDashboard() {
   // React Query hooks
   const { data: futsalsData } = useFutsals();
   const futsal = admin?.futsal_id ? futsalsData?.find((f: Futsal) => f.futsal_id === admin.futsal_id) : null;
-  const { data: bookingsData, refetch: refetchBookings } = useFutsalBookings(futsal?.futsal_id || 0);
+  const { data: bookingsData, refetch: refetchBookings, error: bookingsError } = useFutsalBookings(futsal?.futsal_id || 0);
   const { data: slotsData } = useFutsalSlotsForDate(futsal?.futsal_id ?? 0, slotDate);
   const closeAllSlotsMutation = useCloseAllSlotsForDate();
   const openAllSlotsMutation = useOpenAllSlotsForDate();
