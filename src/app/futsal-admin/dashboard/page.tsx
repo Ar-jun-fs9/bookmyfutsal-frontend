@@ -1077,7 +1077,7 @@ export default function FutsalAdminDashboard() {
                     </div>
                   )}
 
-                  <div className="space-y-4">
+                  <div className="space-y-4 mt-5">
                     {filteredBookings
                       .filter((b: any) => {
                         const category = categorizeBooking(b);
@@ -3723,7 +3723,6 @@ function EditRatingForm({ rating, onUpdate, onCancel }: { rating: any, onUpdate:
 // View Original Booking Modal Component
 function ViewOriginalBookingModal({ booking, onClose, showNotification }: { booking: any, onClose: () => void, showNotification: (notification: { message: string, type: 'success' | 'info' }) => void }) {
   const [history, setHistory] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
   const { tokens } = useAuthStore();
   const [confirmModal, setConfirmModal] = useState<{ isOpen: boolean, message: string, onConfirm: () => void }>({ isOpen: false, message: '', onConfirm: () => { } });
 
@@ -3744,8 +3743,6 @@ function ViewOriginalBookingModal({ booking, onClose, showNotification }: { book
         }
       } catch (error) {
         console.error('Error fetching booking history:', error);
-      } finally {
-        setLoading(false);
       }
     };
 
@@ -3807,12 +3804,7 @@ function ViewOriginalBookingModal({ booking, onClose, showNotification }: { book
         </div>
 
         <div className="p-6 max-h-[70vh] overflow-y-auto">
-          {loading ? (
-            <div className="text-center py-8">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-              <p className="mt-2 text-gray-600">Loading booking history...</p>
-            </div>
-          ) : history.length === 0 ? (
+          {history.length === 0 ? (
             <div className="text-center py-8">
               <p className="text-gray-600">No booking history found.</p>
             </div>

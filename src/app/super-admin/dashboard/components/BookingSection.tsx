@@ -446,7 +446,6 @@ export function BookingSection({ isVisible, onToggle }: BookingSectionProps) {
 // View Original Booking Modal Component
 function ViewOriginalBookingModal({ booking, onClose, setNotification }: { booking: any, onClose: () => void, setNotification: (notification: { message: string, type: 'success' | 'info' } | null) => void }) {
   const [history, setHistory] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
   const [confirmModal, setConfirmModal] = useState<{isOpen: boolean, message: string, onConfirm: () => void}>({isOpen: false, message: '', onConfirm: () => {}});
   const { tokens } = useAuthStore();
 
@@ -467,8 +466,6 @@ function ViewOriginalBookingModal({ booking, onClose, setNotification }: { booki
         }
       } catch (error) {
         console.error('Error fetching booking history:', error);
-      } finally {
-        setLoading(false);
       }
     };
 
@@ -537,12 +534,7 @@ function ViewOriginalBookingModal({ booking, onClose, setNotification }: { booki
         </div>
 
         <div className="p-6 max-h-[70vh] overflow-y-auto">
-          {loading ? (
-            <div className="text-center py-8">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-              <p className="mt-2 text-gray-600">Loading booking history...</p>
-            </div>
-          ) : history.length === 0 ? (
+          {history.length === 0 ? (
             <div className="text-center py-8">
               <p className="text-gray-600">No booking history found.</p>
             </div>
