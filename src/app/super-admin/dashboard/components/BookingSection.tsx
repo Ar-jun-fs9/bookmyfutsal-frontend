@@ -421,7 +421,7 @@ export function BookingSection({ isVisible, onToggle }: BookingSectionProps) {
                         Cancel
                       </button>
                     )}
-                    {booking.update_count > 0 && (
+                    {booking.update_count > 0 && historyCache[booking.booking_id] && historyCache[booking.booking_id].length > 0 && (
                       <button
                         onClick={() => setViewingOriginalBooking({ booking, history: historyCache[booking.booking_id] || [] })}
                         className="bg-linear-to-r from-blue-600 to-blue-700 text-white px-3 py-1 rounded text-sm hover:shadow-lg transform hover:scale-105 transition-all duration-300"

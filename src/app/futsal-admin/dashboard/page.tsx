@@ -1218,7 +1218,7 @@ export default function FutsalAdminDashboard() {
                                       Delete
                                     </button>
                                   )}
-                                  {b.update_count > 0 && (
+                                  {b.update_count > 0 && historyCache[b.booking_id] && historyCache[b.booking_id].length > 0 && (
                                     <button
                                       onClick={() => setViewingOriginalBooking({ booking: b, history: historyCache[b.booking_id] || [] })}
                                       className="bg-linear-to-r from-blue-600 to-blue-700 text-white px-3 py-1 rounded text-sm hover:shadow-lg transform hover:scale-105 transition-all duration-300"
