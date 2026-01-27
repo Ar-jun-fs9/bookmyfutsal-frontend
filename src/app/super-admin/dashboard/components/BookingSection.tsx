@@ -35,8 +35,8 @@ export function BookingSection({ isVisible, onToggle }: BookingSectionProps) {
   const { selectedItems, showCheckboxes, toggleSelection, toggleSelectAll, clearSelection, selectedCount } = useBulkOperations();
   const [editingBooking, setEditingBooking] = useState<any | null>(null);
   const [viewingOriginalBooking, setViewingOriginalBooking] = useState<any | null>(null);
-  const [notification, setNotification] = useState<{message: string, type: 'success' | 'info'} | null>(null);
-  const [confirmModal, setConfirmModal] = useState<{isOpen: boolean, message: string, onConfirm: () => void}>({isOpen: false, message: '', onConfirm: () => {}});
+  const [notification, setNotification] = useState<{ message: string, type: 'success' | 'info' } | null>(null);
+  const [confirmModal, setConfirmModal] = useState<{ isOpen: boolean, message: string, onConfirm: () => void }>({ isOpen: false, message: '', onConfirm: () => { } });
   const [showDateFilter, setShowDateFilter] = useState(false);
   const [historyCache, setHistoryCache] = useState<Record<number, any[]>>({});
   const { tokens } = useAuthStore();
@@ -83,7 +83,7 @@ export function BookingSection({ isVisible, onToggle }: BookingSectionProps) {
       isOpen: true,
       message: 'Are you sure you want to delete this booking permanently?',
       onConfirm: async () => {
-        setConfirmModal({ isOpen: false, message: '', onConfirm: () => {} });
+        setConfirmModal({ isOpen: false, message: '', onConfirm: () => { } });
         const result = await deleteBooking(id);
         if (result.success) {
           setNotification({ message: 'Booking deleted successfully', type: 'success' });
@@ -105,7 +105,7 @@ export function BookingSection({ isVisible, onToggle }: BookingSectionProps) {
       isOpen: true,
       message: messages[type],
       onConfirm: async () => {
-        setConfirmModal({ isOpen: false, message: '', onConfirm: () => {} });
+        setConfirmModal({ isOpen: false, message: '', onConfirm: () => { } });
         const result = await cancelBooking(id);
         if (result.success) {
           setNotification({ message: type === 'active' ? "Booking cancelled successfully" : "Booking deleted successfully", type: 'success' });
@@ -134,7 +134,7 @@ export function BookingSection({ isVisible, onToggle }: BookingSectionProps) {
       isOpen: true,
       message: filterMessages[bookingFilter],
       onConfirm: async () => {
-        setConfirmModal({ isOpen: false, message: '', onConfirm: () => {} });
+        setConfirmModal({ isOpen: false, message: '', onConfirm: () => { } });
         const result = await bulkDelete(selectedItems);
         if (result.success) {
           setNotification({ message: `${result.deletedCount ?? selectedItems.length} bookings deleted successfully!`, type: 'success' });
@@ -261,8 +261,8 @@ export function BookingSection({ isVisible, onToggle }: BookingSectionProps) {
                 clearSelection();
               }}
               className={`px-4 py-2 rounded-lg font-medium transition-all duration-300 flex items-center gap-2 ${bookingFilter === filter.key
-                  ? 'bg-linear-to-r from-green-500 to-green-600 text-white shadow-lg'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                ? 'bg-linear-to-r from-green-500 to-green-600 text-white shadow-lg'
+                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                 }`}
             >
               <span>{filter.icon}</span>
@@ -351,7 +351,7 @@ export function BookingSection({ isVisible, onToggle }: BookingSectionProps) {
                   <p><strong>Futsal:</strong> {booking.futsal_name}</p>
                   <p><strong>Playing Date:</strong> {booking.formatted_date}</p>
                   {/* <p><strong>Booked On:</strong> {booking.created_at.split('T')[0]}</p> */}
-                  <p><strong>Booked On:</strong> {(() => { const parts = booking.created_at.includes('T') ? booking.created_at.split('T') : booking.created_at.split(' '); const timeStr = parts[1].substring(0,5); const [hours, minutes] = timeStr.split(':').map(Number); const period = hours >= 12 ? 'PM' : 'AM'; const displayHours = hours === 0 ? 12 : hours > 12 ? hours - 12 : hours; return parts[0] + ' ' + `${displayHours}:${minutes.toString().padStart(2,'0')} ${period}`; })()}</p>
+                  <p><strong>Booked On:</strong> {(() => { const parts = booking.created_at.includes('T') ? booking.created_at.split('T') : booking.created_at.split(' '); const timeStr = parts[1].substring(0, 5); const [hours, minutes] = timeStr.split(':').map(Number); const period = hours >= 12 ? 'PM' : 'AM'; const displayHours = hours === 0 ? 12 : hours > 12 ? hours - 12 : hours; return parts[0] + ' ' + `${displayHours}:${minutes.toString().padStart(2, '0')} ${period}`; })()}</p>
                   <p><strong>Booking Type:</strong> {(() => {
                     const type = booking.booking_type || 'normal';
                     switch (type) {
@@ -370,7 +370,7 @@ export function BookingSection({ isVisible, onToggle }: BookingSectionProps) {
                   {booking.update_count > 0 && booking.last_updated_by && (
                     <p><strong>Last Updated By:</strong> {booking.last_updated_by} ({booking.update_count})</p>
                   )}
-                  {booking.cancelled_by && booking.cancelled_at && <p><strong>Cancelled on:</strong> {(() => { const parts = booking.cancelled_at.includes('T') ? booking.cancelled_at.split('T') : booking.cancelled_at.split(' '); const timeStr = parts[1].substring(0,5); const [hours, minutes] = timeStr.split(':').map(Number); const period = hours >= 12 ? 'PM' : 'AM'; const displayHours = hours === 0 ? 12 : hours > 12 ? hours - 12 : hours; return parts[0] + ' ' + `${displayHours}:${minutes.toString().padStart(2,'0')} ${period}`; })()}</p>}
+                  {booking.cancelled_by && booking.cancelled_at && <p><strong>Cancelled on:</strong> {(() => { const parts = booking.cancelled_at.includes('T') ? booking.cancelled_at.split('T') : booking.cancelled_at.split(' '); const timeStr = parts[1].substring(0, 5); const [hours, minutes] = timeStr.split(':').map(Number); const period = hours >= 12 ? 'PM' : 'AM'; const displayHours = hours === 0 ? 12 : hours > 12 ? hours - 12 : hours; return parts[0] + ' ' + `${displayHours}:${minutes.toString().padStart(2, '0')} ${period}`; })()}</p>}
                 </div>
 
                 <div className="flex flex-col items-end space-y-2">
@@ -393,8 +393,8 @@ export function BookingSection({ isVisible, onToggle }: BookingSectionProps) {
                       onClick={() => setEditingBooking(booking)}
                       disabled={isPastBooking || !!booking.cancelled_by}
                       className={`px-3 py-1 rounded text-sm transition-all duration-300 ${isPastBooking || !!booking.cancelled_by
-                          ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                          : 'bg-linear-to-r from-green-600 to-green-700 text-white hover:shadow-lg transform hover:scale-105'
+                        ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                        : 'bg-linear-to-r from-green-600 to-green-700 text-white hover:shadow-lg transform hover:scale-105'
                         }`}
                     >
                       Edit
@@ -442,7 +442,7 @@ export function BookingSection({ isVisible, onToggle }: BookingSectionProps) {
         isOpen={confirmModal.isOpen}
         message={confirmModal.message}
         onConfirm={confirmModal.onConfirm}
-        onCancel={() => setConfirmModal({ isOpen: false, message: '', onConfirm: () => {} })}
+        onCancel={() => setConfirmModal({ isOpen: false, message: '', onConfirm: () => { } })}
       />
 
       <NotificationModal
@@ -476,7 +476,7 @@ export function BookingSection({ isVisible, onToggle }: BookingSectionProps) {
 function ViewOriginalBookingModal({ booking, onClose, setNotification }: { booking: any, onClose: () => void, setNotification: (notification: { message: string, type: 'success' | 'info' } | null) => void }) {
   const [history, setHistory] = useState<any[]>(booking.history || []);
   const [loading, setLoading] = useState(booking.history ? false : true);
-  const [confirmModal, setConfirmModal] = useState<{isOpen: boolean, message: string, onConfirm: () => void}>({isOpen: false, message: '', onConfirm: () => {}});
+  const [confirmModal, setConfirmModal] = useState<{ isOpen: boolean, message: string, onConfirm: () => void }>({ isOpen: false, message: '', onConfirm: () => { } });
   const { tokens } = useAuthStore();
 
   useEffect(() => {
@@ -521,7 +521,7 @@ function ViewOriginalBookingModal({ booking, onClose, setNotification }: { booki
       isOpen: true,
       message: 'Are you sure you want to permanently delete this history entry?',
       onConfirm: async () => {
-        setConfirmModal({ isOpen: false, message: '', onConfirm: () => {} });
+        setConfirmModal({ isOpen: false, message: '', onConfirm: () => { } });
         try {
           const headers: any = { 'Content-Type': 'application/json' };
           if (tokens?.accessToken) {
@@ -613,11 +613,11 @@ function ViewOriginalBookingModal({ booking, onClose, setNotification }: { booki
                     <div>
                       <strong>Booked On:</strong> {(() => {
                         const parts = version.created_at.includes('T') ? version.created_at.split('T') : version.created_at.split(' ');
-                        const timeStr = parts[1].substring(0,5);
+                        const timeStr = parts[1].substring(0, 5);
                         const [hours, minutes] = timeStr.split(':').map(Number);
                         const period = hours >= 12 ? 'PM' : 'AM';
                         const displayHours = hours === 0 ? 12 : hours > 12 ? hours - 12 : hours;
-                        return parts[0] + ' ' + `${displayHours}:${minutes.toString().padStart(2,'0')} ${period}`;
+                        return parts[0] + ' ' + `${displayHours}:${minutes.toString().padStart(2, '0')} ${period}`;
                       })()}
                     </div>
                     <div>
@@ -684,7 +684,7 @@ function ViewOriginalBookingModal({ booking, onClose, setNotification }: { booki
               <p className="text-sm text-gray-600 mb-6">{confirmModal.message}</p>
               <div className="flex flex-col sm:flex-row gap-3">
                 <button
-                  onClick={() => setConfirmModal({ isOpen: false, message: '', onConfirm: () => {} })}
+                  onClick={() => setConfirmModal({ isOpen: false, message: '', onConfirm: () => { } })}
                   className="flex-1 bg-gray-100 text-gray-700 font-semibold py-2 px-4 rounded-lg hover:bg-gray-200 transition-all duration-300"
                 >
                   Cancel
