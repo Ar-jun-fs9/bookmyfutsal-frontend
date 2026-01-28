@@ -365,7 +365,8 @@ export function BookingSection({ isVisible, onToggle }: BookingSectionProps) {
                   <p><strong>Time:</strong> {formatTimeRange(booking.time_slot)}</p>
                   <p><strong>Players:</strong> {booking.number_of_players}</p>
                   {booking.team_name && <p><strong>Team:</strong> {booking.team_name}</p>}
-                  <p><strong>Advance:</strong> {booking.payment_status}</p>
+                  {/* <p><strong>Advance:</strong> {booking.payment_status}</p> */}
+                  <p><strong>Advance Paid: Rs.</strong><span className="text-green-600 font-bold"> {booking.amount_paid}</span></p>
                   {/* {booking.cancelled_by && booking.cancelled_at && <p><strong>Cancelled on:</strong> {new Date(booking.cancelled_at).toLocaleDateString('en-CA')}, {new Date(booking.cancelled_at).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })}</p>} */}
                   {booking.update_count > 0 && booking.last_updated_by && (
                     <p><strong>Last Updated By:</strong> {booking.last_updated_by} ({booking.update_count})</p>
@@ -374,7 +375,8 @@ export function BookingSection({ isVisible, onToggle }: BookingSectionProps) {
                 </div>
 
                 <div className="flex flex-col items-end space-y-2">
-                  <p className="text-lg font-semibold">Rs. {booking.amount_paid}</p>
+                  {/* <p className="text-lg font-semibold">Rs. {booking.amount_paid}</p> */}
+                   <p className="text-lg font-semibold">Rs. <span className="text-green-600 font-bold"> {booking.total_amount}</span></p>
 
                   {isPastBooking && !booking.cancelled_by && (
                     <span className="inline-flex items-center px-2 py-1 rounded-lg text-xs font-medium bg-red-100 text-red-800">

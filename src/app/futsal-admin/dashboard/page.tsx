@@ -1156,7 +1156,7 @@ export default function FutsalAdminDashboard() {
                                 <p><strong>Players:</strong> {b.number_of_players}</p>
                                 {b.team_name && <p><strong>Team:</strong> {b.team_name}</p>}
                                 {/* <p><strong>Advance:</strong> {b.payment_status}</p> */}
-                                <p><strong>Advance Paid:</strong> Rs.<span className="text-green-600 font-semibold"> {b.amount_paid}</span></p>
+                                <p><strong>Advance Paid: Rs.</strong><span className="text-green-600 font-bold"> {b.amount_paid}</span></p>
 
                                 {/* {b.cancelled_by && b.cancelled_at && <p><strong>Cancelled on:</strong> {new Date(b.cancelled_at).toLocaleDateString('en-CA')}, {new Date(b.cancelled_at).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })}</p>} */}
                                 {b.update_count > 0 && b.last_updated_by && (
@@ -1167,6 +1167,7 @@ export default function FutsalAdminDashboard() {
 
                               <div className="flex flex-col items-end space-y-2">
                                 {/* <p className="text-lg font-semibold">Rs. {b.amount_paid}</p> */}
+                                <p className="text-lg font-semibold">Rs. <span className="text-green-600 font-bold"> {b.total_amount}</span></p>
 
                                 {isPastBooking && !b.cancelled_by && (
                                   <span className="inline-flex items-center px-2 py-1 rounded-lg text-xs font-medium bg-red-100 text-red-800">
