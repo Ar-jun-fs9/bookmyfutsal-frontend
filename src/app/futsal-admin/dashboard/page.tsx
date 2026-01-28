@@ -64,6 +64,13 @@ function formatTimeRange(timeRange: string): string {
   return `${formatTimeSlot(startTime)}-${formatTimeSlot(endTime)}`;
 }
 
+
+function getDayOfWeek(dateString: string): string {
+  if (!dateString) return '';
+  const date = new Date(dateString);
+  return date.toLocaleDateString('en-US', { weekday: 'long' });
+}
+
 function categorizeBooking(booking: any): 'past' | 'today' | 'future' {
   const now = new Date();
   const matchDate = booking.formatted_date || booking.booking_date?.toString().split('T')[0];
@@ -1140,6 +1147,7 @@ export default function FutsalAdminDashboard() {
                                   </p>
                                 )}
                                 <p><strong>Playing Date:</strong> {b.formatted_date || b.booking_date?.split('T')[0]}</p>
+                                <p><strong>Paying Day:</strong> {getDayOfWeek(b.formatted_date || b.booking_date?.split('T')[0])}</p>
                                 {/* <p><strong>Booked On:</strong> {b.created_at.split('T')[0]}</p> */}
                                 <p><strong>Booked On:</strong> {(() => { const parts = b.created_at.includes('T') ? b.created_at.split('T') : b.created_at.split(' '); const timeStr = parts[1].substring(0, 5); const [hours, minutes] = timeStr.split(':').map(Number); const period = hours >= 12 ? 'PM' : 'AM'; const displayHours = hours === 0 ? 12 : hours > 12 ? hours - 12 : hours; return parts[0] + ' ' + `${displayHours}:${minutes.toString().padStart(2, '0')} ${period}`; })()}</p>
                                 <p><strong>Booking Type:</strong> {(() => {
@@ -3840,7 +3848,7 @@ function ViewOriginalBookingModal({ booking, onClose, showNotification }: { book
           </div>
         </div>
 
-        <div className="p-6 max-h-[70vh] overflow-y-auto">
+        <div className="p-2 max-h-[70vh] overflow-y-auto md:p-6">
           {loading ? (
             <div className="text-center py-8">
               <p className="text-gray-600">Loading history...</p>
@@ -3872,6 +3880,9 @@ function ViewOriginalBookingModal({ booking, onClose, showNotification }: { book
                     </div>
                     <div>
                       <strong>Playing Date:</strong> {version.formatted_date}
+                    </div>
+                    <div>
+                    <strong>Paying Day:</strong> {getDayOfWeek(version.formatted_date || version.booking_date?.split('T')[0])}
                     </div>
                     <div>
                       <strong>Booked On:</strong> {(() => {

@@ -636,8 +636,11 @@ export default function UserDashboard() {
   const futureCount = visibleBookings.filter(b => categorizeBooking(b) === 'future').length;
   const cancelledCount = visibleBookings.filter(b => b.cancelled_by).length;
 
-
-
+  function getDayOfWeek(dateString: string): string {
+  if (!dateString) return '';
+  const date = new Date(dateString);
+  return date.toLocaleDateString('en-US', { weekday: 'long' });
+  }
   return (
     <div className="min-h-screen bg-linear-to-br from-green-50 via-white to-blue-50">
       <header className="bg-linear-to-r from-gray-900 via-green-900 to-blue-900 backdrop-blur-md shadow-2xl border-b border-green-500/20">
@@ -1203,6 +1206,7 @@ export default function UserDashboard() {
                                 </div>
                                 <p><strong>Location:</strong> {booking.location}, {booking.city}</p>
                                 <p><strong>Playing Date:</strong> {new Date(booking.booking_date).toLocaleDateString('en-CA')}</p>
+                                <p><strong>Paying Day:</strong> {getDayOfWeek(booking.formatted_date || booking.booking_date?.split('T')[0])}</p>
                                 <p><strong>Booked On:</strong> {(() => { const parts = booking.created_at.includes('T') ? booking.created_at.split('T') : booking.created_at.split(' '); const timeStr = parts[1].substring(0, 5); const [hours, minutes] = timeStr.split(':').map(Number); const period = hours >= 12 ? 'PM' : 'AM'; const displayHours = hours === 0 ? 12 : hours > 12 ? hours - 12 : hours; const formattedTime = `${displayHours}:${minutes.toString().padStart(2, '0')} ${period}`; return parts[0] + ' ' + formattedTime; })()}</p>
                                 <p><strong>Booking Type:</strong> {(() => {
                                   const type = booking.booking_type || 'normal';
