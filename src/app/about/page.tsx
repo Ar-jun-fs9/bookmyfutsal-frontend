@@ -194,7 +194,7 @@ export default function AboutPage() {
               </h3>
 
               <p className="text-green-600 font-medium mb-3">
-                Founder · Developer · Product · Everything 😎
+                Founder · Developer · Product · Everything 
               </p>
 
               <p className="text-gray-600 text-sm">
