@@ -13,7 +13,7 @@ export default function TestimonialSection() {
   } = useTestimonials();
 
   return (
-    <section className="py-16 bg-linear-to-br from-gray-50 to-white">
+    <section className="bg-linear-to-br from-gray-50 to-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
           <h2 className="text-4xl md:text-5xl font-bold bg-linear-to-r from-green-600 to-blue-600 bg-clip-text text-transparent mb-4">

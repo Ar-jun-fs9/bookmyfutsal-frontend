@@ -132,7 +132,7 @@ export default function AboutPage() {
       {/* Main Content */}
       <main className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
         {/* Mission Section */}
-        <div className=" rounded-2xl  p-8 mb-8">
+        <div className=" rounded-2xl  p-8">
           <div className="text-center mb-8">
             <h2 className="text-3xl font-bold bg-linear-to-r from-green-600 to-blue-600 bg-clip-text text-transparent mb-4">
               Our Mission
@@ -167,8 +167,57 @@ export default function AboutPage() {
         {/* Testimonials Section */}
         <TestimonialSection />
 
+        {/* Owner Section */}
+        <div className="rounded-2xl p-8">
+          <div className="text-center mb-8">
+            <h2 className="text-3xl font-bold bg-linear-to-r from-green-600 to-blue-600 bg-clip-text text-transparent mb-4">
+              Meet the Owner
+            </h2>
+            <p className="text-gray-600 text-lg">
+              One man. Many roles. Hakuna Matata.
+            </p>
+          </div>
+
+          <div className="flex justify-center">
+            <div className="text-center max-w-md">
+
+              <div className="mx-auto mb-6">
+                <img
+                  src="/owner/owner.png"
+                  className="w-64 md:w-72 lg:w-80 h-auto mx-auto object-contain"
+                  alt="Owner"
+                />
+              </div>
+
+              <h3 className="text-2xl font-bold text-gray-800 mb-2">
+                Hakuna Matata
+              </h3>
+
+              <p className="text-green-600 font-medium mb-3">
+                Founder · Developer · Product · Everything 😎
+              </p>
+
+              <p className="text-gray-600 text-sm">
+                Solo founder and all-rounder behind BookMyFutsal — handling product,
+                engineering, strategy, and execution with a simple belief:
+                build things that just work.
+              </p>
+              <div className="mt-6">
+                <a
+                  href="mailto:bookmyfutsal@gmail.com"
+                  className="inline-block bg-linear-to-r from-green-600 to-blue-600 text-white font-bold text-sm md:text-xl px-6 py-3 rounded-lg hover:bg-gray-800 transition-colors"
+                >
+                  Contact: bookmyfutsal@gmail.com
+                </a>
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+
         {/* Team Section */}
-        <div className=" rounded-2xl  p-8 mb-8">
+        {/* <div className=" rounded-2xl  p-8 mb-8">
           <div className="text-center mb-8">
             <h2 className="text-3xl font-bold bg-linear-to-r from-green-600 to-blue-600 bg-clip-text text-transparent mb-4">
               Meet Our Team
@@ -178,10 +227,10 @@ export default function AboutPage() {
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-             <div className="text-center">
-              {/* <div className="w-32 h-32 bg-linear-to-r from-teal-400 to-cyan-500 rounded-full mx-auto mb-4 flex items-center justify-center overflow-hidden"> */}
-              <div className="w-32 h-32 bg-linear-to-r rounded-full mx-auto mb-4 flex items-center justify-center overflow-hidden">
-                <img src="/partners/arpit.jpeg" className="w-full h-full object-cover" />
+             <div className="text-center"> */}
+        {/* <div className="w-32 h-32 bg-linear-to-r from-teal-400 to-cyan-500 rounded-full mx-auto mb-4 flex items-center justify-center overflow-hidden"> */}
+        {/* <div className="w-32 h-32 bg-linear-to-r rounded-full mx-auto mb-4 flex items-center justify-center overflow-hidden">
+                <img src="/owner/arpit.jpeg" className="w-full h-full object-cover" />
               </div>
               <h3 className="text-xl font-bold text-gray-800 mb-2">Arpit</h3>
               <p className="text-teal-600 font-medium mb-2">Product Manager</p>
@@ -189,10 +238,10 @@ export default function AboutPage() {
                 Product strategist focused on user experience and driving product growth through data-driven decisions.
               </p>
             </div>
-             <div className="text-center">
-              {/* <div className="w-32 h-32 bg-linear-to-r from-orange-400 to-red-500 rounded-full mx-auto mb-4 flex items-center justify-center overflow-hidden"> */}
-               <div className="w-32 h-32 bg-linear-to-r rounded-full mx-auto mb-4 flex items-center justify-center overflow-hidden">
-                <img src="/partners/suman.jpeg" className="w-full h-full object-cover" />
+             <div className="text-center"> */}
+        {/* <div className="w-32 h-32 bg-linear-to-r from-orange-400 to-red-500 rounded-full mx-auto mb-4 flex items-center justify-center overflow-hidden"> */}
+        {/* <div className="w-32 h-32 bg-linear-to-r rounded-full mx-auto mb-4 flex items-center justify-center overflow-hidden">
+                <img src="/owner/suman.jpeg" className="w-full h-full object-cover" />
               </div>
               <h3 className="text-xl font-bold text-gray-800 mb-2">Suman</h3>
               <p className="text-orange-600 font-medium mb-2">Software Engineer / Developer</p>
@@ -200,10 +249,10 @@ export default function AboutPage() {
                 Full-stack developer specializing in modern web technologies and creating robust user interfaces.
               </p>
             </div>
-            <div className="text-center">
-              {/* <div className="w-32 h-32 bg-linear-to-r from-purple-400 to-pink-500 rounded-full mx-auto mb-4 flex items-center justify-center overflow-hidden"> */}
-              <div className="w-32 h-32 bg-linear-to-r rounded-full mx-auto mb-4 flex items-center justify-center overflow-hidden">
-                <img src="/partners/prawjol.jpeg" className="w-full h-full object-cover" />
+            <div className="text-center"> */}
+        {/* <div className="w-32 h-32 bg-linear-to-r from-purple-400 to-pink-500 rounded-full mx-auto mb-4 flex items-center justify-center overflow-hidden"> */}
+        {/* <div className="w-32 h-32 bg-linear-to-r rounded-full mx-auto mb-4 flex items-center justify-center overflow-hidden">
+                <img src="/owner/prawjol.jpeg" className="w-full h-full object-cover" />
               </div>
               <h3 className="text-xl font-bold text-gray-800 mb-2">Prajwol</h3>
               <p className="text-purple-600 font-medium mb-2">Engineering Manager</p>
@@ -211,10 +260,10 @@ export default function AboutPage() {
                 Experienced engineering leader focused on building scalable solutions and mentoring development teams.
               </p>
             </div>
-            <div className="text-center">
-              {/* <div className="w-32 h-32 bg-linear-to-r from-blue-400 to-purple-500 rounded-full mx-auto mb-4 flex items-center justify-center overflow-hidden"> */}
-              <div className="w-32 h-32 bg-linear-to-r rounded-full mx-auto mb-4 flex items-center justify-center overflow-hidden">
-                <img src="/partners/bidesh.jpeg" className="w-full h-full object-cover" />
+            <div className="text-center"> */}
+        {/* <div className="w-32 h-32 bg-linear-to-r from-blue-400 to-purple-500 rounded-full mx-auto mb-4 flex items-center justify-center overflow-hidden"> */}
+        {/* <div className="w-32 h-32 bg-linear-to-r rounded-full mx-auto mb-4 flex items-center justify-center overflow-hidden">
+                <img src="/owner/bidesh.jpeg" className="w-full h-full object-cover" />
               </div>
               <h3 className="text-xl font-bold text-gray-800 mb-2">Bidesh</h3>
               <p className="text-blue-600 font-medium mb-2">Chief Technology Officer</p>
@@ -222,10 +271,10 @@ export default function AboutPage() {
                 Technology expert ensuring our platform delivers exceptional performance and user experience.
               </p>
             </div>
-            <div className="text-center">
-              {/* <div className="w-32 h-32 bg-linear-to-r from-indigo-400 to-purple-500 rounded-full mx-auto mb-4 flex items-center justify-center overflow-hidden"> */}
-               <div className="w-32 h-32 bg-linear-to-r rounded-full mx-auto mb-4 flex items-center justify-center overflow-hidden">
-                <img src="/partners/roshan.jpeg" className="w-full h-full object-cover" />
+            <div className="text-center"> */}
+        {/* <div className="w-32 h-32 bg-linear-to-r from-indigo-400 to-purple-500 rounded-full mx-auto mb-4 flex items-center justify-center overflow-hidden"> */}
+        {/* <div className="w-32 h-32 bg-linear-to-r rounded-full mx-auto mb-4 flex items-center justify-center overflow-hidden">
+                <img src="/owner/roshan.jpeg" className="w-full h-full object-cover" />
               </div>
               <h3 className="text-xl font-bold text-gray-800 mb-2">Roshan</h3>
               <p className="text-indigo-600 font-medium mb-2">Quality Assurance Engineer</p>
@@ -233,10 +282,10 @@ export default function AboutPage() {
                 Quality assurance specialist ensuring our platform delivers reliable and bug-free experiences to users.
               </p>
             </div>
-             <div className="text-center">
-              {/* <div className="w-32 h-32 bg-linear-to-r from-green-400 to-blue-500 rounded-full mx-auto mb-4 flex items-center justify-center overflow-hidden"> */}
-              <div className="w-32 h-32 bg-linear-to-rrounded-full mx-auto mb-4 flex items-center justify-center overflow-hidden">
-                <img src="/partners/arjun.jpeg" className="w-full h-full object-cover rounded-full" />
+             <div className="text-center"> */}
+        {/* <div className="w-32 h-32 bg-linear-to-r from-green-400 to-blue-500 rounded-full mx-auto mb-4 flex items-center justify-center overflow-hidden"> */}
+        {/* <div className="w-32 h-32 bg-linear-to-rrounded-full mx-auto mb-4 flex items-center justify-center overflow-hidden">
+                <img src="/owner/arjun.jpeg" className="w-full h-full object-cover rounded-full" />
               </div>
               <h3 className="text-xl font-bold text-gray-800 mb-2">Hakuna Matata</h3>
               <p className="text-green-600 font-medium mb-2">All Rounder</p>
@@ -245,7 +294,7 @@ export default function AboutPage() {
               </p>
             </div>
           </div>
-        </div>
+        </div> */}
       </main>
     </div>
   );

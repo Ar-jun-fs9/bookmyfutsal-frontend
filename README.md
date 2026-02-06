@@ -77,13 +77,8 @@ BookMyFutsal is a comprehensive web platform for booking futsal venues in Nepal.
 │   │   ├── 📁 logo/                      # Logo assets
 │   │   │   ├── 🖼️ logo.png               # Application logo
 │   │   │   └── 🖼️ logo1.png              # Alternative logo
-│   │   └── 📁 partners/                  # Partner logo assets
-│   │       ├── 🖼️ partner1.png           # Partner 1 logo
-│   │       ├── 🖼️ partner2.png           # Partner 2 logo
-│   │       ├── 🖼️ partner3.png           # Partner 3 logo
-│   │       ├── 🖼️ partner4.png           # Partner 4 logo
-│   │       ├── 🖼️ partner5.png           # Partner 5 logo
-│   │       └── 🖼️ partner6.png           # Partner 6 logo
+│   │   └── 📁 owner/                     # owner logo assets
+│   │       ├── 🖼️ owner.png              # single owner
 │   └── 📁 src/                           # Source code
 │       ├── 📁 app/                       # Next.js App Router directory
 │       │   ├── 🖼️ favicon.ico            # Browser favicon
