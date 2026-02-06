@@ -168,7 +168,7 @@ export default function AboutPage() {
         <TestimonialSection />
 
         {/* Owner Section */}
-        <div className="rounded-2xl p-8">
+        <div className="rounded-2xl p-8 mt-9">
           <div className="text-center mb-8">
             <h2 className="text-3xl font-bold bg-linear-to-r from-green-600 to-blue-600 bg-clip-text text-transparent mb-4">
               Meet the Owner
@@ -198,7 +198,7 @@ export default function AboutPage() {
               </p>
 
               <p className="text-gray-600 text-sm">
-                Solo founder and all-rounder behind BookMyFutsal — handling product,
+                Solo founder and all-rounder behind <span className="font-bold text-green-600">BookMyFutsal</span>, handling product,
                 engineering, strategy, and execution with a simple belief:
                 build things that just work.
               </p>
