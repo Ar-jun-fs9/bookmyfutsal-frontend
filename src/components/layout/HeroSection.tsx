@@ -14,7 +14,7 @@ export default function HeroSection() {
         <div className="absolute inset-0 bg-linear-to-r from-green-900/30 via-transparent to-blue-900/30"></div>
       </div>
 
-      <div className="relative z-10 max-w-7xl mx-auto px-6 md:py-24 grid grid-cols-1 lg:grid-cols-2 gap-12 md:gap-16 items-center">
+      <div className="relative z-10 max-w-7xl mx-auto px-6 py-16 md:py-24 grid grid-cols-1 lg:grid-cols-2 gap-12 md:gap-16 items-center">
 
         {/* LEFT CONTENT */}
         <div className="text-white space-y-8 ">
