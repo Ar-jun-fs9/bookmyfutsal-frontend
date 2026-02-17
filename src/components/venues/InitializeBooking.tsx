@@ -90,11 +90,11 @@ export default function InitializeBooking({ onComplete }: InitializeBookingProps
         </div>
         
         {/* Time indicator (for debugging/verification) */}
-        {elapsedTime > 0 && (
+        {/* {elapsedTime > 0 && (
           <p className="text-xs text-gray-400 mt-4">
             Initialization time: {elapsedTime.toFixed(0)}ms
           </p>
-        )}
+        )} */}
       </div>
     </div>
   );
