@@ -1,6 +1,8 @@
 import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 import { useVenueCarousel } from '@/hooks/useVenueCarousel';
 import { useFutsalStore } from '@/stores/futsalStore';
+import InitializeBooking from './InitializeBooking'; // Import the InitializeBooking component
 
 interface Futsal {
   futsal_id: number;
@@ -26,9 +28,30 @@ export default function VenueCarousel() {
   const router = useRouter();
   const { futsals, currentCarouselIndex, goToNext, goToPrev, goToSlide } = useVenueCarousel();
   const { setSelectedFutsal } = useFutsalStore();
+  const [showInitializeBooking, setShowInitializeBooking] = useState(false);
+
+  // Added a loading state to show the InitializeBooking component while navigating to the booking page
+  const handleBookNow = (futsal: Futsal) => {
+    // Start timing the initialization
+    const startTime = performance.now();
+    
+    // Store futsal data
+    localStorage.setItem('selectedFutsal', JSON.stringify(futsal));
+    localStorage.setItem('bookingStartTime', startTime.toString());
+    
+    // Show the initialize booking component
+    setShowInitializeBooking(true);
+    
+    // Navigate to booking page after a brief delay to show loading feedback
+    setTimeout(() => {
+      router.push(`/book/${futsal.futsal_id}`);
+    }, 100);
+  };
 
   return (
-    <section className="py-16 bg-white">
+    <>
+      {showInitializeBooking && <InitializeBooking />}
+      <section className="py-16 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
           <h2 className="text-4xl md:text-5xl font-bold bg-linear-to-r from-green-600 to-blue-600 bg-clip-text text-transparent mb-4">
@@ -66,10 +89,7 @@ export default function VenueCarousel() {
                       <span className="text-xl md:text-2xl font-bold text-green-400">Rs. {futsal.price_per_hour}/hour</span>
                     </div>
                     <button
-                      onClick={() => {
-                        localStorage.setItem('selectedFutsal', JSON.stringify(futsal));
-                        router.push(`/book/${futsal.futsal_id}`);
-                      }}
+                      onClick={() => handleBookNow(futsal)}
                       className="inline-block bg-linear-to-r from-green-500 to-green-600 text-white font-bold py-2 px-6 md:py-3 md:px-8 rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 text-sm md:text-base"
                     >
                       Book Now
@@ -112,5 +132,6 @@ export default function VenueCarousel() {
         </div>
       </div>
     </section>
+    </>
   );
 }
