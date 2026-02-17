@@ -340,7 +340,7 @@ export default function UserLogin() {
                   <div className="space-y-4">
                     <div className="relative">
                       <label htmlFor="username" className="block text-sm font-semibold text-gray-700 mb-1.5">
-                        👤 Username or Email
+                         Username or Email
                       </label>
                       <div className="relative">
                         <input
@@ -363,7 +363,7 @@ export default function UserLogin() {
 
                     <div className="relative">
                       <label htmlFor="password" className="block text-sm font-semibold text-gray-700 mb-1.5">
-                        🔒 Password
+                         Password
                       </label>
                       <div className="relative">
                         <input
@@ -512,7 +512,7 @@ export default function UserLogin() {
 
                     <div className="relative">
                       <label htmlFor="forgotEmail" className="block text-sm font-semibold text-gray-700 mb-2">
-                        📧 Email Address
+                         Email Address
                       </label>
                       <div className="relative">
                         <input

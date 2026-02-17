@@ -476,7 +476,7 @@ export default function UserRegister() {
                       <div className="grid grid-cols-2 gap-4">
                         <div className="relative">
                           <label htmlFor="first_name" className="block text-sm font-semibold text-gray-700 mb-1.5">
-                            👤 First Name
+                             First Name
                           </label>
                           <div className="relative">
                             <input
@@ -499,7 +499,7 @@ export default function UserRegister() {
 
                         <div className="relative">
                           <label htmlFor="last_name" className="block text-sm font-semibold text-gray-700 mb-1.5">
-                            👤 Last Name
+                             Last Name
                           </label>
                           <div className="relative">
                             <input
@@ -524,7 +524,7 @@ export default function UserRegister() {
                       <div className="grid grid-cols-2 gap-4">
                         <div className="relative">
                           <label htmlFor="username" className="block text-sm font-semibold text-gray-700 mb-1.5">
-                            👤 Username
+                            Username
                           </label>
                           <div className="relative">
                             <input
@@ -560,7 +560,7 @@ export default function UserRegister() {
 
                         <div className="relative">
                           <label htmlFor="email" className="block text-sm font-semibold text-gray-700 mb-1.5">
-                            📧 Email Address
+                             Email Address
                           </label>
                           <div className="relative">
                             <input
@@ -585,7 +585,7 @@ export default function UserRegister() {
                       <div className="grid grid-cols-2 gap-4">
                         <div className="relative">
                           <label htmlFor="password" className="block text-sm font-semibold text-gray-700 mb-1.5">
-                            🔒 Password
+                             Password
                           </label>
                           <div className="relative">
                             <input
@@ -630,7 +630,7 @@ export default function UserRegister() {
 
                         <div className="relative">
                           <label htmlFor="confirm_password" className="block text-sm font-semibold text-gray-700 mb-1.5">
-                            🔒 Confirm Password
+                             Confirm Password
                           </label>
                           <div className="relative">
                             <input
@@ -682,7 +682,7 @@ export default function UserRegister() {
 
                       <div className="relative">
                         <label htmlFor="phone" className="block text-sm font-semibold text-gray-700 mb-1.5">
-                          📞 Phone Number
+                           Phone Number
                         </label>
                         <div className="relative">
                           <input
