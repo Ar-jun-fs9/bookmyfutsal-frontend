@@ -15,6 +15,7 @@ import { filterReducer, initialFilterState } from '@/reducers/filterReducer';
 import { useSpecialPrices } from './hooks/useSpecialPrices';
 import { useTimeBasedPricing } from './hooks/useTimeBasedPricing';
 import { OfferMessageModal } from '../../super-admin/dashboard/components/modals/OfferMessageModal';
+import SlotLoading from '@/components/venues/SlotLoading';
 
 interface Admin {
   id: number;
@@ -162,7 +163,7 @@ export default function FutsalAdminDashboard() {
   const { data: futsalsData } = useFutsals();
   const futsal = admin?.futsal_id ? futsalsData?.find((f: Futsal) => f.futsal_id === admin.futsal_id) : null;
   const { data: bookingsData, refetch: refetchBookings, error: bookingsError } = useFutsalBookings(futsal?.futsal_id || 0);
-  const { data: slotsData } = useFutsalSlotsForDate(futsal?.futsal_id ?? 0, slotDate);
+  const { data: slotsData, isLoading: isSlotsLoading } = useFutsalSlotsForDate(futsal?.futsal_id ?? 0, slotDate);
   const closeAllSlotsMutation = useCloseAllSlotsForDate();
   const openAllSlotsMutation = useOpenAllSlotsForDate();
   const updateSlotStatusMutation = useUpdateSlotStatus();
@@ -908,7 +909,9 @@ export default function FutsalAdminDashboard() {
                 {/* Display slots for selected date only */}
                 <div className="mb-6">
                   <h4 className="text-lg font-semibold mb-3">{new Date(slotDate).toLocaleDateString()}</h4>
-                  {slots.length > 0 ? (
+                  {isSlotsLoading ? (
+                    <SlotLoading message="Loading slots for this date..." />
+                  ) : slots.length > 0 ? (
                     <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4">
                       {slots.map((slot: any) => (
                         <div

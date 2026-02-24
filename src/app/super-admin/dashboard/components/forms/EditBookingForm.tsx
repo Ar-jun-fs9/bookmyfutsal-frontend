@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import SlotLoading from '@/components/venues/SlotLoading';
 
 interface EditBookingFormProps {
   booking: any;
@@ -74,6 +75,7 @@ export function EditBookingForm({ booking, onUpdate, onCancel, setNotification }
   const [selectedDate, setSelectedDate] = useState(booking.booking_date?.split('T')[0] || '');
   const [selectedShift, setSelectedShift] = useState('');
   const [availableSlots, setAvailableSlots] = useState<any[]>([]);
+  const [isLoadingSlots, setIsLoadingSlots] = useState(false);
   const [selectedSlotId, setSelectedSlotId] = useState<number | null>(null);
   const [numberOfPlayers, setNumberOfPlayers] = useState(booking.number_of_players);
   const [teamName, setTeamName] = useState(booking.team_name || '');
@@ -93,6 +95,7 @@ export function EditBookingForm({ booking, onUpdate, onCancel, setNotification }
 
   const handleShiftSubmit = async () => {
     if (selectedShift && selectedDate && futsalId) {
+      setIsLoadingSlots(true);
       try {
         const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/time-slots/futsal/${futsalId}/date/${selectedDate}/shift/${selectedShift}`);
         if (response.ok) {
@@ -102,6 +105,8 @@ export function EditBookingForm({ booking, onUpdate, onCancel, setNotification }
         }
       } catch (error) {
         console.error('Error fetching slots:', error);
+      } finally {
+        setIsLoadingSlots(false);
       }
     }
   };
@@ -487,7 +492,9 @@ export function EditBookingForm({ booking, onUpdate, onCancel, setNotification }
                   </div>
 
                   {/* Slot Selection */}
-                  {availableSlots.length > 0 ? (
+                  {isLoadingSlots ? (
+                    <SlotLoading message="Loading available time slots..." />
+                  ) : availableSlots.length > 0 ? (
                     <div className="mb-8">
                       <h3 className="text-lg font-semibold text-gray-800 mb-4 text-center">Available Time Slots</h3>
                       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
@@ -565,13 +572,7 @@ export function EditBookingForm({ booking, onUpdate, onCancel, setNotification }
                     </div>
                   ) : (
                     <div className="text-center py-8">
-                      <div className="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center mx-auto mb-4">
-                        <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                      </div>
-                      <p className="text-gray-500 text-lg font-medium">No slots available for this shift</p>
-                      <p className="text-gray-400 text-sm mt-1">Try selecting a different shift or date</p>
+                      <SlotLoading message="Checking available slots..." />
                     </div>
                   )}
 

@@ -14,6 +14,7 @@ import { Notification } from '@/components/ui/Notification';
 import { useSpecialPrices } from '@/hooks/useSpecialPrices';
 import PriceNotificationModal from '@/components/modals/PriceNotificationModal';
 import TermsModal from '@/components/modals/BookingTermsModal';
+import SlotLoading from '@/components/venues/SlotLoading';
 
 // Calculate advance payment based on price ranges
 function calculateAdvance(price: number): number {
@@ -2373,6 +2374,7 @@ function BookingModal({ futsal, user, onClose, onSuccess, setSuccessModal, setCo
   const [selectedDate, setSelectedDate] = useState('');
   const [selectedShift, setSelectedShift] = useState('');
   const [availableSlots, setAvailableSlots] = useState<any[]>([]);
+  const [isLoadingSlots, setIsLoadingSlots] = useState(false);
   const [availableShifts, setAvailableShifts] = useState<string[]>([]);
   const [selectedSlotIds, setSelectedSlotIds] = useState<number[]>([]);
   const [numberOfPlayers, setNumberOfPlayers] = useState('');
@@ -2640,6 +2642,7 @@ function BookingModal({ futsal, user, onClose, onSuccess, setSuccessModal, setCo
         setSelectedSlotIds([]);
       }
       setFirstSelectedSpecialPrice(null);
+      setIsLoadingSlots(true);
       try {
         const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/time-slots/futsal/${futsal.futsal_id}/date/${selectedDate}/shift/${selectedShift}`);
         if (response.ok) {
@@ -2649,6 +2652,8 @@ function BookingModal({ futsal, user, onClose, onSuccess, setSuccessModal, setCo
         }
       } catch (error) {
         console.error('Error fetching slots:', error);
+      } finally {
+        setIsLoadingSlots(false);
       }
     }
   };
@@ -3201,7 +3206,11 @@ function BookingModal({ futsal, user, onClose, onSuccess, setSuccessModal, setCo
                   </div>
 
                   {/* Slot Selection */}
-                  {availableSlots.length > 0 ? (
+                  {isLoadingSlots ? (
+                    <div className="flex justify-center items-center py-12">
+                      <SlotLoading />
+                    </div>
+                  ) : availableSlots.length > 0 ? (
                     <div className="mb-8">
                       <h3 className="text-lg font-semibold text-gray-800 mb-4 text-center">Available Time Slots</h3>
                       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
@@ -3599,6 +3608,7 @@ function UpdateBookingModal({ booking, onClose, onSuccess, setSuccessModal, show
   const [selectedDate, setSelectedDate] = useState(booking.booking_date?.split('T')[0] || '');
   const [selectedShift, setSelectedShift] = useState('');
   const [availableSlots, setAvailableSlots] = useState<any[]>([]);
+  const [isLoadingSlots, setIsLoadingSlots] = useState(false);
   const [availableShifts, setAvailableShifts] = useState<string[]>([]);
   const [futsal, setFutsal] = useState<Futsal | null>(null);
   const [selectedSlotIds, setSelectedSlotIds] = useState<number[]>([]);
@@ -3813,6 +3823,7 @@ function UpdateBookingModal({ booking, onClose, onSuccess, setSuccessModal, show
 
   const handleShiftSubmit = async () => {
     if (selectedShift && selectedDate && futsalId) {
+      setIsLoadingSlots(true);
       try {
         const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/time-slots/futsal/${futsalId}/date/${selectedDate}/shift/${selectedShift}`);
         if (response.ok) {
@@ -3822,6 +3833,8 @@ function UpdateBookingModal({ booking, onClose, onSuccess, setSuccessModal, show
         }
       } catch (error) {
         console.error('Error fetching slots:', error);
+      } finally {
+        setIsLoadingSlots(false);
       }
     }
   };
@@ -4151,7 +4164,11 @@ function UpdateBookingModal({ booking, onClose, onSuccess, setSuccessModal, show
                   </div>
 
                   {/* Slot Selection */}
-                  {availableSlots.length > 0 ? (
+                  {isLoadingSlots ? (
+                    <div className="flex justify-center items-center py-12">
+                      <SlotLoading />
+                    </div>
+                  ) : availableSlots.length > 0 ? (
                     <div className="mb-8">
                       <h3 className="text-lg font-semibold text-gray-800 mb-4 text-center">Available Time Slots</h3>
                       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">

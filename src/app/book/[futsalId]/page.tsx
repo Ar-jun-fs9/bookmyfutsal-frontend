@@ -13,6 +13,7 @@ import { bookingReducer, initialBookingState } from "@/reducers/bookingReducer";
 import { formatTime, formatDate, formatBookingTimeRange, generateTrackingCode } from "@/utils/helpers";
 import PriceNotificationModal from "@/components/modals/PriceNotificationModal";
 import TermsModal from "@/components/modals/BookingTermsModal";
+import SlotLoading from "@/components/venues/SlotLoading";
 
 interface Futsal {
   futsal_id: number;
@@ -354,7 +355,7 @@ export default function BookFutsal() {
   };
 
   // Time slots query
-  const { data: timeSlotsData, refetch: refetchTimeSlots } = useTimeSlots(
+  const { data: timeSlotsData, refetch: refetchTimeSlots, isLoading: isSlotsLoading } = useTimeSlots(
     futsalId!,
     bookingState.selectedDate,
     bookingState.selectedShift
@@ -1324,7 +1325,9 @@ export default function BookFutsal() {
                   </div>
 
                   {/* Slot Selection */}
-                  {availableSlots.length > 0 ? (
+                  {isSlotsLoading ? (
+                    <SlotLoading message="Loading available time slots..." />
+                  ) : availableSlots.length > 0 ? (
                     <div className="mb-8">
                       <h3 className="text-lg font-semibold text-gray-800 mb-4 text-center">Available Time Slots</h3>
                       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
