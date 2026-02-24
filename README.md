@@ -152,12 +152,14 @@ BookMyFutsal is a comprehensive web platform for booking futsal venues in Nepal.
 │       │   │   │   │   ├── 📁 hooks/                         # Custom React hooks
 │       │   │   │   │   │   ├── 📄 useBookings.ts             # Hook for bookings data management
 │       │   │   │   │   │   ├── 📄 useBulkOperations.ts       # Hook for bulk operations logic
+│       │   │   │   │   │   ├── 📄 useContacts.ts             # Hook for contact messages
 │       │   │   │   │   │   ├── 📄 useDashboardSocket.ts      # Hook for dashboard socket handling
 │       │   │   │   │   │   ├── 📄 useFeedbacks.ts            # Hook for feedbacks and bugs
 │       │   │   │   │   │   ├── 📄 useFutsalAdmins.ts         # Hook for futsal admins data
 │       │   │   │   │   │   ├── 📄 useFutsals.ts              # Hook for futsals data
 │       │   │   │   │   │   ├── 📄 useRatings.ts              # Hook for ratings data
 │       │   │   │   │   │   ├── 📄 useSlots.ts                # Hook for time slots data
+│       │   │   │   │   │   ├── 📄 useSpecialPrices.ts         # Hook for special prices data
 │       │   │   │   │   │   └── 📄 useUsers.ts                # Hook for users data
 │       │   │   │   │   └── 📁 utils/                         # Utility functions
 │       │   │   │   │       ├── 📄 bookingUtils.ts            # Booking-related utilities
@@ -198,6 +200,8 @@ BookMyFutsal is a comprehensive web platform for booking futsal venues in Nepal.
 │       │   ├── 📁 ui/                                        # UI components
 │       │   │   └── 📄 Notification.tsx                       # Notification component
 │       │   └── 📁 venues/                                    # Venue-related components
+│       │       ├── 📄 InitializeBooking.tsx                  # Booking initialization component
+│       │       ├── 📄 SlotLoading.tsx                        # Slot loading spinner component
 │       │       ├── 📄 VenueCard.tsx                          # Individual venue card component
 │       │       ├── 📄 VenueCarousel.tsx                      # Venue carousel component
 │       │       ├── 📄 VenueGrid.tsx                          # Venue grid layout component
@@ -211,8 +215,8 @@ BookMyFutsal is a comprehensive web platform for booking futsal venues in Nepal.
 │       │   ├── 📄 useTestimonials.ts                         # Hook for testimonials data
 │       │   ├── 📄 useTimeSlots.ts                            # Hook for time slots data
 │       │   ├── 📄 useVenueCarousel.ts                        # Hook for venue carousel logic
-│       ├── 📄 useVenueFilters.ts                         # Hook for venue filtering
-│       └── 📄 useSpecialPrices.ts                             # Hook for special prices data
+│       │   ├── 📄 useVenueFilters.ts                         # Hook for venue filtering
+│       │   └── 📄 useSpecialPrices.ts                             # Hook for special prices data
 │       ├── 📁 reducers/                                      # Redux-style reducers
 │       │   ├── 📄 bookingReducer.ts                          # Reducer for booking state
 │       │   ├── 📄 filterReducer.ts                           # Reducer for filter state
