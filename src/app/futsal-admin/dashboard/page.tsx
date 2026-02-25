@@ -3100,6 +3100,7 @@ function EditBookingForm({ booking, onUpdate, onCancel, adminId, setNotification
   const [selectedDate, setSelectedDate] = useState(booking.booking_date?.split('T')[0] || '');
   const [selectedShift, setSelectedShift] = useState('');
   const [availableSlots, setAvailableSlots] = useState<any[]>([]);
+  const [isLoadingSlots, setIsLoadingSlots] = useState(false);
   const [selectedSlotId, setSelectedSlotId] = useState<number | null>(null);
   const [numberOfPlayers, setNumberOfPlayers] = useState(booking.number_of_players);
   const [teamName, setTeamName] = useState(booking.team_name || '');
@@ -3119,15 +3120,21 @@ function EditBookingForm({ booking, onUpdate, onCancel, adminId, setNotification
 
   const handleShiftSubmit = async () => {
     if (selectedShift && selectedDate && futsalId) {
+      // Navigate to step 3 FIRST for instant feedback
+      setStep(3);
+      
+      // Then fetch slots in the background
+      setIsLoadingSlots(true);
       try {
         const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/time-slots/futsal/${futsalId}/date/${selectedDate}/shift/${selectedShift}`);
         if (response.ok) {
           const data = await response.json();
           setAvailableSlots(data.slots);
-          setStep(3);
         }
       } catch (error) {
         console.error('Error fetching slots:', error);
+      } finally {
+        setIsLoadingSlots(false);
       }
     }
   };
@@ -3395,7 +3402,9 @@ function EditBookingForm({ booking, onUpdate, onCancel, adminId, setNotification
               </div>
 
               {/* Slot Selection */}
-              {availableSlots.length > 0 ? (
+              {isLoadingSlots ? (
+                <SlotLoading message="Loading available time slots..." />
+              ) : availableSlots.length > 0 ? (
                 <div className="mb-8">
                   <h3 className="text-lg font-semibold text-gray-800 mb-4 text-center">Available Time Slots</h3>
                   <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">

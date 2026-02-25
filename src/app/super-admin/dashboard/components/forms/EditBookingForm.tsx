@@ -95,13 +95,16 @@ export function EditBookingForm({ booking, onUpdate, onCancel, setNotification }
 
   const handleShiftSubmit = async () => {
     if (selectedShift && selectedDate && futsalId) {
+      // Navigate to step 3 FIRST for instant feedback
+      setStep(3);
+      
+      // Then fetch slots in the background
       setIsLoadingSlots(true);
       try {
         const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/time-slots/futsal/${futsalId}/date/${selectedDate}/shift/${selectedShift}`);
         if (response.ok) {
           const data = await response.json();
           setAvailableSlots(data.slots);
-          setStep(3);
         }
       } catch (error) {
         console.error('Error fetching slots:', error);

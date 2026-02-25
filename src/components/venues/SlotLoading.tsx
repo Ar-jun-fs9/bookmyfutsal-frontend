@@ -18,7 +18,7 @@ interface SlotLoadingProps {
   size?: 'sm' | 'md';
 }
 
-export default function SlotLoading({ message = 'Loading slots...', size = 'md' }: SlotLoadingProps) {
+export default function SlotLoading({ message = 'Loading available time slots...', size = 'md' }: SlotLoadingProps) {
   const spinnerSize = size === 'sm' ? 'w-10 h-10' : 'w-16 h-16';
   const iconSize = size === 'sm' ? 'w-4 h-4' : 'w-6 h-6';
   const textSize = size === 'sm' ? 'text-sm' : 'text-base';

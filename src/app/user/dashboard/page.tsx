@@ -2642,13 +2642,17 @@ function BookingModal({ futsal, user, onClose, onSuccess, setSuccessModal, setCo
         setSelectedSlotIds([]);
       }
       setFirstSelectedSpecialPrice(null);
+      
+      // Instantly navigate to step 3 first (matching futsalId/page.tsx behavior)
+      setStep(3);
+      
+      // Then fetch slots in the background
       setIsLoadingSlots(true);
       try {
         const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/time-slots/futsal/${futsal.futsal_id}/date/${selectedDate}/shift/${selectedShift}`);
         if (response.ok) {
           const data = await response.json();
           setAvailableSlots(data.slots);
-          setStep(3);
         }
       } catch (error) {
         console.error('Error fetching slots:', error);
@@ -3823,13 +3827,16 @@ function UpdateBookingModal({ booking, onClose, onSuccess, setSuccessModal, show
 
   const handleShiftSubmit = async () => {
     if (selectedShift && selectedDate && futsalId) {
+      // Instantly navigate to step 3 first (matching futsalId/page.tsx behavior)
+      setStep(3);
+      
+      // Then fetch slots in the background
       setIsLoadingSlots(true);
       try {
         const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/time-slots/futsal/${futsalId}/date/${selectedDate}/shift/${selectedShift}`);
         if (response.ok) {
           const data = await response.json();
           setAvailableSlots(data.slots);
-          setStep(3);
         }
       } catch (error) {
         console.error('Error fetching slots:', error);
