@@ -504,7 +504,12 @@ export function EditBookingForm({ booking, onUpdate, onCancel, setNotification }
                         {availableSlots.map((slot: any) => (
                           <button
                             key={slot.slot_id}
-                            onClick={() => slot.display_status === 'available' && setSelectedSlotId(slot.slot_id)}
+                            onClick={() => {
+                              if (slot.display_status === 'available') {
+                                // Toggle slot selection: if already selected, deselect; otherwise select
+                                setSelectedSlotId(selectedSlotId === slot.slot_id ? null : slot.slot_id);
+                              }
+                            }}
                             disabled={
                               (slot.display_status === "booked" ||
                               slot.display_status === "expired" ||

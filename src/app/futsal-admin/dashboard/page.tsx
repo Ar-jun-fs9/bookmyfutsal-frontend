@@ -3411,7 +3411,12 @@ function EditBookingForm({ booking, onUpdate, onCancel, adminId, setNotification
                     {availableSlots.map((slot) => (
                       <button
                         key={slot.slot_id}
-                        onClick={() => slot.display_status === 'available' && setSelectedSlotId(slot.slot_id)}
+                        onClick={() => {
+                          if (slot.display_status === 'available') {
+                            // Toggle slot selection: if already selected, deselect; otherwise select
+                            setSelectedSlotId(selectedSlotId === slot.slot_id ? null : slot.slot_id);
+                          }
+                        }}
                         disabled={
                           slot.display_status === "booked" ||
                           slot.display_status === "expired" ||
@@ -3454,8 +3459,10 @@ function EditBookingForm({ booking, onUpdate, onCancel, adminId, setNotification
                                 slot.status === "pending" ? 'text-orange-500' :
                                   'text-gray-600'
                           }`}>
-                          {slot.display_status === "booked"
-                            ? `👤 ${slot.booker_name || "User"}`
+                          {selectedSlotId === slot.slot_id
+                            ? "✅ Selected"
+                            : slot.display_status === "booked"
+                              ? `👤 ${slot.booker_name || "User"}`
                             : slot.display_status === "expired"
                               ? "⏰ Expired"
                               : slot.status === "disabled"
