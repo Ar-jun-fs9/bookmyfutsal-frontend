@@ -95,16 +95,13 @@ export function EditBookingForm({ booking, onUpdate, onCancel, setNotification }
 
   const handleShiftSubmit = async () => {
     if (selectedShift && selectedDate && futsalId) {
-      // Navigate to step 3 FIRST for instant feedback
-      setStep(3);
-      
-      // Then fetch slots in the background
       setIsLoadingSlots(true);
       try {
         const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/time-slots/futsal/${futsalId}/date/${selectedDate}/shift/${selectedShift}`);
         if (response.ok) {
           const data = await response.json();
           setAvailableSlots(data.slots);
+          setStep(3);
         }
       } catch (error) {
         console.error('Error fetching slots:', error);
@@ -504,12 +501,7 @@ export function EditBookingForm({ booking, onUpdate, onCancel, setNotification }
                         {availableSlots.map((slot: any) => (
                           <button
                             key={slot.slot_id}
-                            onClick={() => {
-                              if (slot.display_status === 'available') {
-                                // Toggle slot selection: if already selected, deselect; otherwise select
-                                setSelectedSlotId(selectedSlotId === slot.slot_id ? null : slot.slot_id);
-                              }
-                            }}
+                            onClick={() => slot.display_status === 'available' && setSelectedSlotId(slot.slot_id)}
                             disabled={
                               (slot.display_status === "booked" ||
                               slot.display_status === "expired" ||

@@ -3100,7 +3100,6 @@ function EditBookingForm({ booking, onUpdate, onCancel, adminId, setNotification
   const [selectedDate, setSelectedDate] = useState(booking.booking_date?.split('T')[0] || '');
   const [selectedShift, setSelectedShift] = useState('');
   const [availableSlots, setAvailableSlots] = useState<any[]>([]);
-  const [isLoadingSlots, setIsLoadingSlots] = useState(false);
   const [selectedSlotId, setSelectedSlotId] = useState<number | null>(null);
   const [numberOfPlayers, setNumberOfPlayers] = useState(booking.number_of_players);
   const [teamName, setTeamName] = useState(booking.team_name || '');
@@ -3120,21 +3119,15 @@ function EditBookingForm({ booking, onUpdate, onCancel, adminId, setNotification
 
   const handleShiftSubmit = async () => {
     if (selectedShift && selectedDate && futsalId) {
-      // Navigate to step 3 FIRST for instant feedback
-      setStep(3);
-      
-      // Then fetch slots in the background
-      setIsLoadingSlots(true);
       try {
         const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/time-slots/futsal/${futsalId}/date/${selectedDate}/shift/${selectedShift}`);
         if (response.ok) {
           const data = await response.json();
           setAvailableSlots(data.slots);
+          setStep(3);
         }
       } catch (error) {
         console.error('Error fetching slots:', error);
-      } finally {
-        setIsLoadingSlots(false);
       }
     }
   };
@@ -3402,21 +3395,14 @@ function EditBookingForm({ booking, onUpdate, onCancel, adminId, setNotification
               </div>
 
               {/* Slot Selection */}
-              {isLoadingSlots ? (
-                <SlotLoading message="Loading available time slots..." />
-              ) : availableSlots.length > 0 ? (
+              {availableSlots.length > 0 ? (
                 <div className="mb-8">
                   <h3 className="text-lg font-semibold text-gray-800 mb-4 text-center">Available Time Slots</h3>
                   <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                     {availableSlots.map((slot) => (
                       <button
                         key={slot.slot_id}
-                        onClick={() => {
-                          if (slot.display_status === 'available') {
-                            // Toggle slot selection: if already selected, deselect; otherwise select
-                            setSelectedSlotId(selectedSlotId === slot.slot_id ? null : slot.slot_id);
-                          }
-                        }}
+                        onClick={() => slot.display_status === 'available' && setSelectedSlotId(slot.slot_id)}
                         disabled={
                           slot.display_status === "booked" ||
                           slot.display_status === "expired" ||
@@ -3459,10 +3445,8 @@ function EditBookingForm({ booking, onUpdate, onCancel, adminId, setNotification
                                 slot.status === "pending" ? 'text-orange-500' :
                                   'text-gray-600'
                           }`}>
-                          {selectedSlotId === slot.slot_id
-                            ? "✅ Selected"
-                            : slot.display_status === "booked"
-                              ? `👤 ${slot.booker_name || "User"}`
+                          {slot.display_status === "booked"
+                            ? `👤 ${slot.booker_name || "User"}`
                             : slot.display_status === "expired"
                               ? "⏰ Expired"
                               : slot.status === "disabled"
