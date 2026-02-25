@@ -3132,6 +3132,26 @@ function EditBookingForm({ booking, onUpdate, onCancel, adminId, setNotification
     }
   };
 
+  // Handle slot selection with toggle (select/unselect)
+  const handleSlotClick = (slot: any) => {
+    if (slot.display_status !== 'available') return;
+    
+    // Toggle: if already selected, deselect; otherwise select
+    if (selectedSlotId === slot.slot_id) {
+      setSelectedSlotId(null);
+      // Update display status back to available
+      setAvailableSlots(prev => prev.map(s => 
+        s.slot_id === slot.slot_id ? { ...s, display_status: 'available', status: 'available' } : s
+      ));
+    } else {
+      setSelectedSlotId(slot.slot_id);
+      // Update display status to selected
+      setAvailableSlots(prev => prev.map(s => 
+        s.slot_id === slot.slot_id ? { ...s, display_status: 'selected', status: 'selected' } : s
+      ));
+    }
+  };
+
   const handleFinalSubmit = async () => {
     if (!selectedSlotId) return;
 
@@ -3402,7 +3422,7 @@ function EditBookingForm({ booking, onUpdate, onCancel, adminId, setNotification
                     {availableSlots.map((slot) => (
                       <button
                         key={slot.slot_id}
-                        onClick={() => slot.display_status === 'available' && setSelectedSlotId(slot.slot_id)}
+                        onClick={() => handleSlotClick(slot)}
                         disabled={
                           slot.display_status === "booked" ||
                           slot.display_status === "expired" ||
