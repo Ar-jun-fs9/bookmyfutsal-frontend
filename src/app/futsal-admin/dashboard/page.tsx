@@ -3465,15 +3465,17 @@ function EditBookingForm({ booking, onUpdate, onCancel, adminId, setNotification
                                 slot.status === "pending" ? 'text-orange-500' :
                                   'text-gray-600'
                           }`}>
-                          {slot.display_status === "booked"
-                            ? `👤 ${slot.booker_name || "User"}`
-                            : slot.display_status === "expired"
-                              ? "⏰ Expired"
-                              : slot.status === "disabled"
-                                ? "🚫 Disabled"
-                                : slot.status === "pending"
-                                  ? "⏳ In Process"
-                                  : "✅ Available"}
+                          {selectedSlotId === slot.slot_id
+                            ? "✅ Selected"
+                            : slot.display_status === "booked"
+                              ? `👤 ${slot.booker_name || "User"}`
+                              : slot.display_status === "expired"
+                                ? "⏰ Expired"
+                                : slot.status === "disabled"
+                                  ? "🚫 Disabled"
+                                  : slot.status === "pending"
+                                    ? "⏳ In Process"
+                                    : "✅ Available"}
                         </div>
                       </button>
                     ))}

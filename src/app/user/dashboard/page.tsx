@@ -3751,7 +3751,7 @@ function UpdateBookingModal({ booking, onClose, onSuccess, setSuccessModal, show
       if (isSelected) {
         // Deselect: release reservation
         await releaseSlotReservation(slot.slot_id);
-        setSelectedSlotIds([]);
+        setSelectedSlotIds(prev => prev.filter(id => id !== slot.slot_id));
         // Update local state to available
         setAvailableSlots(prev => prev.map(s => s.slot_id === slot.slot_id ? { ...s, display_status: 'available', status: 'available' } : s));
       } else {
@@ -4218,15 +4218,17 @@ function UpdateBookingModal({ booking, onClose, onSuccess, setSuccessModal, show
                                     slot.status === "pending" ? 'text-orange-500' :
                                       'text-gray-600'
                               }`}>
-                              {slot.display_status === "booked"
-                                ? `👤 Booked`
-                                : slot.display_status === "expired"
-                                  ? "⏰ Expired"
-                                  : slot.status === "disabled"
-                                    ? "🚫 Disabled"
-                                    : slot.status === "pending"
-                                      ? "⏳ In Process"
-                                      : "✅ Available"}
+                              {selectedSlotIds.includes(slot.slot_id)
+                                ? "✅ Selected"
+                                : slot.display_status === "booked"
+                                  ? `👤 Booked`
+                                  : slot.display_status === "expired"
+                                    ? "⏰ Expired"
+                                    : slot.status === "disabled"
+                                      ? "🚫 Disabled"
+                                      : slot.status === "pending"
+                                        ? "⏳ In Process"
+                                        : "✅ Available"}
                             </div>
                           </button>
                         ))}
