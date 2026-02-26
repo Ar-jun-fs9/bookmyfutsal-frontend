@@ -2384,6 +2384,8 @@ function BookingModal({ futsal, user, onClose, onSuccess, setSuccessModal, setCo
   const [currentPrice, setCurrentPrice] = useState<{ normalPrice: number, specialPrice?: { price: number, message?: string }, effectivePrice: number } | null>(null);
   const [specialPrices, setSpecialPrices] = useState<any[]>([]);
   const [firstSelectedSpecialPrice, setFirstSelectedSpecialPrice] = useState<any>(null);
+  // Slot cache to avoid re-fetching when revisiting same date/shift (like futsalId/page.tsx)
+  const [slotCache, setSlotCache] = useState<{ [key: string]: { slots: any[], timestamp: number } }>({});
   const phone = user?.phone || '';
   const [acceptTerms, setAcceptTerms] = useState(false);
   const [showTermsModal, setShowTermsModal] = useState(false);
@@ -2642,13 +2644,33 @@ function BookingModal({ futsal, user, onClose, onSuccess, setSuccessModal, setCo
         setSelectedSlotIds([]);
       }
       setFirstSelectedSpecialPrice(null);
+      
+      // Check if we have cached slots for this date/shift combination
+      const cacheKey = `${futsal.futsal_id}_${selectedDate}_${selectedShift}`;
+      const cachedData = slotCache[cacheKey];
+      const cacheAge = cachedData ? Date.now() - cachedData.timestamp : Infinity;
+      const CACHE_DURATION = 60000; // 1 minute cache (same as React Query)
+      
+      // If cached data exists and is fresh, use it immediately without loading
+      if (cachedData && cacheAge < CACHE_DURATION) {
+        setAvailableSlots(cachedData.slots);
+        setStep(3);
+        return;
+      }
+      
+      // Navigate to step 3 first to show loading state immediately (like futsalId/page.tsx)
+      setStep(3);
       setIsLoadingSlots(true);
       try {
         const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/time-slots/futsal/${futsal.futsal_id}/date/${selectedDate}/shift/${selectedShift}`);
         if (response.ok) {
           const data = await response.json();
           setAvailableSlots(data.slots);
-          setStep(3);
+          // Cache the slots for future use
+          setSlotCache(prev => ({
+            ...prev,
+            [cacheKey]: { slots: data.slots, timestamp: Date.now() }
+          }));
         }
       } catch (error) {
         console.error('Error fetching slots:', error);
@@ -3615,6 +3637,8 @@ function UpdateBookingModal({ booking, onClose, onSuccess, setSuccessModal, show
   const [numberOfPlayers, setNumberOfPlayers] = useState(booking.number_of_players.toString());
   const [teamName, setTeamName] = useState(booking.team_name || '');
   const [loading, setLoading] = useState(false);
+  // Slot cache to avoid re-fetching when revisiting same date/shift (like futsalId/page.tsx)
+  const [slotCache, setSlotCache] = useState<{ [key: string]: { slots: any[], timestamp: number } }>({});
 
   const fetchPriceForSlot = async (slot: any) => {
     if (step !== 3) return;
@@ -3823,13 +3847,38 @@ function UpdateBookingModal({ booking, onClose, onSuccess, setSuccessModal, show
 
   const handleShiftSubmit = async () => {
     if (selectedShift && selectedDate && futsalId) {
+      // Release any previously selected slots when changing shift
+      if (selectedSlotIds.length > 0) {
+        await Promise.all(selectedSlotIds.map(slotId => releaseSlotReservation(slotId)));
+        setSelectedSlotIds([]);
+      }
+      
+      // Check if we have cached slots for this date/shift combination
+      const cacheKey = `${futsalId}_${selectedDate}_${selectedShift}`;
+      const cachedData = slotCache[cacheKey];
+      const cacheAge = cachedData ? Date.now() - cachedData.timestamp : Infinity;
+      const CACHE_DURATION = 60000; // 1 minute cache (same as React Query)
+      
+      // If cached data exists and is fresh, use it immediately without loading
+      if (cachedData && cacheAge < CACHE_DURATION) {
+        setAvailableSlots(cachedData.slots);
+        setStep(3);
+        return;
+      }
+      
+      // Navigate to step 3 first to show loading state immediately (like futsalId/page.tsx)
+      setStep(3);
       setIsLoadingSlots(true);
       try {
         const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/time-slots/futsal/${futsalId}/date/${selectedDate}/shift/${selectedShift}`);
         if (response.ok) {
           const data = await response.json();
           setAvailableSlots(data.slots);
-          setStep(3);
+          // Cache the slots for future use
+          setSlotCache(prev => ({
+            ...prev,
+            [cacheKey]: { slots: data.slots, timestamp: Date.now() }
+          }));
         }
       } catch (error) {
         console.error('Error fetching slots:', error);
