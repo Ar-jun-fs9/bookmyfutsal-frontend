@@ -112,22 +112,66 @@ export function EditBookingForm({ booking, onUpdate, onCancel, setNotification }
   };
 
   // Handle slot selection with toggle (select/unselect)
-  const handleSlotClick = (slot: any) => {
-    if (slot.display_status !== 'available') return;
+  const handleSlotClick = async (slot: any) => {
+    if (slot.display_status !== 'available' && slot.display_status !== 'selected') return;
     
     // Toggle: if already selected, deselect; otherwise select
     if (selectedSlotId === slot.slot_id) {
+      // Release the slot reservation in the backend
+      try {
+        await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/time-slots/${slot.slot_id}/release`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' }
+        });
+      } catch (error) {
+        console.error('Error releasing slot:', error);
+      }
       setSelectedSlotId(null);
       // Update display status back to available
       setAvailableSlots(prev => prev.map(s => 
         s.slot_id === slot.slot_id ? { ...s, display_status: 'available', status: 'available' } : s
       ));
     } else {
-      setSelectedSlotId(slot.slot_id);
-      // Update display status to selected
-      setAvailableSlots(prev => prev.map(s => 
-        s.slot_id === slot.slot_id ? { ...s, display_status: 'selected', status: 'selected' } : s
-      ));
+      // Select: reserve slot
+      try {
+        const reserveResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/time-slots/${slot.slot_id}/reserve`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' }
+        });
+
+        const reserveData = await reserveResponse.json();
+
+        if (reserveResponse.ok) {
+          setSelectedSlotId(slot.slot_id);
+          // Update display status to selected
+          setAvailableSlots(prev => prev.map(s => 
+            s.slot_id === slot.slot_id ? { ...s, display_status: 'selected', status: 'selected' } : s
+          ));
+        } else {
+          if (reserveData.status === 'pending') {
+            setNotification({ message: "Slot is already chosen and in process of booking. Please choose another one.", type: 'info' });
+          } else if (reserveData.status === 'booked') {
+            setNotification({ message: "Slot already booked. Please choose another slot.", type: 'info' });
+          } else if (reserveData.status === 'disabled') {
+            setNotification({ message: "Slot is disabled. Please choose another slot.", type: 'info' });
+          } else {
+            setNotification({ message: reserveData.message || 'Unable to reserve slot. Please try again.', type: 'info' });
+          }
+          // Refresh slots to show updated status
+          try {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/time-slots/futsal/${futsalId}/date/${selectedDate}/shift/${selectedShift}`);
+            if (response.ok) {
+              const data = await response.json();
+              setAvailableSlots(data.slots);
+            }
+          } catch (error) {
+            console.error('Error refreshing slots:', error);
+          }
+        }
+      } catch (error) {
+        console.error('Error reserving slot:', error);
+        setNotification({ message: "Unable to reserve slot. Please try again.", type: 'info' });
+      }
     }
   };
 
