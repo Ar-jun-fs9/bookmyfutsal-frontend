@@ -4,7 +4,7 @@ export default function HeroSection() {
       {/* Futsal Image Background */}
       <div className="absolute inset-0">
         <img
-          src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/herobg.jpg`}
+          src="https://res.cloudinary.com/dftpt1jaz/image/upload/v1773333569/hero_section_zvl6h2.jpg"
           alt="Futsal Court"
           className="w-full h-full object-cover"
         />

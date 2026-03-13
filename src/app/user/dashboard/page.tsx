@@ -922,7 +922,7 @@ export default function UserDashboard() {
                           <div className="relative h-56 overflow-hidden group">
                             {currentImage && (
                               <img
-                                src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/${currentImage}`}
+                                src={currentImage}
                                 alt={futsal.name}
                                 className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                               />
@@ -1347,7 +1347,7 @@ export default function UserDashboard() {
               <video
                 controls
                 className="w-full h-auto max-h-[70vh] rounded"
-                src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/${videoModal.futsal.video}`}
+                src={videoModal.futsal.video}
               >
                 Your browser does not support the video tag.
               </video>
@@ -1471,7 +1471,7 @@ function DetailsModal({ futsal, onClose }: { futsal: Futsal, onClose: () => void
                 <h4 className="text-lg font-semibold mb-3">Images</h4>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {futsal.images.map((img, index) => (
-                    <img key={index} src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/${img}`} alt={`${futsal.name} ${index + 1}`} className="w-full h-48 object-cover rounded-lg" />
+                    <img key={index} src={img} alt={`${futsal.name} ${index + 1}`} className="w-full h-48 object-cover rounded-lg" />
                   ))}
                 </div>
               </div>
@@ -1617,7 +1617,7 @@ function DetailsModal({ futsal, onClose }: { futsal: Futsal, onClose: () => void
             <div>
               <h4 className="text-lg font-semibold mb-3">Video</h4>
               <video controls className="w-full max-w-2xl rounded-lg">
-                <source src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/${futsal.video}`} type="video/mp4" />
+                <source src={futsal.video} type="video/mp4" />
               </video>
             </div>
           )}

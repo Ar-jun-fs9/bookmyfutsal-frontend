@@ -289,7 +289,7 @@ export function EditFutsalForm({ futsal, onUpdate, onCancel, setNotification }: 
           <div className="flex flex-wrap gap-2 mt-2">
             {existingImages.map((img, index) => (
               <div key={index} className="relative">
-                <img src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/${img}`} alt={`Existing ${index + 1}`} className="w-32 h-32 object-cover" />
+                <img src={img} alt={`Existing ${index + 1}`} className="w-32 h-32 object-cover" />
                 <button
                   type="button"
                   onClick={() => removeImage(img)}
@@ -307,7 +307,7 @@ export function EditFutsalForm({ futsal, onUpdate, onCancel, setNotification }: 
           <strong>Existing Video:</strong>
           <div className="relative mt-2">
             <video controls className="w-64 h-36">
-              <source src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/${existingVideo}`} type="video/mp4" />
+              <source src={existingVideo} type="video/mp4" />
             </video>
             <button
               type="button"

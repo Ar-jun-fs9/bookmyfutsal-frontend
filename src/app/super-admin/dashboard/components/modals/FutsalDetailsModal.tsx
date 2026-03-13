@@ -96,7 +96,7 @@ export function FutsalDetailsModal({ isOpen, futsal, onClose }: FutsalDetailsMod
               <strong>Images:</strong>
               <div className="flex flex-wrap gap-2 mt-2">
                 {futsal.images.map((img, index) => (
-                  <img key={index} src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/${img}`} alt={`${futsal.name} ${index + 1}`} className="w-32 h-32 object-cover" />
+                  <img key={index} src={img} alt={`${futsal.name} ${index + 1}`} className="w-32 h-32 object-cover" />
                 ))}
               </div>
             </div>
@@ -106,7 +106,7 @@ export function FutsalDetailsModal({ isOpen, futsal, onClose }: FutsalDetailsMod
               <strong>Video:</strong>
               <div className="mt-2">
                 <video controls className="w-64 h-36">
-                  <source src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/${futsal.video}`} type="video/mp4" />
+                  <source src={futsal.video} type="video/mp4" />
                 </video>
               </div>
             </div>
