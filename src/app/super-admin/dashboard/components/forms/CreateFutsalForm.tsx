@@ -1,4 +1,12 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
+
+interface UploadProgress {
+  file: File;
+  progress: number;
+  status: 'pending' | 'uploading' | 'completed' | 'error';
+  url?: string;
+  error?: string;
+}
 
 interface CreateFutsalFormProps {
   onSuccess: () => void;
@@ -22,10 +30,11 @@ export function CreateFutsalForm({ onSuccess, setNotification }: CreateFutsalFor
   });
   const [customGameFormat, setCustomGameFormat] = useState('');
   const [customFacilities, setCustomFacilities] = useState('');
-  const [images, setImages] = useState<FileList | null>(null);
-  const [video, setVideo] = useState<File | null>(null);
-  const [imagePreviews, setImagePreviews] = useState<File[]>([]);
-  const [videoPreview, setVideoPreview] = useState<File | null>(null);
+  
+  // Upload state
+  const [imageUploads, setImageUploads] = useState<UploadProgress[]>([]);
+  const [videoUpload, setVideoUpload] = useState<UploadProgress | null>(null);
+  const [uploading, setUploading] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const gameFormatOptions = [
@@ -49,9 +58,166 @@ export function CreateFutsalForm({ onSuccess, setNotification }: CreateFutsalFor
     'Café / snacks area / seating lounge'
   ];
 
+  // Function to upload a single file to Cloudinary
+  const uploadFile = async (file: File, type: 'image' | 'video', folder: string): Promise<{ url: string }> => {
+    const formData = new FormData();
+    formData.append(type, file);
+    formData.append('folder', folder);
+
+    const xhr = new XMLHttpRequest();
+    
+    return new Promise((resolve, reject) => {
+      xhr.upload.addEventListener('progress', (event) => {
+        if (event.lengthComputable) {
+          const progress = Math.round((event.loaded / event.total) * 100);
+          // Update progress in state
+          if (type === 'image') {
+            setImageUploads(prev => prev.map(img => 
+              img.file === file ? { ...img, progress } : img
+            ));
+          } else {
+            setVideoUpload(prev => prev ? { ...prev, progress } : null);
+          }
+        }
+      });
+
+      xhr.addEventListener('load', () => {
+        if (xhr.status >= 200 && xhr.status < 300) {
+          const response = JSON.parse(xhr.responseText);
+          resolve({ url: response.url });
+        } else {
+          reject(new Error('Upload failed'));
+        }
+      });
+
+      xhr.addEventListener('error', () => {
+        reject(new Error('Upload failed'));
+      });
+
+      xhr.open('POST', `${process.env.NEXT_PUBLIC_API_URL}/api/upload/${type}`);
+      xhr.send(formData);
+    });
+  };
+
+  // Handle image selection - upload immediately in parallel
+  const handleImageChange = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    if (files.length === 0) return;
+
+    // Get folder name from form data
+    const folderName = formData.name ? `bookmyfutsal/${formData.name.replace(/[^a-zA-Z0-9]/g, '_')}` : 'bookmyfutsal/images';
+
+    // Create upload progress entries
+    const newUploads: UploadProgress[] = files.map(file => ({
+      file,
+      progress: 0,
+      status: 'pending' as const
+    }));
+
+    setImageUploads(prev => [...prev, ...newUploads]);
+
+    // Upload all images in parallel immediately
+    const uploadPromises = files.map(async (file, index) => {
+      const uploadIndex = imageUploads.length + index;
+      
+      // Update status to uploading
+      setImageUploads(prev => prev.map((img, i) => 
+        i === uploadIndex ? { ...img, status: 'uploading' } : img
+      ));
+
+      try {
+        const result = await uploadFile(file, 'image', folderName);
+        
+        // Update with completed status and URL
+        setImageUploads(prev => prev.map((img, i) => 
+          i === uploadIndex ? { ...img, status: 'completed', progress: 100, url: result.url } : img
+        ));
+        
+        return { success: true, url: result.url };
+      } catch (error) {
+        // Update with error status
+        setImageUploads(prev => prev.map((img, i) => 
+          i === uploadIndex ? { ...img, status: 'error', error: 'Upload failed' } : img
+        ));
+        
+        return { success: false, url: null };
+      }
+    });
+
+    await Promise.all(uploadPromises);
+  }, [formData.name, imageUploads.length]);
+
+  // Handle video selection - upload immediately
+  const handleVideoChange = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0] || null;
+    if (!file) return;
+
+    // Get folder name from form data
+    const folderName = formData.name ? `bookmyfutsal/${formData.name.replace(/[^a-zA-Z0-9]/g, '_')}` : 'bookmyfutsal/videos';
+
+    // Create upload progress entry
+    setVideoUpload({
+      file,
+      progress: 0,
+      status: 'pending'
+    });
+
+    // Update status to uploading
+    setVideoUpload({
+      file,
+      progress: 0,
+      status: 'uploading'
+    });
+
+    try {
+      const result = await uploadFile(file, 'video', folderName);
+      
+      // Update with completed status and URL
+      setVideoUpload({
+        file,
+        progress: 100,
+        status: 'completed',
+        url: result.url
+      });
+    } catch (error) {
+      // Update with error status
+      setVideoUpload({
+        file,
+        progress: 0,
+        status: 'error',
+        error: 'Upload failed'
+      });
+    }
+  }, [formData.name]);
+
+  // Remove an image from uploads
+  const removeImage = (index: number) => {
+    setImageUploads(prev => prev.filter((_, i) => i !== index));
+  };
+
+  // Remove video from uploads
+  const removeVideo = () => {
+    setVideoUpload(null);
+  };
+
+  // Check if all uploads are completed
+  const isFormReady = () => {
+    const imagesCompleted = imageUploads.every(img => img.status === 'completed');
+    const videoCompleted = !videoUpload || videoUpload.status === 'completed';
+    return imagesCompleted && videoCompleted;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+
+    // Get completed image URLs
+    const imageUrls = imageUploads
+      .filter(img => img.status === 'completed' && img.url)
+      .map(img => img.url as string);
+
+    // Get completed video URL
+    const videoUrl = videoUpload?.status === 'completed' ? videoUpload.url : null;
 
     const data = new FormData();
     Object.entries(formData).forEach(([key, value]) => {
@@ -61,12 +227,14 @@ export function CreateFutsalForm({ onSuccess, setNotification }: CreateFutsalFor
         data.append(key, value as string);
       }
     });
-    if (images) {
-      for (let i = 0; i < images.length; i++) {
-        data.append('images', images[i]);
-      }
+
+    // Send URLs instead of files
+    if (imageUrls.length > 0) {
+      data.append('image_urls', JSON.stringify(imageUrls));
     }
-    if (video) data.append('video', video);
+    if (videoUrl) {
+      data.append('video_url', videoUrl);
+    }
 
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/futsals`, {
@@ -82,10 +250,8 @@ export function CreateFutsalForm({ onSuccess, setNotification }: CreateFutsalFor
         });
         setCustomGameFormat('');
         setCustomFacilities('');
-        setImages(null);
-        setVideo(null);
-        setImagePreviews([]);
-        setVideoPreview(null);
+        setImageUploads([]);
+        setVideoUpload(null);
       } else {
         setNotification({ message: "Error creating futsal", type: 'info' });
       }
@@ -258,70 +424,109 @@ export function CreateFutsalForm({ onSuccess, setNotification }: CreateFutsalFor
           </select>
         </div>
         <textarea placeholder="Description" value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} className="w-full p-2 border border-gray-400 rounded resize-none focus:outline-none focus:ring-0 focus:border-gray-900 focus:border" />
+        
+        {/* Images with upload progress */}
         <div>
-          <label>Images (up to 5): <input type="file" accept="image/*" multiple onChange={(e) => {
-            const files = Array.from(e.target.files || []);
-            setImages(e.target.files);
-            setImagePreviews(files);
-          }} /></label>
+          <label>Images (up to 5): <input type="file" accept="image/*" multiple onChange={handleImageChange} /></label>
         </div>
-        <div>
-          <label>Video: <input type="file" accept="video/*" onChange={(e) => {
-            const file = e.target.files?.[0] || null;
-            setVideo(file);
-            setVideoPreview(file);
-          }} /></label>
-        </div>
-        {imagePreviews.length > 0 && (
+        
+        {/* Image upload progress */}
+        {imageUploads.length > 0 && (
           <div>
-            <strong>New Images:</strong>
-            <div className="flex flex-wrap gap-2 mt-2">
-              {imagePreviews.map((file, index) => (
-                <div key={index} className="relative">
-                  <img src={URL.createObjectURL(file)} alt={`New ${index + 1}`} className="w-32 h-32 object-cover" />
-                  <button
-                    type="button"
-                    onClick={() => {
-                      const newPreviews = imagePreviews.filter((_, i) => i !== index);
-                      setImagePreviews(newPreviews);
-                      const dt = new DataTransfer();
-                      newPreviews.forEach(f => dt.items.add(f));
-                      const input = document.querySelector('input[type="file"][accept="image/*"]') as HTMLInputElement;
-                      if (input) input.files = dt.files;
-                      setImages(dt.files);
-                    }}
-                    className="absolute top-0 right-0 bg-red-600 text-white rounded-lg w-6 h-6 flex items-center justify-center text-xs"
-                  >
-                    ×
-                  </button>
+            <strong>Image Uploads:</strong>
+            <div className="space-y-2 mt-2">
+              {imageUploads.map((upload, index) => (
+                <div key={index} className="relative border rounded p-2">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <img src={URL.createObjectURL(upload.file)} alt={`Preview ${index + 1}`} className="w-16 h-16 object-cover" />
+                      <div>
+                        <p className="text-sm font-medium">{upload.file.name}</p>
+                        <p className="text-xs text-gray-500">
+                          {upload.status === 'pending' && 'Waiting...'}
+                          {upload.status === 'uploading' && `Uploading: ${upload.progress}%`}
+                          {upload.status === 'completed' && '✓ Uploaded'}
+                          {upload.status === 'error' && '✗ Upload failed'}
+                        </p>
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => removeImage(index)}
+                      className="bg-red-600 text-white rounded-lg w-6 h-6 flex items-center justify-center text-xs"
+                    >
+                      ×
+                    </button>
+                  </div>
+                  {/* Progress bar */}
+                  <div className="mt-2 h-2 bg-gray-200 rounded overflow-hidden">
+                    <div 
+                      className={`h-full transition-all duration-300 ${
+                        upload.status === 'completed' ? 'bg-green-500' : 
+                        upload.status === 'error' ? 'bg-red-500' : 
+                        'bg-blue-500'
+                      }`}
+                      style={{ width: `${upload.progress}%` }}
+                    />
+                  </div>
                 </div>
               ))}
             </div>
           </div>
         )}
-        {videoPreview && (
+        
+        {/* Video with upload progress */}
+        <div>
+          <label>Video: <input type="file" accept="video/*" onChange={handleVideoChange} /></label>
+        </div>
+        
+        {videoUpload && (
           <div>
-            <strong>New Video:</strong>
-            <div className="relative mt-2">
-              <video controls className="w-64 h-36">
-                <source src={URL.createObjectURL(videoPreview)} type="video/mp4" />
-              </video>
-              <button
-                type="button"
-                onClick={() => {
-                  setVideoPreview(null);
-                  setVideo(null);
-                  const input = document.querySelector('input[type="file"][accept="video/*"]') as HTMLInputElement;
-                  if (input) input.value = '';
-                }}
-                className="absolute top-0 right-0 bg-red-600 text-white rounded-lg w-6 h-6 flex items-center justify-center text-xs"
-              >
-                ×
-              </button>
+            <strong>Video Upload:</strong>
+            <div className="relative border rounded p-2 mt-2">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <video controls className="w-24 h-16 object-cover">
+                    <source src={URL.createObjectURL(videoUpload.file)} type="video/mp4" />
+                  </video>
+                  <div>
+                    <p className="text-sm font-medium">{videoUpload.file.name}</p>
+                    <p className="text-xs text-gray-500">
+                      {videoUpload.status === 'pending' && 'Waiting...'}
+                      {videoUpload.status === 'uploading' && `Uploading: ${videoUpload.progress}%`}
+                      {videoUpload.status === 'completed' && '✓ Uploaded'}
+                      {videoUpload.status === 'error' && '✗ Upload failed'}
+                    </p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={removeVideo}
+                  className="bg-red-600 text-white rounded-lg w-6 h-6 flex items-center justify-center text-xs"
+                >
+                  ×
+                </button>
+              </div>
+              {/* Progress bar */}
+              <div className="mt-2 h-2 bg-gray-200 rounded overflow-hidden">
+                <div 
+                  className={`h-full transition-all duration-300 ${
+                    videoUpload.status === 'completed' ? 'bg-green-500' : 
+                    videoUpload.status === 'error' ? 'bg-red-500' : 
+                    'bg-blue-500'
+                  }`}
+                  style={{ width: `${videoUpload.progress}%` }}
+                />
+              </div>
             </div>
           </div>
         )}
-        <button type="submit" disabled={loading} className="bg-green-600 text-white px-4 py-2 rounded disabled:opacity-50">
+        
+        <button 
+          type="submit" 
+          disabled={loading || !isFormReady()} 
+          className="bg-green-600 text-white px-4 py-2 rounded disabled:opacity-50"
+        >
           {loading ? 'Creating...' : 'Create Futsal'}
         </button>
       </form>
