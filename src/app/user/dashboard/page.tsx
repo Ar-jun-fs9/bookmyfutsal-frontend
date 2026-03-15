@@ -199,9 +199,10 @@ export default function UserDashboard() {
   }, [futsals]);
 
   // =============================================================================
-  // PREFETCH: Preload all images and videos for faster modal opening
+  // PREFETCH: Preload all images, videos, special prices, and ratings
   // =============================================================================
   // Uses browser-native prefetching so media is in cache before modal opens
+  // Also prefetches ratings for RatingModal to open instantly
   // =============================================================================
   useEffect(() => {
     if (futsals.length === 0) return;
@@ -222,9 +223,31 @@ export default function UserDashboard() {
       }
     };
 
-    // Run prefetching after a small delay to not block initial page render
-    const timeoutId = setTimeout(prefetchMedia, 1000);
-    return () => clearTimeout(timeoutId);
+    // =============================================================================
+    // PREFETCH: Prefetch ratings for all futsals on page load
+    // =============================================================================
+    // This ensures RatingModal opens instantly when user clicks handleDescRating
+    // =============================================================================
+    const prefetchRatings = async () => {
+      for (const futsal of futsals) {
+        try {
+          const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/ratings/futsal/${futsal.futsal_id}`);
+          if (response.ok) {
+            const data = await response.json();
+            // =======================================================================
+            // PREFETCH: Store ratings in cache for RatingModal
+            // =======================================================================
+            usePrefetchStore.getState().setRatings(futsal.futsal_id, data || []);
+          }
+        } catch (error) {
+          console.error('Error prefetching ratings for futsal', futsal.futsal_id, error);
+        }
+      }
+    };
+
+    // Run prefetching immediately to ensure data is ready when user clicks
+    prefetchMedia();
+    prefetchRatings();
   }, [futsals]);
 
   // Prevent background scrolling when modals are open
@@ -1757,13 +1780,84 @@ function RatingModal({ futsal, onClose, onRatingSubmitted, showNotification, set
     return `${displayHours}:${minutes.toString().padStart(2, '0')} ${period}`;
   };
 
+  // =============================================================================
+  // PREFETCH: Try to get ratings from cache first
+  // =============================================================================
+  // Page prefetches ratings on load, so modal opens instantly
+  // Falls back to fetching if not yet prefetched
+  // =============================================================================
   useEffect(() => {
-    // Fetch existing ratings
-    fetchRatings();
-
-    // Check if user has already rated
-    checkUserRating();
+    const cachedRatings = usePrefetchStore.getState().getRatings(futsal.futsal_id);
+    
+    if (cachedRatings) {
+      // Ratings already prefetched - use cached data
+      setRatings(cachedRatings);
+      // Check user rating from cached data
+      checkUserRatingFromCache(cachedRatings);
+    } else {
+      // Not prefetched yet - fetch on demand (fallback)
+      fetchRatings();
+      checkUserRating();
+    }
   }, [futsal.futsal_id]);
+
+  // =============================================================================
+  // PREFETCH: Check user rating from cached ratings (no API call needed)
+  // =============================================================================
+  const checkUserRatingFromCache = (cachedRatings: any[]) => {
+    try {
+      const user = sessionStorage.getItem('user');
+      const userData = user ? JSON.parse(user) : null;
+
+      if (userData) {
+        // Registered user - check if they have rated this futsal
+        const userRating = cachedRatings.find((r: any) => r.user_id === userData.user_id);
+        if (userRating) {
+          setHasRated(true);
+          setUserExistingRating(userRating);
+          setUserRating(userRating.rating);
+          setComment(userRating.comment || '');
+        } else {
+          setHasRated(false);
+          setUserExistingRating(null);
+        }
+      } else {
+        // Unregistered user - check localStorage for rating info
+        const storedRatingInfo = localStorage.getItem(`rating_${futsal.futsal_id}`);
+        if (storedRatingInfo) {
+          try {
+            const ratingInfo = JSON.parse(storedRatingInfo);
+            let userRating = cachedRatings.find((r: any) => r.id === ratingInfo.rating_id);
+            if (!userRating) {
+              userRating = cachedRatings.find((r: any) =>
+                r.users === ratingInfo.users && r.users_type === ratingInfo.users_type
+              );
+            }
+            if (userRating) {
+              setHasRated(true);
+              setUserExistingRating(userRating);
+              setUserRating(userRating.rating);
+              setComment(userRating.comment || '');
+              setUserName(userRating.users !== 'Anonymous' ? userRating.users : '');
+              setIsAnonymous(userRating.users === 'Anonymous');
+            } else {
+              setHasRated(false);
+              setUserExistingRating(null);
+            }
+          } catch (error) {
+            setHasRated(false);
+            setUserExistingRating(null);
+          }
+        } else {
+          setHasRated(false);
+          setUserExistingRating(null);
+        }
+      }
+    } catch (error) {
+      console.error('Error checking user rating from cache:', error);
+      setHasRated(false);
+    }
+  };
 
   const fetchRatings = async () => {
     try {

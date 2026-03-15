@@ -107,9 +107,10 @@ export default function VenueGrid() {
    }, [futsals]);
 
    // =============================================================================
-   // PREFETCH: Preload all images and videos for faster modal opening
+   // PREFETCH: Preload all images, videos, and ratings for faster modal opening
    // =============================================================================
    // Uses browser-native prefetching so media is in cache before modal opens
+   // Also prefetches ratings for RatingModal to open instantly
    // =============================================================================
    useEffect(() => {
      if (futsals.length === 0) return;
@@ -130,8 +131,33 @@ export default function VenueGrid() {
        }
      };
 
+     // =============================================================================
+     // PREFETCH: Prefetch ratings for all futsals on page load
+     // =============================================================================
+     // This ensures RatingModal opens instantly when user clicks handleDescRating
+     // =============================================================================
+     const prefetchRatings = async () => {
+       for (const futsal of futsals) {
+         try {
+           const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/ratings/futsal/${futsal.futsal_id}`);
+           if (response.ok) {
+             const data = await response.json();
+             // =======================================================================
+             // PREFETCH: Store ratings in cache for RatingModal
+             // =======================================================================
+             usePrefetchStore.getState().setRatings(futsal.futsal_id, data || []);
+           }
+         } catch (error) {
+           console.error('Error prefetching ratings for futsal', futsal.futsal_id, error);
+         }
+       }
+     };
+
      // Run prefetching after a small delay to not block initial page render
-     const timeoutId = setTimeout(prefetchMedia, 1000);
+     const timeoutId = setTimeout(() => {
+       prefetchMedia();
+       prefetchRatings();
+     }, 1000);
      return () => clearTimeout(timeoutId);
    }, [futsals]);
 
@@ -305,7 +331,7 @@ export default function VenueGrid() {
         </div>
       )}
 
-      {/* Venue Grid - Use virtualization for large lists */}
+      {/* venue Grid - Use virtualization for large lists */}
       {shouldUseVirtualization && showAllFutsals ? (
         <VirtualizedVenueGrid
           futsals={displayVenues}

@@ -18,16 +18,32 @@ interface SpecialPrice {
   futsal_name: string;
 }
 
+interface Rating {
+  id: number;
+  rating: number;
+  comment?: string;
+  users: string;
+  users_type?: string;
+  user_id?: number;
+  first_name?: string;
+  last_name?: string;
+  created_at: string;
+  updated_at?: string;
+}
+
 interface PrefetchState {
   // =============================================================================
-  // PREFETCH CACHE - Background prefetching for DetailsModal
+  // PREFETCH CACHE - Background prefetching for DetailsModal and RatingModal
   // =============================================================================
-  // These stores cache data fetched on page load so DetailsModal opens instantly
-  // without waiting for additional fetches when user clicks handleDetailsModal
+  // These stores cache data fetched on page load so modals open instantly
+  // without waiting for additional fetches when user clicks handle functions
   // =============================================================================
   
   // Cache special prices by futsal_id
   specialPricesCache: { [futsalId: number]: SpecialPrice[] };
+  
+  // Cache ratings by futsal_id
+  ratingsCache: { [futsalId: number]: Rating[] };
   
   // Track which futsals have been prefetched
   prefetchedFutsals: Set<number>;
@@ -39,6 +55,8 @@ interface PrefetchState {
   // Actions
   setSpecialPrices: (futsalId: number, prices: SpecialPrice[]) => void;
   getSpecialPrices: (futsalId: number) => SpecialPrice[] | undefined;
+  setRatings: (futsalId: number, ratings: Rating[]) => void;
+  getRatings: (futsalId: number) => Rating[] | undefined;
   markFutsalPrefetched: (futsalId: number) => void;
   isFutsalPrefetched: (futsalId: number) => boolean;
   preloadImage: (url: string) => void;
@@ -50,6 +68,7 @@ interface PrefetchState {
 
 export const usePrefetchStore = create<PrefetchState>((set, get) => ({
   specialPricesCache: {},
+  ratingsCache: {},
   prefetchedFutsals: new Set<number>(),
   preloadedImages: new Set<string>(),
   preloadedVideos: new Set<string>(),
@@ -66,6 +85,20 @@ export const usePrefetchStore = create<PrefetchState>((set, get) => ({
 
   getSpecialPrices: (futsalId: number) => {
     return get().specialPricesCache[futsalId];
+  },
+
+  setRatings: (futsalId: number, ratings: Rating[]) => {
+    set((state) => ({
+      ratingsCache: {
+        ...state.ratingsCache,
+        [futsalId]: ratings,
+      },
+      prefetchedFutsals: new Set([...state.prefetchedFutsals, futsalId]),
+    }));
+  },
+
+  getRatings: (futsalId: number) => {
+    return get().ratingsCache[futsalId];
   },
 
   markFutsalPrefetched: (futsalId: number) => {
@@ -135,6 +168,7 @@ export const usePrefetchStore = create<PrefetchState>((set, get) => ({
   clearCache: () => {
     set({
       specialPricesCache: {},
+      ratingsCache: {},
       prefetchedFutsals: new Set<number>(),
       preloadedImages: new Set<string>(),
       preloadedVideos: new Set<string>(),
