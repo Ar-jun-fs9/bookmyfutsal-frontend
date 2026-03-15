@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { usePrefetchStore } from '@/stores/prefetchStore';
 
 interface Futsal {
    futsal_id: number;
@@ -47,23 +48,42 @@ export default function DetailsModal({ futsal, onClose }: DetailsModalProps) {
    const [specialPrices, setSpecialPrices] = useState<SpecialPrice[]>([]);
    const [loadingSpecialPrices, setLoadingSpecialPrices] = useState(false);
 
+   // =============================================================================
+   // PREFETCH: Try to get special prices from cache first
+   // =============================================================================
+   // VenueGrid prefetches this data on page load, so modal opens instantly
+   // Falls back to fetching if not yet prefetched (e.g., user opens extremely fast)
+   // =============================================================================
    useEffect(() => {
-     const fetchSpecialPrices = async () => {
-       setLoadingSpecialPrices(true);
-       try {
-         const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/special-prices/${futsal.futsal_id}`);
-         if (response.ok) {
-           const data = await response.json();
-           setSpecialPrices(data.specialPrices || []);
+     const cachedPrices = usePrefetchStore.getState().getSpecialPrices(futsal.futsal_id);
+     
+     if (cachedPrices) {
+       // Data already prefetched - use cached data, no loading state needed
+       setSpecialPrices(cachedPrices);
+       setLoadingSpecialPrices(false);
+     } else {
+       // Not prefetched yet - fetch on demand (fallback)
+       // This handles case where user opens modal before prefetch completes
+       const fetchSpecialPrices = async () => {
+         setLoadingSpecialPrices(true);
+         try {
+           const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/special-prices/${futsal.futsal_id}`);
+           if (response.ok) {
+             const data = await response.json();
+             const prices = data.specialPrices || [];
+             setSpecialPrices(prices);
+             // Cache for future use
+             usePrefetchStore.getState().setSpecialPrices(futsal.futsal_id, prices);
+           }
+         } catch (error) {
+           console.error('Error fetching special prices:', error);
+         } finally {
+           setLoadingSpecialPrices(false);
          }
-       } catch (error) {
-         console.error('Error fetching special prices:', error);
-       } finally {
-         setLoadingSpecialPrices(false);
-       }
-     };
+       };
 
-     fetchSpecialPrices();
+       fetchSpecialPrices();
+     }
    }, [futsal.futsal_id]);
 
    const formatTime = (timeString: string): string => {

@@ -3,6 +3,7 @@ import { useState, useEffect, useMemo } from 'react';
 import VenueCard from './VenueCard';
 import VirtualizedVenueGrid from './VirtualizedVenueGrid';
 import { useFutsals } from '@/hooks/useFutsals';
+import { usePrefetchStore } from '@/stores/prefetchStore';
 
 interface Futsal {
   futsal_id: number;
@@ -71,7 +72,13 @@ export default function VenueGrid() {
      return () => window.removeEventListener('resize', updateDimensions);
    }, []);
 
-   // Fetch special prices for all futsals
+   // Fetch special prices for all futsals and preload media
+   // =============================================================================
+   // BACKGROUND PREFETCHING - Loads data silently on page mount
+   // =============================================================================
+   // This ensures that when user clicks handleDetailsModal, the data is already
+   // cached and the modal opens instantly without loading states
+   // =============================================================================
    useEffect(() => {
      const fetchSpecialPrices = async () => {
        const prices: {[key: number]: any[]} = {};
@@ -81,6 +88,11 @@ export default function VenueGrid() {
            if (response.ok) {
              const data = await response.json();
              prices[futsal.futsal_id] = data.specialPrices || [];
+             
+             // =======================================================================
+             // PREFETCH: Store special prices in cache for DetailsModal
+             // =======================================================================
+             usePrefetchStore.getState().setSpecialPrices(futsal.futsal_id, data.specialPrices || []);
            }
          } catch (error) {
            console.error('Error fetching special prices for futsal', futsal.futsal_id, error);
@@ -92,6 +104,35 @@ export default function VenueGrid() {
      if (futsals.length > 0) {
        fetchSpecialPrices();
      }
+   }, [futsals]);
+
+   // =============================================================================
+   // PREFETCH: Preload all images and videos for faster modal opening
+   // =============================================================================
+   // Uses browser-native prefetching so media is in cache before modal opens
+   // =============================================================================
+   useEffect(() => {
+     if (futsals.length === 0) return;
+
+     const prefetchMedia = () => {
+       for (const futsal of futsals) {
+         // Prefetch all images
+         if (futsal.images && futsal.images.length > 0) {
+           futsal.images.forEach((imageUrl: string) => {
+             usePrefetchStore.getState().preloadImage(imageUrl);
+           });
+         }
+
+         // Prefetch video
+         if (futsal.video) {
+           usePrefetchStore.getState().preloadVideo(futsal.video);
+         }
+       }
+     };
+
+     // Run prefetching after a small delay to not block initial page render
+     const timeoutId = setTimeout(prefetchMedia, 1000);
+     return () => clearTimeout(timeoutId);
    }, [futsals]);
 
   return (
