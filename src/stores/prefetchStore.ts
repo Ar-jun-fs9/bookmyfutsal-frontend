@@ -135,19 +135,9 @@ export const usePrefetchStore = create<PrefetchState>((set, get) => ({
       video.preload = 'auto';
       video.src = url;
       
-      // Method 2: Use <link rel="preload"> for browser-level prefetching
-      // This tells the browser to start fetching the video resource early
-      if (!document.querySelector(`link[href="${url}"]`)) {
-        const link = document.createElement('link');
-        link.rel = 'preload';
-        link.as = 'video';
-        link.href = url;
-        document.head.appendChild(link);
-      }
-      
-      // Method 3: Fetch with range header to get partial content for faster first frame
-      // This helps with getting the first keyframe quickly
-      fetch(url, { method: 'HEAD' }).catch(() => {
+      // Method 2: Use fetch to initiate early download (works more reliably than link preload)
+      // This triggers the browser to start downloading the video resource
+      fetch(url, { mode: 'no-cors', method: 'HEAD' }).catch(() => {
         // Silently fail - we don't want to break anything
       });
     }
