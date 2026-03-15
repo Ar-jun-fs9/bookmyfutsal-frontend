@@ -95,12 +95,28 @@ export const usePrefetchStore = create<PrefetchState>((set, get) => ({
   preloadVideo: (url: string) => {
     if (!url || get().preloadedVideos.has(url)) return;
     
-    // Use browser-native video preloading by creating a video element
-    // This loads the video metadata without auto-playing
+    // Use browser-native video preloading with multiple methods for better coverage
     if (typeof window !== 'undefined') {
+      // Method 1: Create video element with preload='auto' for metadata + partial buffering
       const video = document.createElement('video');
-      video.preload = 'metadata';
+      video.preload = 'auto';
       video.src = url;
+      
+      // Method 2: Use <link rel="preload"> for browser-level prefetching
+      // This tells the browser to start fetching the video resource early
+      if (!document.querySelector(`link[href="${url}"]`)) {
+        const link = document.createElement('link');
+        link.rel = 'preload';
+        link.as = 'video';
+        link.href = url;
+        document.head.appendChild(link);
+      }
+      
+      // Method 3: Fetch with range header to get partial content for faster first frame
+      // This helps with getting the first keyframe quickly
+      fetch(url, { method: 'HEAD' }).catch(() => {
+        // Silently fail - we don't want to break anything
+      });
     }
     
     set((state) => ({

@@ -15,6 +15,7 @@ import { useSpecialPrices } from '@/hooks/useSpecialPrices';
 import PriceNotificationModal from '@/components/modals/PriceNotificationModal';
 import TermsModal from '@/components/modals/BookingTermsModal';
 import SlotLoading from '@/components/venues/SlotLoading';
+import { usePrefetchStore } from '@/stores/prefetchStore';
 
 // Calculate advance payment based on price ranges
 function calculateAdvance(price: number): number {
@@ -162,7 +163,14 @@ export default function UserDashboard() {
     sessionStorage.setItem('dashboardState', JSON.stringify(state));
   }, [selectedFutsal, showBooking]);
 
-  // Fetch special prices for all futsals
+  // Fetch special prices for all futsals and preload media
+  // =============================================================================
+  // BACKGROUND PREFETCHING - Loads data silently on page mount
+  // =============================================================================
+  // This ensures that when user clicks handleDetailsModal, the data is already
+  // cached and the modal opens instantly without loading states
+  // Also prefetches images and videos for faster media loading
+  // =============================================================================
   useEffect(() => {
     const fetchSpecialPrices = async () => {
       const prices: { [key: number]: any[] } = {};
@@ -172,6 +180,11 @@ export default function UserDashboard() {
           if (response.ok) {
             const data = await response.json();
             prices[futsal.futsal_id] = data.specialPrices || [];
+            
+            // =======================================================================
+            // PREFETCH: Store special prices in cache for DetailsModal
+            // =======================================================================
+            usePrefetchStore.getState().setSpecialPrices(futsal.futsal_id, data.specialPrices || []);
           }
         } catch (error) {
           console.error('Error fetching special prices for futsal', futsal.futsal_id, error);
@@ -183,6 +196,35 @@ export default function UserDashboard() {
     if (futsals.length > 0) {
       fetchSpecialPrices();
     }
+  }, [futsals]);
+
+  // =============================================================================
+  // PREFETCH: Preload all images and videos for faster modal opening
+  // =============================================================================
+  // Uses browser-native prefetching so media is in cache before modal opens
+  // =============================================================================
+  useEffect(() => {
+    if (futsals.length === 0) return;
+
+    const prefetchMedia = () => {
+      for (const futsal of futsals) {
+        // Prefetch all images
+        if (futsal.images && futsal.images.length > 0) {
+          futsal.images.forEach((imageUrl: string) => {
+            usePrefetchStore.getState().preloadImage(imageUrl);
+          });
+        }
+
+        // Prefetch video
+        if (futsal.video) {
+          usePrefetchStore.getState().preloadVideo(futsal.video);
+        }
+      }
+    };
+
+    // Run prefetching after a small delay to not block initial page render
+    const timeoutId = setTimeout(prefetchMedia, 1000);
+    return () => clearTimeout(timeoutId);
   }, [futsals]);
 
   // Prevent background scrolling when modals are open
@@ -1436,7 +1478,46 @@ export default function UserDashboard() {
 
 // Details Modal Component
 function DetailsModal({ futsal, onClose }: { futsal: Futsal, onClose: () => void }) {
-  const { data: specialPrices = [], isLoading: loadingSpecialPrices } = useSpecialPrices(futsal.futsal_id);
+  const [specialPrices, setSpecialPrices] = useState<any[]>([]);
+  const [loadingSpecialPrices, setLoadingSpecialPrices] = useState(false);
+
+  // =============================================================================
+  // PREFETCH: Try to get special prices from cache first
+  // =============================================================================
+  // User Dashboard prefetches this data on page load, so modal opens instantly
+  // Falls back to fetching if not yet prefetched (e.g., user opens extremely fast)
+  // =============================================================================
+  useEffect(() => {
+    const cachedPrices = usePrefetchStore.getState().getSpecialPrices(futsal.futsal_id);
+    
+    if (cachedPrices) {
+      // Data already prefetched - use cached data, no loading state needed
+      setSpecialPrices(cachedPrices);
+      setLoadingSpecialPrices(false);
+    } else {
+      // Not prefetched yet - fetch on demand (fallback)
+      // This handles case where user opens modal before prefetch completes
+      const fetchSpecialPrices = async () => {
+        setLoadingSpecialPrices(true);
+        try {
+          const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/special-prices/${futsal.futsal_id}`);
+          if (response.ok) {
+            const data = await response.json();
+            const prices = data.specialPrices || [];
+            setSpecialPrices(prices);
+            // Cache for future use
+            usePrefetchStore.getState().setSpecialPrices(futsal.futsal_id, prices);
+          }
+        } catch (error) {
+          console.error('Error fetching special prices:', error);
+        } finally {
+          setLoadingSpecialPrices(false);
+        }
+      };
+
+      fetchSpecialPrices();
+    }
+  }, [futsal.futsal_id]);
 
   const formatTime = (timeString: string): string => {
     const [hours, minutes] = timeString.split(':').map(Number);
