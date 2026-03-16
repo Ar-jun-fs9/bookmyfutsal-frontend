@@ -3,6 +3,7 @@ import { useSlots } from '../hooks/useSlots';
 import { useFutsals } from '../hooks/useFutsals';
 import { ConfirmModal } from './modals/ConfirmModal';
 import { NotificationModal } from './modals/NotificationModal';
+import SlotLoading from '@/components/venues/SlotLoading';
 
 interface SlotSectionProps {
   isVisible: boolean;
@@ -153,8 +154,13 @@ export function SlotSection({ isVisible, onToggle }: SlotSectionProps) {
         )}
       </div>
 
-      {/* Group slots by futsal and date */}
-      {Object.entries(
+      {/* Loading state for All Futsals scenario */}
+      {isVisible && selectedFutsal === null && loading ? (
+        <SlotLoading message="Loading slots for all futsals..." />
+      ) : (
+        <>
+          {/* Group slots by futsal and date */}
+          {Object.entries(
         slots.reduce((acc: Record<string, any[]>, slot: any) => {
           const formattedDate = new Date(slot.slot_date).toLocaleDateString('en-CA');
           const key = `${slot.futsal_name || 'Unknown Futsal'} - ${formattedDate}`;
@@ -216,6 +222,8 @@ export function SlotSection({ isVisible, onToggle }: SlotSectionProps) {
           </div>
         </div>
       ))}
+        </>
+      )}
 
       {/* Modals */}
       <ConfirmModal
