@@ -818,14 +818,14 @@ export default function UserDashboard() {
                         onClick={() => dispatch({ type: 'SET_SHOW_FILTERS', payload: !filterState.showFilters })}
                         className="bg-linear-to-r from-green-500 to-green-600 text-white font-semibold py-2 px-4 rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 text-sm"
                       >
-                        {filterState.showFilters ? '🔽 Hide' : '🔍 Show Filters'}
+                        {filterState.showFilters ? 'X' : 'Show Filters'}
                       </button>
                       {filterState.showFilters && (
                         <button
                           onClick={() => dispatch({ type: 'CLEAR_FILTERS' })}
                           className="bg-linear-to-r from-red-500 to-red-600 text-white font-semibold py-2 px-4 rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 text-sm"
                         >
-                          🗑️ Clear
+                          Clear
                         </button>
                       )}
                     </div>
@@ -864,28 +864,28 @@ export default function UserDashboard() {
                   </div>
                   {/* Filters */}
                   {filterState.showFilters && (
-                    <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-6 ">
+                    <div className=" rounded-2xl  border border-gray-200 p-6 ">
                       <h3 className="text-xl font-bold mb-6 bg-linear-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">Filter & Search Futsals</h3>
                       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-6">
                         {/* Search Bar */}
                         <div className="lg:col-span-2">
-                          <label className="block text-sm font-semibold text-gray-800 mb-2">🔍 Search</label>
+                          <label className="block text-sm font-semibold text-gray-800 mb-2">Search</label>
                           <input
                             type="text"
                             placeholder="Search by name, city, or location..."
                             value={filterState.searchQuery}
                             onChange={(e) => dispatch({ type: 'SET_SEARCH_QUERY', payload: e.target.value })}
-                            className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-400/50 focus:border-green-400/50 transition-all text-sm"
+                            className="w-full px-4 py-3 border border-gray-200 rounded-xl text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-400/50 focus:border-green-400/50 transition-all text-sm"
                           />
                         </div>
 
                         {/* Name Filter */}
                         <div>
-                          <label className="block text-sm font-semibold text-gray-800 mb-2">🏟️ Futsal Name</label>
+                          <label className="block text-sm font-semibold text-gray-800 mb-2">Futsal Name</label>
                           <select
                             value={filterState.selectedName}
                             onChange={(e) => dispatch({ type: 'SET_SELECTED_NAME', payload: e.target.value })}
-                            className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none focus:ring-2 focus:ring-green-400/50 focus:border-green-400/50 transition-all text-sm"
+                            className="w-full px-4 py-3  border border-gray-200 rounded-xl text-gray-800 focus:outline-none focus:ring-2 focus:ring-green-400/50 focus:border-green-400/50 transition-all text-sm"
                           >
                             <option value="">All Names</option>
                             {uniqueNames.map((name: string) => (
@@ -896,11 +896,11 @@ export default function UserDashboard() {
 
                         {/* City Filter */}
                         <div>
-                          <label className="block text-sm font-semibold text-gray-800 mb-2">🏙️ City</label>
+                          <label className="block text-sm font-semibold text-gray-800 mb-2">City</label>
                           <select
                             value={filterState.selectedCity}
                             onChange={(e) => dispatch({ type: 'SET_SELECTED_CITY', payload: e.target.value })}
-                            className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none focus:ring-2 focus:ring-green-400/50 focus:border-green-400/50 transition-all text-sm"
+                            className="w-full px-4 py-3  border border-gray-200 rounded-xl text-gray-800 focus:outline-none focus:ring-2 focus:ring-green-400/50 focus:border-green-400/50 transition-all text-sm"
                           >
                             <option value="">All Cities</option>
                             {uniqueCities.map((city: string) => (
@@ -911,11 +911,11 @@ export default function UserDashboard() {
 
                         {/* Location Filter */}
                         <div>
-                          <label className="block text-sm font-semibold text-gray-800 mb-2">📍 Location</label>
+                          <label className="block text-sm font-semibold text-gray-800 mb-2">Location</label>
                           <select
                             value={filterState.selectedLocation}
                             onChange={(e) => dispatch({ type: 'SET_SELECTED_LOCATION', payload: e.target.value })}
-                            className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none focus:ring-2 focus:ring-green-400/50 focus:border-green-400/50 transition-all text-sm"
+                            className="w-full px-4 py-3  border border-gray-200 rounded-xl text-gray-800 focus:outline-none focus:ring-2 focus:ring-green-400/50 focus:border-green-400/50 transition-all text-sm"
                           >
                             <option value="">All Locations</option>
                             {uniqueLocations.map((location: string) => (
@@ -926,11 +926,11 @@ export default function UserDashboard() {
 
                         {/* Offers Filter */}
                         <div>
-                          <label className="block text-sm font-semibold text-gray-800 mb-2">🎁 Offers</label>
+                          <label className="block text-sm font-semibold text-gray-800 mb-2">Offers</label>
                           <select
                             value={filterState.selectedOffer}
                             onChange={(e) => dispatch({ type: 'SET_SELECTED_OFFER', payload: e.target.value as 'all' | 'offers' })}
-                            className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none focus:ring-2 focus:ring-green-400/50 focus:border-green-400/50 transition-all text-sm"
+                            className="w-full px-4 py-3  border border-gray-200 rounded-xl text-gray-800 focus:outline-none focus:ring-2 focus:ring-green-400/50 focus:border-green-400/50 transition-all text-sm"
                           >
                             <option value="all">All</option>
                             <option value="offers">With Offers</option>
@@ -941,11 +941,11 @@ export default function UserDashboard() {
                       {/* Sort Options */}
                       <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
-                          <label className="block text-sm font-semibold text-gray-800 mb-2">⭐ Sort by Rating</label>
+                          <label className="block text-sm font-semibold text-gray-800 mb-2">Sort by Rating</label>
                           <select
                             value={filterState.sortByRating}
                             onChange={(e) => dispatch({ type: 'SET_SORT_BY_RATING', payload: e.target.value as 'none' | 'highest' | 'lowest' })}
-                            className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none focus:ring-2 focus:ring-green-400/50 focus:border-green-400/50 transition-all text-sm"
+                            className="w-full px-4 py-3  border border-gray-200 rounded-xl text-gray-800 focus:outline-none focus:ring-2 focus:ring-green-400/50 focus:border-green-400/50 transition-all text-sm"
                           >
                             <option value="none">No Rating Sort</option>
                             <option value="highest">Highest Rating</option>
@@ -954,11 +954,11 @@ export default function UserDashboard() {
                         </div>
 
                         <div>
-                          <label className="block text-sm font-semibold text-gray-800 mb-2">💰 Sort by Price</label>
+                          <label className="block text-sm font-semibold text-gray-800 mb-2">Sort by Price</label>
                           <select
                             value={filterState.sortByPrice}
                             onChange={(e) => dispatch({ type: 'SET_SORT_BY_PRICE', payload: e.target.value as 'none' | 'low-to-high' | 'high-to-low' })}
-                            className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none focus:ring-2 focus:ring-green-400/50 focus:border-green-400/50 transition-all text-sm"
+                            className="w-full px-4 py-3  border border-gray-200 rounded-xl text-gray-800 focus:outline-none focus:ring-2 focus:ring-green-400/50 focus:border-green-400/50 transition-all text-sm"
                           >
                             <option value="none">No Price Sort</option>
                             <option value="low-to-high">Low to High</option>
@@ -3131,7 +3131,7 @@ function BookingModal({ futsal, user, onClose, onSuccess, setSuccessModal, setCo
                   <div className="space-y-7">
                     <div className="relative">
                       <label htmlFor="bookingDate" className="block text-sm font-semibold text-gray-700 mb-2">
-                        📅 Booking Date
+                        Booking Date
                       </label>
                       <div className="relative">
                         <input
@@ -3497,7 +3497,7 @@ function BookingModal({ futsal, user, onClose, onSuccess, setSuccessModal, setCo
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                           <div className="relative">
                             <label className="block text-sm font-semibold text-gray-700 mb-2">
-                              👥 Number of Players
+                              Number of Players
                             </label>
                             <div className="relative">
                               <input
@@ -3521,7 +3521,7 @@ function BookingModal({ futsal, user, onClose, onSuccess, setSuccessModal, setCo
 
                           <div className="relative">
                             <label className="block text-sm font-semibold text-gray-700 mb-2">
-                              🏆 Team Name <span className="text-gray-500 font-normal">(optional)</span>
+                              Team Name <span className="text-gray-500 font-normal">(optional)</span>
                             </label>
                             <div className="relative">
                               <input
@@ -3688,7 +3688,7 @@ function BookingModal({ futsal, user, onClose, onSuccess, setSuccessModal, setCo
                   {/* eSewa Phone Number Input */}
                   <div className="bg-white border border-gray-200 rounded-xl p-4 mb-6">
                     <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      📱 eSewa Phone Number
+                      eSewa Phone Number
                     </label>
                     <div className="relative">
                       <input
@@ -4482,7 +4482,7 @@ function UpdateBookingModal({ booking, onClose, onSuccess, setSuccessModal, show
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                           <div className="relative">
                             <label className="block text-sm font-semibold text-gray-700 mb-2">
-                              👥 Number of Players
+                              Number of Players
                             </label>
                             <div className="relative">
                               <input
@@ -4506,7 +4506,7 @@ function UpdateBookingModal({ booking, onClose, onSuccess, setSuccessModal, show
 
                           <div className="relative">
                             <label className="block text-sm font-semibold text-gray-700 mb-2">
-                              🏆 Team Name <span className="text-gray-500 font-normal">(optional)</span>
+                              Team Name <span className="text-gray-500 font-normal">(optional)</span>
                             </label>
                             <div className="relative">
                               <input

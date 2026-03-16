@@ -30,8 +30,8 @@ export default function TestimonialSection() {
             {visibleTestimonials.map((testimonial, index) => (
               <div
                 key={index}
-                className={`bg-white rounded-2xl p-3 hover:shadow-2xl transform hover:scale-105 transition-all duration-500 border ${
-                  index === subIndex && testimonialsPerPage > 1 ? 'border-green-500 ring-1 ring-green-200' : 'border-gray-100'
+                className={`rounded-2xl p-3 hover:shadow-2xl transform hover:scale-102 transition-all duration-500 border ${
+                  index === subIndex && testimonialsPerPage > 1 ? 'border-green-500 ring-1 ring-green-200' : 'border-gray-300'
                 }`}
                 style={{ animationDelay: `${index * 200}ms` }}
               >

@@ -1010,8 +1010,8 @@ export default function UserLogin() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
               <div className="text-center md:text-left">
                 <h5 className="font-semibold mb-2">Contact Us</h5>
-                <p className="text-gray-300 text-sm">📧 bookmyfutsal@gmail.com</p>
-                <p className="text-gray-300 text-sm">📞 +977-123-456789</p>
+                <p className="text-gray-300 text-sm">bookmyfutsal@gmail.com</p>
+                <p className="text-gray-300 text-sm">+977-123-456789</p>
               </div>
               <div className="text-center">
                 <h5 className="font-semibold mb-2">Business Hours</h5>

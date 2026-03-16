@@ -1,17 +1,17 @@
-'use client';
+"use client";
 
-import Link from 'next/link';
-import { useState } from 'react';
-import { useNotificationStore } from '@/stores/notificationStore';
+import Link from "next/link";
+import { useState } from "react";
+import { useNotificationStore } from "@/stores/notificationStore";
 
 export default function ContactPage() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    subject: '',
-    message: '',
-    phone: ''
+    name: "",
+    email: "",
+    subject: "",
+    message: "",
+    phone: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -22,39 +22,41 @@ export default function ContactPage() {
 
     // Name validation
     if (!formData.name.trim()) {
-      newErrors.name = 'Full name is required';
+      newErrors.name = "Full name is required";
     } else if (formData.name.length < 2 || formData.name.length > 100) {
-      newErrors.name = 'Name must be between 2 and 100 characters';
+      newErrors.name = "Name must be between 2 and 100 characters";
     } else if (!/^[a-zA-Z\s\-'\.]+$/.test(formData.name)) {
-      newErrors.name = 'Name can only contain letters, spaces, hyphens, apostrophes, and periods';
+      newErrors.name =
+        "Name can only contain letters, spaces, hyphens, apostrophes, and periods";
     }
 
     // Email validation
     if (!formData.email.trim()) {
-      newErrors.email = 'Email address is required';
+      newErrors.email = "Email address is required";
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      newErrors.email = 'Please provide a valid email address';
+      newErrors.email = "Please provide a valid email address";
     }
 
     // Subject validation
     if (!formData.subject.trim()) {
-      newErrors.subject = 'Subject is required';
+      newErrors.subject = "Subject is required";
     } else if (formData.subject.length < 3 || formData.subject.length > 200) {
-      newErrors.subject = 'Subject must be between 3 and 200 characters';
+      newErrors.subject = "Subject must be between 3 and 200 characters";
     }
 
     // Message validation
     if (!formData.message.trim()) {
-      newErrors.message = 'Message is required';
+      newErrors.message = "Message is required";
     } else if (formData.message.length < 10 || formData.message.length > 2000) {
-      newErrors.message = 'Message must be between 10 and 2000 characters';
+      newErrors.message = "Message must be between 10 and 2000 characters";
     }
 
     // Phone validation
     if (!formData.phone.trim()) {
-      newErrors.phone = 'Phone number is required';
+      newErrors.phone = "Phone number is required";
     } else if (!/^9\d{9}$/.test(formData.phone)) {
-      newErrors.phone = 'Phone number must start with 9 and be exactly 10 digits';
+      newErrors.phone =
+        "Phone number must start with 9 and be exactly 10 digits";
     }
 
     setErrors(newErrors);
@@ -71,58 +73,82 @@ export default function ContactPage() {
     setIsSubmitting(true);
 
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/contact`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/contact`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(formData),
         },
-        body: JSON.stringify(formData),
-      });
+      );
 
       if (response.ok) {
-        setFormData({ name: '', email: '', subject: '', message: '', phone: '' });
-        showNotification({ message: 'Message sent successfully!', type: 'success' });
+        setFormData({
+          name: "",
+          email: "",
+          subject: "",
+          message: "",
+          phone: "",
+        });
+        showNotification({
+          message: "Message sent successfully!",
+          type: "success",
+        });
       } else {
         const errorData = await response.json().catch(() => ({}));
         if (errorData.errors && Array.isArray(errorData.errors)) {
-          const errorMessages = errorData.errors.map((err: any) => err.msg).join(', ');
-          showNotification({ message: errorMessages, type: 'info' });
+          const errorMessages = errorData.errors
+            .map((err: any) => err.msg)
+            .join(", ");
+          showNotification({ message: errorMessages, type: "info" });
         } else {
-          showNotification({ message: 'Failed to send message. Please try again.', type: 'info' });
+          showNotification({
+            message: "Failed to send message. Please try again.",
+            type: "info",
+          });
         }
       }
     } catch (error) {
-      console.error('Contact form submission error:', error);
-      showNotification({ message: 'An error occurred. Please try again later.', type: 'info' });
+      console.error("Contact form submission error:", error);
+      showNotification({
+        message: "An error occurred. Please try again later.",
+        type: "info",
+      });
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >,
+  ) => {
     let value = e.target.value;
 
-    if (e.target.name === 'phone') {
+    if (e.target.name === "phone") {
       // Allow only digits, max 10 characters, and must start with 9
-      value = value.replace(/\D/g, ''); // Remove non-digits
+      value = value.replace(/\D/g, ""); // Remove non-digits
       if (value.length > 10) {
         value = value.slice(0, 10);
       }
       // Only allow if empty or starts with 9
-      if (value && !value.startsWith('9')) {
-        value = ''; // Reject input that doesn't start with 9
+      if (value && !value.startsWith("9")) {
+        value = ""; // Reject input that doesn't start with 9
       }
     }
 
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [e.target.name]: value
+      [e.target.name]: value,
     }));
     // Clear error for this field
     if (errors[e.target.name]) {
-      setErrors(prev => ({
+      setErrors((prev) => ({
         ...prev,
-        [e.target.name]: ''
+        [e.target.name]: "",
       }));
     }
   };
@@ -134,36 +160,60 @@ export default function ContactPage() {
         <div className="max-w-7xl mx-auto px-1 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-4 px-2">
             {/* Logo */}
-            <Link href="/" className="flex items-center space-x-3 cursor-pointer">
+            <Link
+              href="/"
+              className="flex items-center space-x-3 cursor-pointer"
+            >
               <div className="relative">
-                <img src="/logo/logo.png" alt="BookMyFutsal" className="h-12 w-12 rounded-lg bg-green-900 shadow-lg ring-2 ring-white" />
+                <img
+                  src="/logo/logo.png"
+                  alt="BookMyFutsal"
+                  className="h-12 w-12 rounded-lg bg-green-900 shadow-lg ring-2 ring-white"
+                />
                 <div className="absolute -top-1 -right-1 w-4 h-4 bg-white rounded-lg animate-pulse"></div>
               </div>
               <h1 className="text-2xl md:text-3xl font-bold text-white drop-shadow-lg">
-                <span className="bg-linear-to-r from-green-400 to-blue-400 bg-clip-text text-transparent">BookMy</span>
+                <span className="bg-linear-to-r from-green-400 to-blue-400 bg-clip-text text-transparent">
+                  BookMy
+                </span>
                 <span className="text-white">Futsal</span>
               </h1>
             </Link>
 
             {/* Desktop Navigation */}
             <nav className="hidden md:flex items-center space-x-8">
-              <Link href="/" className="text-gray-200 hover:text-green-400 font-semibold transition-all duration-300 hover:scale-105 relative group">
+              <Link
+                href="/"
+                className="text-gray-200 hover:text-green-400 font-semibold transition-all duration-300 hover:scale-105 relative group"
+              >
                 Home
                 <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-green-400 transition-all duration-300 group-hover:w-full"></span>
               </Link>
-              <Link href="/venues" className="text-gray-200 hover:text-green-400 font-semibold transition-all duration-300 hover:scale-105 relative group">
+              <Link
+                href="/venues"
+                className="text-gray-200 hover:text-green-400 font-semibold transition-all duration-300 hover:scale-105 relative group"
+              >
                 Venues
                 <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-green-400 transition-all duration-300 group-hover:w-full"></span>
               </Link>
-              <Link href="/bookings" className="text-gray-200 hover:text-green-400 font-semibold transition-all duration-300 hover:scale-105 relative group">
+              <Link
+                href="/bookings"
+                className="text-gray-200 hover:text-green-400 font-semibold transition-all duration-300 hover:scale-105 relative group"
+              >
                 Bookings
                 <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-green-400 transition-all duration-300 group-hover:w-full"></span>
               </Link>
-              <Link href="/about" className="text-gray-200 hover:text-green-400 font-semibold transition-all duration-300 hover:scale-105 relative group">
+              <Link
+                href="/about"
+                className="text-gray-200 hover:text-green-400 font-semibold transition-all duration-300 hover:scale-105 relative group"
+              >
                 About
                 <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-green-400 transition-all duration-300 group-hover:w-full"></span>
               </Link>
-              <Link href="/contact" className="text-gray-200 hover:text-green-400 font-semibold transition-all duration-300 hover:scale-105 relative group">
+              <Link
+                href="/contact"
+                className="text-gray-200 hover:text-green-400 font-semibold transition-all duration-300 hover:scale-105 relative group"
+              >
                 Contact
                 <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-green-400 transition-all duration-300 group-hover:w-full"></span>
               </Link>
@@ -190,11 +240,26 @@ export default function ContactPage() {
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               className="md:hidden p-2 rounded-lg text-gray-200 hover:text-green-400 hover:bg-green-900/50 transition-all duration-300 border border-gray-600/30"
             >
-              <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg
+                className="h-6 w-6"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
                 {isMobileMenuOpen ? (
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
                 ) : (
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M4 6h16M4 12h16M4 18h16"
+                  />
                 )}
               </svg>
             </button>
@@ -204,11 +269,36 @@ export default function ContactPage() {
           {isMobileMenuOpen && (
             <div className="md:hidden border-t border-green-500/20 py-4 px-2 bg-linear-to-b from-gray-900/95 to-green-900/95 backdrop-blur-md">
               <nav className="flex flex-col space-y-4">
-                <Link href="/" className="text-gray-200 hover:text-green-400 font-semibold transition-all duration-300 px-3 py-2 rounded-lg hover:bg-green-900/50">Home</Link>
-                <Link href="/venues" className="text-gray-200 hover:text-green-400 font-semibold transition-all duration-300 px-3 py-2 rounded-lg hover:bg-green-900/50">Venues</Link>
-                <Link href="/bookings" className="text-gray-200 hover:text-green-400 font-semibold transition-all duration-300 px-3 py-2 rounded-lg hover:bg-green-900/50">Bookings</Link>
-                <Link href="/about" className="text-gray-200 hover:text-green-400 font-semibold transition-all duration-300 px-3 py-2 rounded-lg hover:bg-green-900/50">About</Link>
-                <Link href="/contact" className="text-gray-200 hover:text-green-400 font-semibold transition-all duration-300 px-3 py-2 rounded-lg hover:bg-green-900/50">Contact</Link>
+                <Link
+                  href="/"
+                  className="text-gray-200 hover:text-green-400 font-semibold transition-all duration-300 px-3 py-2 rounded-lg hover:bg-green-900/50"
+                >
+                  Home
+                </Link>
+                <Link
+                  href="/venues"
+                  className="text-gray-200 hover:text-green-400 font-semibold transition-all duration-300 px-3 py-2 rounded-lg hover:bg-green-900/50"
+                >
+                  Venues
+                </Link>
+                <Link
+                  href="/bookings"
+                  className="text-gray-200 hover:text-green-400 font-semibold transition-all duration-300 px-3 py-2 rounded-lg hover:bg-green-900/50"
+                >
+                  Bookings
+                </Link>
+                <Link
+                  href="/about"
+                  className="text-gray-200 hover:text-green-400 font-semibold transition-all duration-300 px-3 py-2 rounded-lg hover:bg-green-900/50"
+                >
+                  About
+                </Link>
+                <Link
+                  href="/contact"
+                  className="text-gray-200 hover:text-green-400 font-semibold transition-all duration-300 px-3 py-2 rounded-lg hover:bg-green-900/50"
+                >
+                  Contact
+                </Link>
 
                 <div className="flex flex-row space-x-3 pt-4 border-t border-green-500/20">
                   <Link
@@ -246,10 +336,12 @@ export default function ContactPage() {
           {/* Contact Information */}
           <div className="space-y-8">
             <div>
-              <h2 className="text-3xl font-bold text-gray-800 mb-6 text-center">Get In Touch</h2>
+              <h2 className="text-3xl font-bold text-gray-800 mb-6 text-center">
+                Get In Touch
+              </h2>
               <p className="text-gray-600 text-lg mb-8">
-                Have questions about booking venues, need support, or want to partner with us?
-                We'd love to hear from you.
+                Have questions about booking venues, need support, or want to
+                partner with us? We'd love to hear from you.
               </p>
             </div>
 
@@ -257,70 +349,168 @@ export default function ContactPage() {
             <div className="space-y-6">
               <div className="flex items-start space-x-4">
                 <div className="shrink-0 w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                  <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" />
+                  <svg
+                    className="w-6 h-6 text-green-600"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z"
+                    />
                   </svg>
                 </div>
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-800 mb-1">Phone</h3>
-                  <p className="text-gray-600">📞 +977-123-456789</p>
-                  <p className="text-sm text-gray-500 mt-1">Mon - Sun: 6:00 AM - 11:00 PM</p>
+                  <h3 className="text-lg font-semibold text-gray-800 mb-1">
+                    Phone
+                  </h3>
+                  <p className="text-gray-600">+977-123-456789</p>
+                  <p className="text-sm text-gray-500 mt-1">
+                    Mon - Sun: 6:00 AM - 11:00 PM
+                  </p>
                 </div>
               </div>
 
               <div className="flex items-start space-x-4">
                 <div className="shrink-0 w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                  <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                  <svg
+                    className="w-6 h-6 text-blue-600"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                    />
                   </svg>
                 </div>
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-800 mb-1">Email</h3>
-                  <p className="text-gray-600">📧 bookmyfutsal@gmail.com</p>
-                  <p className="text-sm text-gray-500 mt-1">We respond within 24 hours</p>
+                  <h3 className="text-lg font-semibold text-gray-800 mb-1">
+                    Email
+                  </h3>
+                  <p className="text-gray-600">bookmyfutsal@gmail.com</p>
+                  <p className="text-sm text-gray-500 mt-1">
+                    We respond within 24 hours
+                  </p>
                 </div>
               </div>
 
               <div className="flex items-start space-x-4">
                 <div className="shrink-0 w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
-                  <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                  <svg
+                    className="w-6 h-6 text-purple-600"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                    />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                    />
                   </svg>
                 </div>
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-800 mb-1">Location</h3>
-                  <p className="text-gray-600">📍 Kathmandu, Nepal</p>
-                  <p className="text-sm text-gray-500 mt-1">Serving futsal venues across the city</p>
+                  <h3 className="text-lg font-semibold text-gray-800 mb-1">
+                    Location
+                  </h3>
+                  <p className="text-gray-600">Kathmandu, Nepal</p>
+                  <p className="text-sm text-gray-500 mt-1">
+                    Serving futsal venues across the city
+                  </p>
                 </div>
               </div>
 
               <div className="flex items-start space-x-4">
                 <div className="shrink-0 w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
-                  <svg className="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  <svg
+                    className="w-6 h-6 text-orange-600"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
                   </svg>
                 </div>
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-800 mb-1">Business Hours</h3>
-                  <p className="text-gray-600">🕐 Emergency Support: 24/7</p>
-                  <p className="text-gray-600">🕐 General Support: 6:00 AM - 11:00 PM</p>
+                  <h3 className="text-lg font-semibold text-gray-800 mb-1">
+                    Business Hours
+                  </h3>
+                  <p className="text-gray-600">Emergency Support: 24/7</p>
+                  <p className="text-gray-600">
+                    General Support: 6:00 AM - 11:00 PM
+                  </p>
                 </div>
               </div>
             </div>
 
             {/* Social Media */}
             <div>
-              <h3 className="text-lg font-semibold text-gray-800 mb-4">Follow Us</h3>
+              <h3 className="text-lg font-semibold text-gray-800 mb-4">
+                Follow Us
+              </h3>
               <div className="flex space-x-4">
-                <a href="https://facebook.com" className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center text-white hover:bg-blue-700 transition-colors">
-                  <span className="text-lg">f</span>
+                {/* Facebook */}
+                <a
+                  href="https://facebook.com"
+                  className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center text-white hover:bg-blue-700 transition-colors"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                    className="w-5 h-5"
+                  >
+                    <path d="M13.397 20.997v-8.196h2.765l.411-3.209h-3.176V7.548c0-.926.258-1.56 1.587-1.56h1.684V3.127A22.336 22.336 0 0 0 14.201 3c-2.444 0-4.122 1.492-4.122 4.231v2.355H7.332v3.209h2.753v8.202h3.312z" />
+                  </svg>
                 </a>
-                <a href="https://instagram.com" className="w-10 h-10 bg-pink-600 rounded-lg flex items-center justify-center text-white hover:bg-pink-700 transition-colors">
-                  <span className="text-lg">📷</span>
+
+                {/* Instagram */}
+                <a
+                  href="https://instagram.com"
+                  className="w-10 h-10 bg-linear-to-tr from-yellow-400 via-pink-500 to-purple-600 rounded-lg flex items-center justify-center text-white hover:opacity-90 transition-opacity"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                    className="w-5 h-5"
+                  >
+                    <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z" />
+                  </svg>
                 </a>
-                <a href="https://youtube.com" className="w-10 h-10 bg-red-600 rounded-lg flex items-center justify-center text-white hover:bg-red-700 transition-colors">
-                  <span className="text-lg">▶️</span>
+
+                {/* YouTube */}
+                <a
+                  href="https://youtube.com"
+                  className="w-10 h-10 bg-red-600 rounded-lg flex items-center justify-center text-white hover:bg-red-700 transition-colors"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                    className="w-5 h-5"
+                  >
+                    <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
+                  </svg>
                 </a>
               </div>
             </div>
@@ -328,12 +518,17 @@ export default function ContactPage() {
 
           {/* Contact Form */}
           <div className="bg-white rounded-2xl p-1 sm:p-8">
-            <h2 className="text-2xl font-bold text-gray-800 mb-6">Send us a Message</h2>
+            <h2 className="text-2xl font-bold text-gray-800 mb-6">
+              Send us a Message
+            </h2>
 
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 <div>
-                  <label htmlFor="name" className="block text-sm font-semibold text-gray-700 mb-2">
+                  <label
+                    htmlFor="name"
+                    className="block text-sm font-semibold text-gray-700 mb-2"
+                  >
                     Full Name *
                   </label>
                   <input
@@ -343,14 +538,19 @@ export default function ContactPage() {
                     required
                     value={formData.name}
                     onChange={handleChange}
-                    className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-green-400 transition-all ${errors.name ? 'border-red-500' : 'border-gray-300'}`}
+                    className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-green-400 transition-all ${errors.name ? "border-red-500" : "border-gray-300"}`}
                     placeholder="Your full name"
                   />
-                  {errors.name && <p className="mt-1 text-sm text-red-600">{errors.name}</p>}
+                  {errors.name && (
+                    <p className="mt-1 text-sm text-red-600">{errors.name}</p>
+                  )}
                 </div>
 
                 <div>
-                  <label htmlFor="email" className="block text-sm font-semibold text-gray-700 mb-2">
+                  <label
+                    htmlFor="email"
+                    className="block text-sm font-semibold text-gray-700 mb-2"
+                  >
                     Email Address *
                   </label>
                   <input
@@ -360,16 +560,21 @@ export default function ContactPage() {
                     required
                     value={formData.email}
                     onChange={handleChange}
-                    className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-green-400 transition-all ${errors.email ? 'border-red-500' : 'border-gray-300'}`}
+                    className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-green-400 transition-all ${errors.email ? "border-red-500" : "border-gray-300"}`}
                     placeholder="your.email@example.com"
                   />
-                  {errors.email && <p className="mt-1 text-sm text-red-600">{errors.email}</p>}
+                  {errors.email && (
+                    <p className="mt-1 text-sm text-red-600">{errors.email}</p>
+                  )}
                 </div>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 <div>
-                  <label htmlFor="phone" className="block text-sm font-semibold text-gray-700 mb-2">
+                  <label
+                    htmlFor="phone"
+                    className="block text-sm font-semibold text-gray-700 mb-2"
+                  >
                     Phone Number *
                   </label>
                   <input
@@ -379,16 +584,20 @@ export default function ContactPage() {
                     required
                     value={formData.phone}
                     onChange={handleChange}
-                    className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-green-400 transition-all ${errors.phone ? 'border-red-500' : 'border-gray-300'}`}
+                    className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-green-400 transition-all ${errors.phone ? "border-red-500" : "border-gray-300"}`}
                     placeholder="9846875161"
                   />
-                  {errors.phone && <p className="mt-1 text-sm text-red-600">{errors.phone}</p>}
+                  {errors.phone && (
+                    <p className="mt-1 text-sm text-red-600">{errors.phone}</p>
+                  )}
                 </div>
-
               </div>
 
               <div>
-                <label htmlFor="subject" className="block text-sm font-semibold text-gray-700 mb-2">
+                <label
+                  htmlFor="subject"
+                  className="block text-sm font-semibold text-gray-700 mb-2"
+                >
                   Subject *
                 </label>
                 <select
@@ -397,7 +606,7 @@ export default function ContactPage() {
                   required
                   value={formData.subject}
                   onChange={handleChange}
-                  className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-green-400 transition-all ${errors.subject ? 'border-red-500' : 'border-gray-300'}`}
+                  className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-green-400 transition-all ${errors.subject ? "border-red-500" : "border-gray-300"}`}
                 >
                   <option value="">Select a subject</option>
                   <option value="booking">Booking Inquiry</option>
@@ -406,11 +615,16 @@ export default function ContactPage() {
                   <option value="feedback">Feedback</option>
                   <option value="other">Other</option>
                 </select>
-                {errors.subject && <p className="mt-1 text-sm text-red-600">{errors.subject}</p>}
+                {errors.subject && (
+                  <p className="mt-1 text-sm text-red-600">{errors.subject}</p>
+                )}
               </div>
 
               <div>
-                <label htmlFor="message" className="block text-sm font-semibold text-gray-700 mb-2">
+                <label
+                  htmlFor="message"
+                  className="block text-sm font-semibold text-gray-700 mb-2"
+                >
                   Message *
                 </label>
                 <textarea
@@ -420,10 +634,12 @@ export default function ContactPage() {
                   rows={6}
                   value={formData.message}
                   onChange={handleChange}
-                  className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-green-400 transition-all resize-none ${errors.message ? 'border-red-500' : 'border-gray-300'}`}
+                  className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-green-400 transition-all resize-none ${errors.message ? "border-red-500" : "border-gray-300"}`}
                   placeholder="Tell us how we can help you..."
                 />
-                {errors.message && <p className="mt-1 text-sm text-red-600">{errors.message}</p>}
+                {errors.message && (
+                  <p className="mt-1 text-sm text-red-600">{errors.message}</p>
+                )}
               </div>
 
               <button
@@ -433,14 +649,30 @@ export default function ContactPage() {
               >
                 {isSubmitting ? (
                   <span className="flex items-center justify-center">
-                    <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    <svg
+                      className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      ></circle>
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      ></path>
                     </svg>
                     Sending...
                   </span>
                 ) : (
-                  'Send Message'
+                  "Send Message"
                 )}
               </button>
             </form>

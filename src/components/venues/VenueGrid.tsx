@@ -179,14 +179,14 @@ export default function VenueGrid() {
             onClick={() => updateFilter('showFilters', !filterState.showFilters)}
             className="bg-linear-to-r from-green-500 to-green-600 text-white font-semibold py-2 px-4 rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 text-sm"
           >
-            {filterState.showFilters ? '🔽 Hide' : '🔍 Show Filters'}
+            {filterState.showFilters ? 'X' : 'Show Filters'}
           </button>
           {filterState.showFilters && (
             <button
               onClick={clearFilters}
               className="bg-linear-to-r from-red-500 to-red-600 text-white font-semibold py-2 px-4 rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 text-sm"
             >
-              🗑️ Clear
+              Clear
             </button>
           )}
         </div>
@@ -226,28 +226,28 @@ export default function VenueGrid() {
 
       {/* Filters */}
       {filterState.showFilters && (
-        <div className="mb-8 bg-white rounded-2xl shadow-xl border border-gray-100 p-6 ">
+        <div className="mb-8  rounded-2xl border border-gray-200 p-6 ">
           <h3 className="text-xl font-bold mb-6 bg-linear-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">Filter & Search Futsals</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-6">
             {/* Search Bar */}
             <div className="lg:col-span-2">
-              <label className="block text-sm font-semibold text-gray-800 mb-2">🔍 Search</label>
+              <label className="block text-sm font-semibold text-gray-800 mb-2">Search</label>
               <input
                 type="text"
                 placeholder="Search by name, city, or location..."
                 value={filterState.searchQuery}
                 onChange={(e) => updateFilter('searchQuery', e.target.value)}
-                className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-400/50 focus:border-green-400/50 transition-all text-sm"
+                className="w-full px-4 py-3  border border-gray-200 rounded-xl text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-400/50 focus:border-green-400/50 transition-all text-sm"
               />
             </div>
 
             {/* Name Filter */}
             <div>
-              <label className="block text-sm font-semibold text-gray-800 mb-2">🏟️ Futsal Name</label>
+              <label className="block text-sm font-semibold text-gray-800 mb-2">Futsal Name</label>
               <select
                 value={filterState.selectedName}
                 onChange={(e) => updateFilter('selectedName', e.target.value)}
-                className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none focus:ring-2 focus:ring-green-400/50 focus:border-green-400/50 transition-all text-sm"
+                className="w-full px-4 py-3  border border-gray-200 rounded-xl text-gray-800 focus:outline-none focus:ring-2 focus:ring-green-400/50 focus:border-green-400/50 transition-all text-sm"
               >
                 <option value="">All Names</option>
                 {uniqueNames.map((name) => (
@@ -258,11 +258,11 @@ export default function VenueGrid() {
 
             {/* City Filter */}
             <div>
-              <label className="block text-sm font-semibold text-gray-800 mb-2">🏙️ City</label>
+              <label className="block text-sm font-semibold text-gray-800 mb-2">City</label>
               <select
                 value={filterState.selectedCity}
                 onChange={(e) => updateFilter('selectedCity', e.target.value)}
-                className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none focus:ring-2 focus:ring-green-400/50 focus:border-green-400/50 transition-all text-sm"
+                className="w-full px-4 py-3  border border-gray-200 rounded-xl text-gray-800 focus:outline-none focus:ring-2 focus:ring-green-400/50 focus:border-green-400/50 transition-all text-sm"
               >
                 <option value="">All Cities</option>
                 {uniqueCities.map((city) => (
@@ -273,11 +273,11 @@ export default function VenueGrid() {
 
             {/* Location Filter */}
             <div>
-              <label className="block text-sm font-semibold text-gray-800 mb-2">📍 Location</label>
+              <label className="block text-sm font-semibold text-gray-800 mb-2">Location</label>
               <select
                 value={filterState.selectedLocation}
                 onChange={(e) => updateFilter('selectedLocation', e.target.value)}
-                className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none focus:ring-2 focus:ring-green-400/50 focus:border-green-400/50 transition-all text-sm"
+                className="w-full px-4 py-3  border border-gray-200 rounded-xl text-gray-800 focus:outline-none focus:ring-2 focus:ring-green-400/50 focus:border-green-400/50 transition-all text-sm"
               >
                 <option value="">All Locations</option>
                 {uniqueLocations.map((location) => (
@@ -288,11 +288,11 @@ export default function VenueGrid() {
 
             {/* Offers Filter */}
             <div>
-              <label className="block text-sm font-semibold text-gray-800 mb-2">🎁 Offers</label>
+              <label className="block text-sm font-semibold text-gray-800 mb-2">Offers</label>
               <select
                 value={filterState.selectedOffer}
                 onChange={(e) => updateFilter('selectedOffer', e.target.value as 'all' | 'offers')}
-                className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none focus:ring-2 focus:ring-green-400/50 focus:border-green-400/50 transition-all text-sm"
+                className="w-full px-4 py-3  border border-gray-200 rounded-xl text-gray-800 focus:outline-none focus:ring-2 focus:ring-green-400/50 focus:border-green-400/50 transition-all text-sm"
               >
                 <option value="all">All</option>
                 <option value="offers">With Offers</option>
@@ -303,11 +303,11 @@ export default function VenueGrid() {
           {/* Sort Options */}
           <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label className="block text-sm font-semibold text-gray-800 mb-2">⭐ Sort by Rating</label>
+              <label className="block text-sm font-semibold text-gray-800 mb-2">Sort by Rating</label>
               <select
                 value={filterState.sortByRating}
                 onChange={(e) => updateFilter('sortByRating', e.target.value as 'none' | 'highest' | 'lowest')}
-                className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none focus:ring-2 focus:ring-green-400/50 focus:border-green-400/50 transition-all text-sm"
+                className="w-full px-4 py-3  border border-gray-200 rounded-xl text-gray-800 focus:outline-none focus:ring-2 focus:ring-green-400/50 focus:border-green-400/50 transition-all text-sm"
               >
                 <option value="none">No Rating Sort</option>
                 <option value="highest">Highest Rating</option>
@@ -316,11 +316,11 @@ export default function VenueGrid() {
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-gray-800 mb-2">💰 Sort by Price</label>
+              <label className="block text-sm font-semibold text-gray-800 mb-2">Sort by Price</label>
               <select
                 value={filterState.sortByPrice}
                 onChange={(e) => updateFilter('sortByPrice', e.target.value as 'none' | 'low-to-high' | 'high-to-low')}
-                className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none focus:ring-2 focus:ring-green-400/50 focus:border-green-400/50 transition-all text-sm"
+                className="w-full px-4 py-3  border border-gray-200 rounded-xl text-gray-800 focus:outline-none focus:ring-2 focus:ring-green-400/50 focus:border-green-400/50 transition-all text-sm"
               >
                 <option value="none">No Price Sort</option>
                 <option value="low-to-high">Low to High</option>

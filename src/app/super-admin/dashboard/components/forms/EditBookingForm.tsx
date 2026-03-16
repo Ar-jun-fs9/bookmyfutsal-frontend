@@ -350,7 +350,7 @@ export function EditBookingForm({ booking, onUpdate, onCancel, setNotification }
                   <div className="space-y-7">
                     <div className="relative">
                       <label htmlFor="bookingDate"  className="block text-sm font-semibold text-gray-700 mb-2">
-                        📅 Booking Date
+                        Booking Date
                       </label>
                       <div className="relative">
                         <input
@@ -652,7 +652,7 @@ export function EditBookingForm({ booking, onUpdate, onCancel, setNotification }
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                           <div className="relative">
                             <label className="block text-sm font-semibold text-gray-700 mb-2">
-                              👥 Number of Players
+                              Number of Players
                             </label>
                             <div className="relative">
                               <input
@@ -676,7 +676,7 @@ export function EditBookingForm({ booking, onUpdate, onCancel, setNotification }
 
                           <div className="relative">
                             <label className="block text-sm font-semibold text-gray-700 mb-2">
-                              🏆 Team Name <span className="text-gray-500 font-normal">(optional)</span>
+                              Team Name <span className="text-gray-500 font-normal">(optional)</span>
                             </label>
                             <div className="relative">
                               <input

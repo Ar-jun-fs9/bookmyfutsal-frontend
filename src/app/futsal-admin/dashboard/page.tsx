@@ -3549,7 +3549,7 @@ function EditBookingForm({ booking, onUpdate, onCancel, adminId, setNotification
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div className="relative">
                         <label className="block text-sm font-semibold text-gray-700 mb-2">
-                          👥 Number of Players
+                          Number of Players
                         </label>
                         <div className="relative">
                           <input
@@ -3573,7 +3573,7 @@ function EditBookingForm({ booking, onUpdate, onCancel, adminId, setNotification
 
                       <div className="relative">
                         <label className="block text-sm font-semibold text-gray-700 mb-2">
-                          🏆 Team Name <span className="text-gray-500 font-normal">(optional)</span>
+                          Team Name <span className="text-gray-500 font-normal">(optional)</span>
                         </label>
                         <div className="relative">
                           <input

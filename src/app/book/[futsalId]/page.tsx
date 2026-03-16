@@ -1042,7 +1042,7 @@ export default function BookFutsal() {
                   <div className="space-y-7">
                     <div className="relative">
                       <label htmlFor="bookingDate" className="block text-sm font-semibold text-gray-700 mb-2">
-                        📅 Booking Date
+                        Booking Date
                       </label>
                       <div className="relative">
                         <input
@@ -1424,7 +1424,7 @@ export default function BookFutsal() {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                           <div className="relative">
                             <label className="block text-sm font-semibold text-gray-700 mb-2">
-                              📱 Phone Number
+                              Phone Number
                             </label>
                             <div className="relative">
                               <input
@@ -1469,7 +1469,7 @@ export default function BookFutsal() {
 
                           <div className="relative">
                             <label className="block text-sm font-semibold text-gray-700 mb-2">
-                              👤 Your Name
+                              Your Name
                             </label>
                             <div className="relative">
                               <input
@@ -1493,7 +1493,7 @@ export default function BookFutsal() {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                           <div className="relative">
                             <label className="block text-sm font-semibold text-gray-700 mb-2">
-                              👥 Number of Players
+                              Number of Players
                             </label>
                             <div className="relative">
                               <input
@@ -1517,7 +1517,7 @@ export default function BookFutsal() {
 
                           <div className="relative">
                             <label className="block text-sm font-semibold text-gray-700 mb-2">
-                              🏆 Team Name <span className="text-gray-500 font-normal">(optional)</span>
+                              Team Name <span className="text-gray-500 font-normal">(optional)</span>
                             </label>
                             <div className="relative">
                               <input
@@ -1831,7 +1831,7 @@ export default function BookFutsal() {
                   {/* eSewa Phone Number Input */}
                   <div className="bg-white border border-gray-200 rounded-xl p-4 mb-6">
                     <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      📱 eSewa Phone Number
+                      eSewa Phone Number
                     </label>
                     <div className="relative">
                       <input
@@ -2090,9 +2090,9 @@ export default function BookFutsal() {
                       {/* Venue Details */}
                       <div className="bg-white rounded-2xl p-6 shadow-lg border border-green-100">
                         <div className="flex items-center mb-4">
-                          <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center mr-3">
+                          {/* <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center mr-3">
                             <span className="text-2xl">🏟️</span>
-                          </div>
+                          </div> */}
                           <h3 className="text-lg font-bold text-gray-800">Venue Details</h3>
                         </div>
                         <div className="space-y-3">
@@ -2114,9 +2114,9 @@ export default function BookFutsal() {
                       {/* Booking Details */}
                       <div className="bg-white rounded-2xl p-6 shadow-lg border border-green-100">
                         <div className="flex items-center mb-4">
-                          <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mr-3">
+                          {/* <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mr-3">
                             <span className="text-2xl">📅</span>
-                          </div>
+                          </div> */}
                           <h3 className="text-lg font-bold text-gray-800">Booking Details</h3>
                         </div>
                         <div className="space-y-3">
@@ -2168,9 +2168,9 @@ export default function BookFutsal() {
                       {/* Payment Details */}
                       <div className="bg-white rounded-2xl p-6 shadow-lg border border-green-100 md:col-span-1 lg:col-span-1">
                         <div className="flex items-center mb-4">
-                          <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center mr-3">
+                          {/* <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center mr-3">
                             <span className="text-2xl">💰</span>
-                          </div>
+                          </div> */}
                           <h3 className="text-lg font-bold text-gray-800">Payment Details</h3>
                         </div>
                         <div className="space-y-3">
@@ -2212,12 +2212,12 @@ export default function BookFutsal() {
                     {/* Important Information */}
                     <div className="bg-linear-to-r from-yellow-50 to-orange-50 rounded-2xl p-6 mb-8 border border-yellow-200" >
                       <h3 className="text-lg font-bold text-yellow-800 mb-4 flex items-center">
-                        <span className="text-2xl mr-2">📋</span>
+                        {/* <span className="text-2xl mr-2">📋</span> */}
                         Important Information
                       </h3>
                       <div className="space-y-3 text-sm text-yellow-800">
                         <div className="flex items-start">
-                          <span className="text-lg mr-3 mt-0.5">🕒</span>
+                          {/* <span className="text-lg mr-3 mt-0.5">🕒</span> */}
                           <div>
                             <strong>Reminder:</strong> Please arrive 15 minutes before your booking time.
                             {!loggedInUser && booking.tracking_code && (
@@ -2226,13 +2226,13 @@ export default function BookFutsal() {
                           </div>
                         </div>
                         <div className="flex items-start">
-                          <span className="text-lg mr-3 mt-0.5">⚠️</span>
+                          {/* <span className="text-lg mr-3 mt-0.5">⚠️</span> */}
                           <div>
                             <strong>Cancellation Policy:</strong> Non-refundable. Free cancellation allowed up to 2 hours before play.
                           </div>
                         </div>
                         <div className="flex items-start">
-                          <span className="text-lg mr-3 mt-0.5">👤🔄</span>
+                          {/* <span className="text-lg mr-3 mt-0.5">👤🔄</span> */}
                           <div>
                             <strong>Account Benefit:</strong> Create an account to reschedule bookings and make multiple bookings easily.
                           </div>
@@ -2580,8 +2580,8 @@ export default function BookFutsal() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
               <div className="text-center md:text-left">
                 <h5 className="font-semibold mb-2">Contact Us</h5>
-                <p className="text-gray-300 text-sm">📧 bookmyfutsal@gmail.com</p>
-                <p className="text-gray-300 text-sm">📞 +977-123-456789</p>
+                <p className="text-gray-300 text-sm">bookmyfutsal@gmail.com</p>
+                <p className="text-gray-300 text-sm">+977-123-456789</p>
               </div>
               <div className="text-center">
                 <h5 className="font-semibold mb-2">Business Hours</h5>

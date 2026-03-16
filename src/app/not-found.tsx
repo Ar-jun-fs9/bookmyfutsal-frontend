@@ -123,7 +123,7 @@ export default function NotFoundPage() {
       {/* Main Content */}
       <main className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
         {/* Error Details */}
-        <div className="bg-white rounded-2xl shadow-xl p-8 mb-8">
+        <div className=" rounded-2xl  p-8 mb-8">
           <div className="text-center mb-8">
             <h2 className="text-3xl font-bold bg-linear-to-r from-red-600 to-orange-600 bg-clip-text text-transparent mb-4">
               What happened?
@@ -161,7 +161,7 @@ export default function NotFoundPage() {
         </div>
 
         {/* Navigation Help */}
-        <div className="bg-white rounded-2xl shadow-xl p-8 mb-8">
+        <div className=" rounded-2xl  p-8 mb-8">
           <div className="text-center mb-8">
             <h2 className="text-3xl font-bold bg-linear-to-r from-green-600 to-blue-600 bg-clip-text text-transparent mb-4">
               Let's get you back on track!
@@ -174,7 +174,7 @@ export default function NotFoundPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <Link
               href="/"
-              className="bg-linear-to-r from-green-500 to-green-600 text-white p-6 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 text-center"
+              className="bg-linear-to-r from-green-500 to-green-500 text-white p-6 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 text-center"
             >
               <div className="text-3xl mb-3">🏠</div>
               <h3 className="text-xl font-bold mb-2">Go Home</h3>
@@ -183,7 +183,7 @@ export default function NotFoundPage() {
 
             <Link
               href="/venues"
-              className="bg-linear-to-r from-blue-500 to-blue-600 text-white p-6 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 text-center"
+              className="bg-linear-to-r from-blue-500 to-blue-500 text-white p-6 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 text-center"
             >
               <div className="text-3xl mb-3">🏟️</div>
               <h3 className="text-xl font-bold mb-2">Browse Venues</h3>
@@ -192,7 +192,7 @@ export default function NotFoundPage() {
 
             <Link
               href="/contact"
-              className="bg-linear-to-r from-purple-500 to-purple-600 text-white p-6 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 text-center"
+              className="bg-linear-to-r from-purple-500 to-purple-500 text-white p-6 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 text-center"
             >
               <div className="text-3xl mb-3">📞</div>
               <h3 className="text-xl font-bold mb-2">Contact Us</h3>
@@ -202,7 +202,7 @@ export default function NotFoundPage() {
         </div>
 
         {/* Search Suggestion */}
-        <div className="bg-linear-to-r from-green-50 to-blue-50 rounded-2xl p-8">
+        <div className="rounded-2xl p-8">
           <div className="text-center">
             <h2 className="text-2xl font-bold text-gray-800 mb-4">Still can't find what you're looking for?</h2>
             <p className="text-gray-600 mb-6">

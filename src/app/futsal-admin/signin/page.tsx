@@ -338,7 +338,7 @@ export default function FutsalAdminSignin() {
                   <div className="space-y-4">
                     <div className="relative">
                       <label htmlFor="username" className="block text-sm font-semibold text-gray-700 mb-1.5">
-                        👤 Username or Email
+                        Username or Email
                       </label>
                       <div className="relative">
                         <input
@@ -361,7 +361,7 @@ export default function FutsalAdminSignin() {
 
                     <div className="relative">
                       <label htmlFor="password" className="block text-sm font-semibold text-gray-700 mb-1.5">
-                        🔒 Password
+                        Password
                       </label>
                       <div className="relative">
                         <input
@@ -998,8 +998,8 @@ export default function FutsalAdminSignin() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
               <div className="text-center md:text-left">
                 <h5 className="font-semibold mb-2">Contact Us</h5>
-                <p className="text-gray-300 text-sm">📧 bookmyfutsal@gmail.com</p>
-                <p className="text-gray-300 text-sm">📞 +977-123-456789</p>
+                <p className="text-gray-300 text-sm">bookmyfutsal@gmail.com</p>
+                <p className="text-gray-300 text-sm">+977-123-456789</p>
               </div>
               <div className="text-center">
                 <h5 className="font-semibold mb-2">Business Hours</h5>
