@@ -65,20 +65,6 @@ BookMyFutsal is a comprehensive web platform for booking futsal venues in Nepal.
 │   ├── 📄 postcss.config.mjs             # PostCSS configuration for CSS processing
 │   ├── 📄 tsconfig.json                  # TypeScript configuration
 │   ├── 📄 README.md                      # Project documentation (this file)
-│   ├── 📁 .next/                         # Next.js build output directory (generated)
-│   ├── 📁 hero/                          # Hero section static images
-│   │   └── 🖼️ hero_section.jpg           # Main hero background image
-│   ├── 📁 public/                        # Static assets served by Next.js
-│   │   ├── 🖼️ file.svg                   # Generic file icon
-│   │   ├── 🖼️ globe.svg                  # Globe icon
-│   │   ├── 🖼️ next.svg                   # Next.js logo
-│   │   ├── 🖼️ vercel.svg                 # Vercel logo
-│   │   ├── 🖼️ window.svg                 # Window icon
-│   │   ├── 📁 logo/                      # Logo assets
-│   │   │   ├── 🖼️ logo.png               # Application logo
-│   │   │   └── 🖼️ logo1.png              # Alternative logo
-│   │   └── 📁 owner/                     # owner logo assets
-│   │       ├── 🖼️ owner.png              # single owner
 │   └── 📁 src/                           # Source code
 │       ├── 📁 app/                       # Next.js App Router directory
 │       │   ├── 🖼️ favicon.ico            # Browser favicon
@@ -229,6 +215,7 @@ BookMyFutsal is a comprehensive web platform for booking futsal venues in Nepal.
 │       │   ├── 📄 futsalStore.ts                             # Futsal state store
 │       │   ├── 📄 modalStore.ts                              # Modal state store
 │       │   ├── 📄 notificationStore.ts                       # Notification state store
+│       │   ├── 📄 prefetchStore.ts                           # Prefetch state for image/video, rating etc for bg loading
 │       │   ├── 📄 socketStore.ts                             # Socket state store
 │       │   └── 📄 uiStore.ts                                 # UI state store
 │       ├── 📁 types/                                         # TypeScript type definitions
@@ -243,183 +230,239 @@ BookMyFutsal is a comprehensive web platform for booking futsal venues in Nepal.
 
 ## 🔒 Security Measures
 
-- **Authentication**: JWT-based authentication with refresh tokens
-- **Password Security**: Argon2 hashing with strong validation rules
-- **Rate Limiting**: Multiple rate limiters for different endpoints (API, auth, bookings)
-- **Input Validation**: Comprehensive input sanitization and validation
-- **CORS Protection**: Configured CORS policies
-- **Security Headers**: Helmet.js for security headers
-- **XSS Protection**: XSS-clean middleware
+### Authentication & Authorization
+
+- **JWT-based Authentication**: Access and refresh token pairs with secure token handling
+- **Password Security**: Argon2 hashing with strong validation rules (12+ chars, mixed case, numbers, special chars)
+- **Progressive Account Blocking**: Auto-block after 5 failed login attempts (15-minute lockout)
+- **Role-based Access Control**: Three-tier authorization (user, futsal_admin, super_admin)
+
+### API Security
+
+- **Rate Limiting**: Multiple rate limiters for different endpoints
+  - General API: 1000 requests/15 minutes
+  - Authentication: 20 attempts/hour
+  - Bookings: 10/hour (write), 500/15min (read)
+  - OTP: 10 generation/hour, 50 verification/15min
+- **Input Validation**: Comprehensive sanitization and validation
+- **CORS Protection**: Configured CORS policies for production domains
+
+### Web Security
+
+- **Security Headers**: Helmet.js with CSP, HSTS, XSS protection
+- **XSS Protection**: xss-clean middleware
 - **HPP Protection**: HTTP Parameter Pollution prevention
-- **OTP Verification**: Email and SMS OTP for registration and password reset
-- **Account Blocking**: Progressive blocking for failed login attempts
-- **Data Sanitization**: Express-mongo-sanitize for NoSQL injection prevention
-- **SQL Injection Prevention**: Parameterized queries with pg library
+- **SQL Injection Prevention**: Parameterized queries + express-mongo-sanitize
+- **Request Size Limiting**: 10MB max request size
+- **File Upload Security**: Type validation and malicious filename detection
+
+### Data Protection
+
+- **OTP Verification**: Email and phone OTP for registration and password reset
+- **Email Validation**: Block temporary email services
+- **Phone Validation**: Nepali 10-digit format validation
+- **Account Blocking**: Manual and automatic blocking capabilities
 
 ## 👥 User Roles & Permissions
 
-### Unregistered Users
+### Unregistered/Guest Users
 
-- Browse and view futsal venues
-- Track existing bookings using tracking codes
-- View venue details, ratings, and facilities
-- Access location information and distance calculation
+| Permission     | Description                         |
+| -------------- | ----------------------------------- |
+| Browse venues  | View all futsal venues              |
+| Track bookings | Track booking by tracking code      |
+| View details   | See venue info, ratings, facilities |
+| Location       | View distance to venues             |
 
 ### Registered Users
 
-- All unregistered user permissions
-- User registration with email/phone verification
-- Secure login with progressive account blocking
-- Book futsal venues with real-time availability
-- Manage personal bookings (view, cancel)
-- Update profile information
-- Rate and review booked venues
-- Password reset with OTP verification
+| Permission            | Description                  |
+| --------------------- | ---------------------------- |
+| All guest permissions | Inherited from guest         |
+| User registration     | Email/phone verification     |
+| Make bookings         | Book time slots              |
+| Manage bookings       | View, update (max 2), cancel |
+| Rate venues           | Submit reviews after booking |
+| Profile management    | Update personal info         |
+| Password reset        | OTP-based password recovery  |
 
 ### Futsal Administrators
 
-- Secure login to manage assigned futsal
-- View and manage bookings for their venue
-- Update venue information and pricing
-- Manage time slots and availability
-- View customer ratings and feedback
-- Password reset functionality
-- Created and managed by super administrators
+| Permission           | Description                   |
+| -------------------- | ----------------------------- |
+| Dashboard access     | Venue management dashboard    |
+| Booking management   | View, update, cancel bookings |
+| Venue configuration  | Update venue info, pricing    |
+| Time slot management | Create/manage availability    |
+| View ratings         | See customer reviews          |
+| Wallet access        | View earnings                 |
+| Password reset       | Admin password recovery       |
 
 ### Super Administrators
 
-- Full system administration privileges
-- Create and manage futsal administrator accounts
-- View and manage all user accounts
-- Block/unblock users for security
-- Access system-wide analytics and reports
-- Manage system configuration and settings
-- Override bookings and venue management
+| Permission            | Description                  |
+| --------------------- | ---------------------------- |
+| System administration | Full platform control        |
+| User management       | Create, block, delete users  |
+| Futsal management     | Create, edit, delete venues  |
+| Admin management      | Create futsal admin accounts |
+| Analytics             | System-wide statistics       |
+| Pricing control       | Override special prices      |
+| Feedback access       | View user feedback           |
 
 ## 📡 API Endpoints
 
-### Authentication & User Management
+### Authentication & Users
 
-#### User Authentication
+#### User Registration & Login
 
-- `POST /api/users/register` - Register new user with email/phone verification
-- `POST /api/users/verify-registration` - Verify email and phone OTP for registration completion
-- `POST /api/users/login` - User login with progressive account blocking
-- `POST /api/users/refresh-token` - Refresh JWT access token
-- `GET /api/users/verify` - Verify JWT token and get user info
-- `POST /api/users/forgot-password` - Send password reset OTP to email
-- `POST /api/users/verify-forgot-otp` - Verify password reset OTP
-- `POST /api/users/reset-password` - Reset user password after OTP verification
+| Method | Endpoint                         | Description                    |
+| ------ | -------------------------------- | ------------------------------ |
+| POST   | `/api/users/register`            | Register new user (sends OTPs) |
+| POST   | `/api/users/verify-registration` | Verify email & phone OTPs      |
+| POST   | `/api/users/login`               | User login                     |
+| POST   | `/api/users/refresh-token`       | Refresh access token           |
+| GET    | `/api/users/verify`              | Verify token & get user info   |
+| POST   | `/api/users/forgot-password`     | Send password reset OTP        |
+| POST   | `/api/users/verify-forgot-otp`   | Verify password reset OTP      |
+| POST   | `/api/users/reset-password`      | Reset password                 |
 
-#### Futsal Admin Authentication
+#### User Management (Super Admin)
 
-- `POST /api/futsal-admins/login` - Futsal admin login
-- `POST /api/futsal-admins/forgot-password` - Send password reset OTP
-- `POST /api/futsal-admins/verify-forgot-otp` - Verify password reset OTP
-- `POST /api/futsal-admins/reset-password` - Reset futsal admin password
+| Method | Endpoint                  | Description        |
+| ------ | ------------------------- | ------------------ |
+| GET    | `/api/users`              | List all users     |
+| GET    | `/api/users/:id`          | Get user details   |
+| PUT    | `/api/users/:id`          | Update user        |
+| DELETE | `/api/users/:id`          | Delete user        |
+| POST   | `/api/users/:id/block`    | Block user         |
+| POST   | `/api/users/:id/unblock`  | Unblock user       |
+| GET    | `/api/users/blocked/list` | List blocked users |
 
-#### Super Admin Authentication
+### Futsal Management
 
-- `POST /api/superadmin/login` - Super admin login
-- `POST /api/superadmin/forgot-password` - Send password reset OTP
-- `POST /api/superadmin/verify-forgot-otp` - Verify password reset OTP
-- `POST /api/superadmin/reset-password` - Reset super admin password
+#### Public Endpoints
 
-#### OTP Verification
+| Method | Endpoint           | Description              |
+| ------ | ------------------ | ------------------------ |
+| GET    | `/api/futsals`     | List all venues (cached) |
+| GET    | `/api/futsals/:id` | Get venue details        |
 
-- `POST /api/otp/send` - Send OTP for various purposes
-- `POST /api/otp/verify` - Verify OTP codes
+#### Admin Endpoints
 
-### Bookings Management
+| Method | Endpoint           | Description  |
+| ------ | ------------------ | ------------ |
+| POST   | `/api/futsals`     | Create venue |
+| PUT    | `/api/futsals/:id` | Update venue |
+| DELETE | `/api/futsals/:id` | Delete venue |
+
+### Bookings
 
 #### User Bookings
 
-- `GET /api/bookings` - Get authenticated user's bookings
-- `POST /api/bookings` - Create new booking (registered or guest)
-- `PUT /api/bookings/user/:id` - Update user's own booking (max 2 updates)
-- `DELETE /api/bookings/user/:id` - Cancel user's own booking
-- `DELETE /api/bookings/cancel/:trackingCode` - Cancel booking by tracking code (guests)
+| Method | Endpoint                     | Description             |
+| ------ | ---------------------------- | ----------------------- |
+| GET    | `/api/bookings`              | Get user's bookings     |
+| POST   | `/api/bookings`              | Create booking          |
+| PUT    | `/api/bookings/user/:id`     | Update booking (max 2)  |
+| DELETE | `/api/bookings/user/:id`     | Cancel booking          |
+| DELETE | `/api/bookings/cancel/:code` | Cancel by tracking code |
 
-#### Admin Bookings Management
+#### Admin Bookings
 
-- `GET /api/bookings/all` - Get all bookings (super admin)
-- `GET /api/bookings/futsal/:futsalId` - Get bookings for specific futsal
-- `PUT /api/bookings/:id` - Update booking (super admin)
-- `PUT /api/bookings/futsal-admin/:id` - Update booking (futsal admin)
-- `DELETE /api/bookings/:id` - Cancel booking (super admin)
-- `DELETE /api/bookings/futsal-admin/:id` - Cancel booking (futsal admin)
-- `DELETE /api/bookings/delete/:id` - Soft delete booking (super admin)
-- `DELETE /api/bookings/futsal-admin/delete/:id` - Soft delete booking (futsal admin)
-- `DELETE /api/bookings/super-admin/bulk-delete` - Bulk delete bookings (super admin)
-- `DELETE /api/bookings/futsal-admin/bulk-delete` - Bulk delete bookings (futsal admin)
-- `DELETE /api/bookings/user/bulk-delete` - Bulk delete user's own bookings
+| Method | Endpoint                                 | Description                |
+| ------ | ---------------------------------------- | -------------------------- |
+| GET    | `/api/bookings/all`                      | All bookings (super admin) |
+| GET    | `/api/bookings/futsal/:id`               | Venue bookings             |
+| PUT    | `/api/bookings/:id`                      | Update (super admin)       |
+| PUT    | `/api/bookings/futsal-admin/:id`         | Update (futsal admin)      |
+| DELETE | `/api/bookings/:id`                      | Cancel (super admin)       |
+| DELETE | `/api/bookings/futsal-admin/:id`         | Cancel (futsal admin)      |
+| DELETE | `/api/bookings/delete/:id`               | Soft delete                |
+| DELETE | `/api/bookings/super-admin/bulk-delete`  | Bulk delete                |
+| DELETE | `/api/bookings/futsal-admin/bulk-delete` | Bulk delete                |
 
-#### Booking Utilities
+#### Booking Tracking
 
-- `GET /api/bookings/track/:code` - Track booking by tracking code
-- `GET /api/bookings/last-by-phone/:phone` - Get last booking by phone (for guests)
-- `GET /api/bookings/:id` - Get booking details by ID
+| Method | Endpoint                             | Description        |
+| ------ | ------------------------------------ | ------------------ |
+| GET    | `/api/bookings/track/:code`          | Track by code      |
+| GET    | `/api/bookings/last-by-phone/:phone` | Last guest booking |
+| GET    | `/api/bookings/history/:id`          | Booking history    |
 
-### Venues & Futsals
+### Time Slots
 
-#### Public Venue Data
+| Method | Endpoint                          | Description         |
+| ------ | --------------------------------- | ------------------- |
+| GET    | `/api/time-slots/:futsalId/:date` | Get available slots |
+| POST   | `/api/time-slots`                 | Create slots        |
+| PUT    | `/api/time-slots/:id`             | Update slot status  |
+| DELETE | `/api/time-slots/:id`             | Delete slot         |
 
-- `GET /api/futsals` - Get all futsal venues with ratings and filters
-- `GET /api/futsals/:id` - Get detailed futsal information
+### Ratings
 
-#### Admin Venue Management
-
-- `POST /api/futsals` - Create new futsal venue (super admin)
-- `PUT /api/futsals/:id` - Update futsal venue (super/futsal admin)
-- `DELETE /api/futsals/:id` - Delete futsal venue (super admin)
-
-### Time Slots & Availability
-
-- `GET /api/time-slots/:futsalId/:date` - Get available time slots for specific date
-- `POST /api/time-slots` - Create time slots (admin)
-- `PUT /api/time-slots/:id` - Update time slot status (admin)
-- `DELETE /api/time-slots/:id` - Delete time slots (admin)
-
-### Ratings & Reviews
-
-- `GET /api/ratings/:futsalId` - Get ratings for specific futsal
-- `POST /api/ratings` - Submit rating/review (authenticated users)
-- `PUT /api/ratings/:id` - Update user's own rating (authenticated users)
-- `DELETE /api/ratings/:id` - Delete rating (admin)
+| Method | Endpoint                 | Description       |
+| ------ | ------------------------ | ----------------- |
+| GET    | `/api/ratings/:futsalId` | Get venue ratings |
+| POST   | `/api/ratings`           | Submit rating     |
+| PUT    | `/api/ratings/:id`       | Update rating     |
+| DELETE | `/api/ratings/:id`       | Delete rating     |
 
 ### Special Pricing
 
-- `GET /api/special-prices/:futsalId` - Get special prices for futsal
-- `POST /api/special-prices` - Create special price rule (admin)
-- `PUT /api/special-prices/:id` - Update special price rule (admin)
-- `DELETE /api/special-prices/:id` - Delete special price rule (admin)
+| Method | Endpoint                                    | Description          |
+| ------ | ------------------------------------------- | -------------------- |
+| GET    | `/api/special-prices/:futsalId`             | Get special prices   |
+| GET    | `/api/special-prices/price/:futsalId/:date` | Get price for date   |
+| POST   | `/api/special-prices`                       | Create special price |
+| PUT    | `/api/special-prices/:id`                   | Update special price |
+| DELETE | `/api/special-prices/:id`                   | Delete special price |
 
-### User Management (Super Admin)
+### Other Endpoints
 
-- `GET /api/users` - Get all registered users
-- `GET /api/users/:id` - Get user details
-- `PUT /api/users/:id` - Update user information
-- `DELETE /api/users/:id` - Delete user account
-- `POST /api/users/:id/block` - Block user account
-- `POST /api/users/:id/unblock` - Unblock user account
-- `GET /api/users/blocked/list` - Get list of blocked users
+#### OTP
 
-### Futsal Admin Management (Super Admin)
+| Method | Endpoint            | Description  |
+| ------ | ------------------- | ------------ |
+| POST   | `/api/otp/generate` | Generate OTP |
+| POST   | `/api/otp/verify`   | Verify OTP   |
 
-- `GET /api/futsal-admins` - Get all futsal admins
-- `POST /api/futsal-admins` - Create new futsal admin
-- `PUT /api/futsal-admins/:id` - Update futsal admin
-- `DELETE /api/futsal-admins/:id` - Delete futsal admin
+#### Feedback
 
-### Feedback & Support
+| Method | Endpoint            | Description     |
+| ------ | ------------------- | --------------- |
+| GET    | `/api/feedback`     | List feedback   |
+| POST   | `/api/feedback`     | Submit feedback |
+| DELETE | `/api/feedback/:id` | Delete feedback |
 
-- `GET /api/feedback` - Get user feedback (admin)
-- `POST /api/feedback` - Submit user feedback
-- `DELETE /api/feedback/:id` - Delete feedback entry (admin)
+#### Contact
 
-### System Health
+| Method | Endpoint       | Description    |
+| ------ | -------------- | -------------- |
+| GET    | `/api/contact` | List contacts  |
+| POST   | `/api/contact` | Submit contact |
 
-- `GET /health` - System health check with database and Redis status
+#### Futsal Admin
+
+| Method | Endpoint                             | Description    |
+| ------ | ------------------------------------ | -------------- |
+| POST   | `/api/futsal-admins/login`           | Admin login    |
+| POST   | `/api/futsal-admins/forgot-password` | Password reset |
+| POST   | `/api/futsal-admins/reset-password`  | New password   |
+
+#### Super Admin
+
+| Method | Endpoint                          | Description       |
+| ------ | --------------------------------- | ----------------- |
+| POST   | `/api/superadmin/login`           | Super admin login |
+| POST   | `/api/superadmin/forgot-password` | Password reset    |
+| POST   | `/api/superadmin/reset-password`  | New password      |
+
+#### File Upload
+
+| Method | Endpoint      | Description                |
+| ------ | ------------- | -------------------------- |
+| POST   | `/api/upload` | Upload media to Cloudinary |
 
 ## 🎨 Frontend Architecture
 
