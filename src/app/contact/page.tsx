@@ -166,7 +166,7 @@ export default function ContactPage() {
             >
               <div className="relative">
                 <img
-                  src="/logo/logo.png"
+                  src="https://res.cloudinary.com/dftpt1jaz/image/upload/v1773643489/logo_hh7jre.png"
                   alt="BookMyFutsal"
                   className="h-12 w-12 rounded-lg bg-green-900 shadow-lg ring-2 ring-white"
                 />

@@ -336,7 +336,7 @@ export default function BookingTracker() {
         <div className="flex justify-center px-4">
           <div ref={summaryRef} className="bg-white rounded-2xl max-w-lg w-full shadow-2xl border border-gray-200 p-6">
             <div className="text-center mb-6">
-              <img src="/logo/logo.png" alt="Logo" className="w-20 h-20 mx-auto mb-4 rounded-lg shadow-lg" />
+              <img src="https://res.cloudinary.com/dftpt1jaz/image/upload/v1773643489/logo_hh7jre.png" alt="Logo" className="w-20 h-20 mx-auto mb-4 rounded-lg shadow-lg" />
               <h2 className="text-2xl font-bold text-gray-800">Booking Confirmation</h2>
               {isExpired && (
                 <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg">
