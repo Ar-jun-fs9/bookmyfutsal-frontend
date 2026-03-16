@@ -183,7 +183,7 @@ export default function AboutPage() {
 
               <div className="mx-auto mb-6">
                 <img
-                  src="/owner/owner.png"
+                  src="https://res.cloudinary.com/dftpt1jaz/image/upload/v1773643518/owner_icuslv.png"
                   className="w-64 md:w-72 lg:w-80 h-auto mx-auto object-contain"
                   alt="Owner"
                 />
