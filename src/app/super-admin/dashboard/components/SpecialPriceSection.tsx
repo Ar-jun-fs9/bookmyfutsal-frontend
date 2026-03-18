@@ -140,16 +140,20 @@ export function SpecialPriceSection({ isVisible, onToggle }: SpecialPriceSection
         <h3 className="text-xl font-semibold text-gray-900">Special Prices</h3>
         <div className="flex space-x-2">
           <button
-            onClick={() => setShowCreateForm(!showCreateForm)}
-            className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded"
-          >
-            {showCreateForm ? 'Cancel Create' : 'Create Special Price'}
-          </button>
+  onClick={() => setShowCreateForm(!showCreateForm)}
+  className={`text-white px-4 py-2 rounded ${
+    showCreateForm
+      ? 'bg-red-600 hover:bg-red-700'
+      : 'bg-green-600 hover:bg-green-700'
+  }`}
+>
+  {showCreateForm ? 'Cancel Create' : 'Create Special Price'}
+</button>
           <button
             onClick={onToggle}
-            className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded"
+            className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded"
           >
-            Hide
+            X
           </button>
         </div>
       </div>
@@ -977,7 +981,7 @@ function EditSpecialPriceForm({ price, futsals, onUpdate, onCancel, setNotificat
       )}
 
       <div className="flex justify-end mt-4 space-x-2">
-        <button type="button" onClick={onCancel} className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded">
+        <button type="button" onClick={onCancel} className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded">
           Cancel
         </button>
         <button type="submit" className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded">

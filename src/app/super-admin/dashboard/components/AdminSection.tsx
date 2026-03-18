@@ -134,17 +134,21 @@ export function AdminSection({ futsals, superAdminId, isVisible, onToggle }: Adm
       <div className="flex justify-between items-center mb-4">
         <h3 className="text-xl font-semibold text-gray-900">Futsal Admins</h3>
         <div className="flex space-x-2">
-          <button
-            onClick={() => setShowCreateAdmin(!showCreateAdmin)}
-            className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded"
-          >
-            {showCreateAdmin ? 'Cancel Create' : 'Create Admin'}
-          </button>
+         <button
+  onClick={() => setShowCreateAdmin(!showCreateAdmin)}
+  className={`text-white px-4 py-2 rounded ${
+    showCreateAdmin
+      ? 'bg-red-600 hover:bg-red-700'
+      : 'bg-green-600 hover:bg-green-700'
+  }`}
+>
+  {showCreateAdmin ? 'Cancel Create' : 'Create Admin'}
+</button>
           <button
             onClick={onToggle}
-            className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded"
+            className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded"
           >
-            Hide
+            X
           </button>
         </div>
       </div>

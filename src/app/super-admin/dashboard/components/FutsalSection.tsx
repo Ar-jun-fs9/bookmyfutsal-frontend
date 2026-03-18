@@ -91,16 +91,20 @@ export function FutsalSection({ isVisible, onToggle }: FutsalSectionProps) {
         <h3 className="text-xl font-semibold text-gray-900">Futsals</h3>
         <div className="flex space-x-2">
           <button
-            onClick={() => setShowCreateFutsal(!showCreateFutsal)}
-            className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded"
-          >
-            {showCreateFutsal ? 'Cancel Create' : 'Create Futsal'}
-          </button>
+  onClick={() => setShowCreateFutsal(!showCreateFutsal)}
+  className={`text-white px-4 py-2 rounded ${
+    showCreateFutsal
+      ? 'bg-red-600 hover:bg-red-700'
+      : 'bg-green-600 hover:bg-green-700'
+  }`}
+>
+  {showCreateFutsal ? 'Cancel Create' : 'Create Futsal'}
+</button>
           <button
             onClick={onToggle}
-            className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded"
+            className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded"
           >
-            Hide
+            X
           </button>
         </div>
       </div>

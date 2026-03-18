@@ -87,14 +87,18 @@ export function RatingSection({ isVisible, onToggle }: RatingSectionProps) {
       <div className="flex justify-between items-center mb-4">
         <h3 className="text-xl font-semibold text-gray-900">All Ratings</h3>
         <div className="flex space-x-2">
-          <button
-            onClick={() => setCreatingRating(!creatingRating)}
-            className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
-          >
-            {creatingRating ? 'Cancel Create' : 'Create Rating'}
-          </button>
-          <button onClick={onToggle} className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded">
-            Hide
+         <button
+  onClick={() => setCreatingRating(!creatingRating)}
+  className={`text-white font-bold py-2 px-4 rounded ${
+    creatingRating
+      ? 'bg-red-600 hover:bg-red-700'
+      : 'bg-green-600 hover:bg-green-700'
+  }`}
+>
+  {creatingRating ? 'Cancel Create' : 'Create Rating'}
+</button>
+          <button onClick={onToggle} className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded">
+            X
           </button>
         </div>
       </div>

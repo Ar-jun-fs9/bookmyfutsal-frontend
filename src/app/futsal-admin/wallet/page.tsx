@@ -168,7 +168,7 @@ export default function FutsalAdminWallet() {
                 {(filteredStartDate || filteredEndDate) && startDate === filteredStartDate && endDate === filteredEndDate ? (
                   <button
                     onClick={handleClearFilter}
-                    className="w-full bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-md transition-all duration-300"
+                    className="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-md transition-all duration-300"
                   >
                     Clear Filter
                   </button>
@@ -236,22 +236,30 @@ export default function FutsalAdminWallet() {
               <h2 className="text-xl font-semibold bg-linear-to-r from-green-600 to-blue-600 bg-clip-text text-transparent pl-3.5 md:pl-0">
                 Booking Details
               </h2>
-              <div className="flex space-x-2">
-                <button
-                  onClick={() => setShowRecords(!showRecords)}
-                  className="bg-green-100 hover:bg-green-200 text-green-700 px-3 py-1 rounded-md text-sm font-medium transition-colors duration-200"
-                >
-                  {showRecords ? 'Hide' : 'Show Records'}
-                </button>
-                {showRecords && (
-                  <button
-                    onClick={() => setShowBookingId(!showBookingId)}
-                    className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-1 rounded-md text-sm font-medium transition-colors duration-200"
-                  >
-                    {showBookingId ? 'Hide' : 'Show ID'} 
-                  </button>
-                )}
-              </div>
+             <div className="flex space-x-2">
+  <button
+    onClick={() => setShowRecords(!showRecords)}
+    className={`px-3 py-1 rounded-md text-sm font-medium transition-colors duration-200 ${
+      showRecords
+        ? 'bg-red-100 hover:bg-red-200 text-red-700'
+        : 'bg-green-100 hover:bg-green-200 text-green-700'
+    }`}
+  >
+    {showRecords ? 'X' : 'Show Records'}
+  </button>
+  {showRecords && (
+    <button
+      onClick={() => setShowBookingId(!showBookingId)}
+      className={`px-3 py-1 rounded-md text-sm font-medium transition-colors duration-200 ${
+        showBookingId
+          ? 'bg-red-100 hover:bg-red-200 text-red-700'
+          : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
+      }`}
+    >
+      {showBookingId ? 'Hide ID' : 'Show ID'}
+    </button>
+  )}
+</div>
             </div>
 
             {showRecords && (

@@ -118,9 +118,9 @@ export function SlotSection({ isVisible, onToggle }: SlotSectionProps) {
           </button>
           <button
             onClick={onToggle}
-            className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded"
+            className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded"
           >
-            Hide
+            X
           </button>
         </div>
       </div>

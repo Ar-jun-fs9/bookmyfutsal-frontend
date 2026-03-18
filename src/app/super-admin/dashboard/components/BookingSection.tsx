@@ -177,8 +177,8 @@ export function BookingSection({ isVisible, onToggle }: BookingSectionProps) {
     <div className="border-2 border-gray-200 rounded-lg p-2">
       <div className="flex justify-between items-center mb-4">
         <h3 className="text-xl font-semibold text-gray-900">All Bookings</h3>
-        <button onClick={onToggle} className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded">
-          Hide
+        <button onClick={onToggle} className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded">
+          X
         </button>
       </div>
 

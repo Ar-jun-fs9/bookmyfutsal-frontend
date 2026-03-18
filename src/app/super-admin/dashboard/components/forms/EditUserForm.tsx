@@ -56,7 +56,7 @@ export function EditUserForm({ user, updateUser, onUpdate, onCancel, setNotifica
         <button type="submit" disabled={loading} className="bg-green-600 text-white px-4 py-2 rounded disabled:opacity-50">
           {loading ? 'Updating...' : 'Update User'}
         </button>
-        <button type="button" onClick={onCancel} className="bg-gray-600 text-white px-4 py-2 rounded">
+        <button type="button" onClick={onCancel} className="bg-red-600 text-white px-4 py-2 rounded">
           Cancel
         </button>
       </div>

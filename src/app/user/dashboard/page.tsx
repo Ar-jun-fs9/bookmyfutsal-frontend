@@ -3168,7 +3168,7 @@ function BookingModal({ futsal, user, onClose, onSuccess, setSuccessModal, setCo
                     <div className="flex flex-col sm:flex-row gap-4 pt-4">
                       <button
                         onClick={onClose}
-                        className="flex-1 order-2 sm:order-1 bg-linear-to-r from-gray-500 to-gray-600 text-white font-semibold py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 border border-gray-400/30"
+                        className="flex-1 order-2 sm:order-1 bg-linear-to-r from-red-500 to-red-600 text-white font-semibold py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 border border-red-400/30"
                       >
                         <span className="flex items-center justify-center">
                           <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -4195,7 +4195,7 @@ function UpdateBookingModal({ booking, onClose, onSuccess, setSuccessModal, show
                     <div className="flex flex-col sm:flex-row gap-4 pt-4">
                       <button
                         onClick={onClose}
-                        className="flex-1 order-2 sm:order-1 bg-linear-to-r from-gray-500 to-gray-600 text-white font-semibold py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 border border-gray-400/30"
+                        className="flex-1 order-2 sm:order-1 bg-linear-to-r from-red-500 to-red-600 text-white font-semibold py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 border border-red-400/30"
                       >
                         <span className="flex items-center justify-center">
                           <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">

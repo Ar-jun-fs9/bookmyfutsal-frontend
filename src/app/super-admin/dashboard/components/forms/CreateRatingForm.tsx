@@ -139,7 +139,7 @@ export function CreateRatingForm({ futsals, onSuccess, onCancel, setNotification
         <button type="submit" disabled={loading || !selectedFutsalId || (!isAnonymous && !userName.trim())} className="bg-green-600 text-white px-4 py-2 rounded disabled:opacity-50">
           {loading ? 'Creating...' : 'Create Rating'}
         </button>
-        <button type="button" onClick={onCancel} className="bg-gray-600 text-white px-4 py-2 rounded">
+        <button type="button" onClick={onCancel} className="bg-red-600 text-white px-4 py-2 rounded">
           Cancel
         </button>
       </div>
