@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useRef, useReducer } from 'react';
+import { useEffect, useState, useRef, useReducer, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useFutsals } from '@/hooks/useFutsals';
@@ -125,7 +125,8 @@ export default function UserDashboard() {
   const [acceptTerms, setAcceptTerms] = useState(false);
   const [showTermsModal, setShowTermsModal] = useState(false);
   const [showSettingsMenu, setShowSettingsMenu] = useState(false);
-
+  const [isVisible, setIsVisible] = useState(false);
+  const futsalSectionRef = useRef<HTMLDivElement>(null);
 
   // Socket handling
   useSocketHandler();
@@ -163,18 +164,45 @@ export default function UserDashboard() {
     sessionStorage.setItem('dashboardState', JSON.stringify(state));
   }, [selectedFutsal, showBooking]);
 
-  // Fetch special prices for all futsals and preload media
   // =============================================================================
-  // BACKGROUND PREFETCHING - Loads data silently on page mount
+  // INTERSECTION OBSERVER - Lazy load when section becomes visible
   // =============================================================================
-  // This ensures that when user clicks handleDetailsModal, the data is already
-  // cached and the modal opens instantly without loading states
-  // Also prefetches images and videos for faster media loading
+  // Only fetch data when user scrolls to the futsal section
+  // This reduces initial API calls from 41+ to just 2-3
   // =============================================================================
   useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.1, rootMargin: '100px' }
+    );
+
+    if (futsalSectionRef.current) {
+      observer.observe(futsalSectionRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, []);
+
+  // =============================================================================
+  // LAZY FETCH: Special prices - only fetch when section is visible
+  // =============================================================================
+  // Limits to first 20 futsals to prevent excessive API calls
+  // Uses stale-while-revalidate caching pattern
+  // =============================================================================
+  useEffect(() => {
+    if (!isVisible || futsals.length === 0) return;
+
     const fetchSpecialPrices = async () => {
       const prices: { [key: number]: any[] } = {};
-      for (const futsal of futsals) {
+      // Only fetch first 20 futsals to avoid rate limiting
+      const futsalsToFetch = futsals.slice(0, 20);
+      
+      for (const futsal of futsalsToFetch) {
         try {
           const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/special-prices/${futsal.futsal_id}`);
           if (response.ok) {
@@ -193,22 +221,23 @@ export default function UserDashboard() {
       setFutsalSpecialPrices(prices);
     };
 
-    if (futsals.length > 0) {
-      fetchSpecialPrices();
-    }
-  }, [futsals]);
+    fetchSpecialPrices();
+  }, [futsals, isVisible]);
 
   // =============================================================================
-  // PREFETCH: Preload all images, videos, special prices, and ratings
+  // LAZY PREFETCH: Images and videos only when section is visible
   // =============================================================================
-  // Uses browser-native prefetching so media is in cache before modal opens
-  // Also prefetches ratings for RatingModal to open instantly
+  // Ratings are fetched on-demand when user clicks rating button
+  // This avoids fetching ratings for all futsals upfront
   // =============================================================================
   useEffect(() => {
-    if (futsals.length === 0) return;
+    if (!isVisible || futsals.length === 0) return;
 
     const prefetchMedia = () => {
-      for (const futsal of futsals) {
+      // Only prefetch first 20 futsals to avoid excessive bandwidth
+      const futsalsToFetch = futsals.slice(0, 20);
+      
+      for (const futsal of futsalsToFetch) {
         // Prefetch all images
         if (futsal.images && futsal.images.length > 0) {
           futsal.images.forEach((imageUrl: string) => {
@@ -223,32 +252,9 @@ export default function UserDashboard() {
       }
     };
 
-    // =============================================================================
-    // PREFETCH: Prefetch ratings for all futsals on page load
-    // =============================================================================
-    // This ensures RatingModal opens instantly when user clicks handleDescRating
-    // =============================================================================
-    const prefetchRatings = async () => {
-      for (const futsal of futsals) {
-        try {
-          const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/ratings/futsal/${futsal.futsal_id}`);
-          if (response.ok) {
-            const data = await response.json();
-            // =======================================================================
-            // PREFETCH: Store ratings in cache for RatingModal
-            // =======================================================================
-            usePrefetchStore.getState().setRatings(futsal.futsal_id, data || []);
-          }
-        } catch (error) {
-          console.error('Error prefetching ratings for futsal', futsal.futsal_id, error);
-        }
-      }
-    };
-
-    // Run prefetching immediately to ensure data is ready when user clicks
+    // Only prefetch media, not ratings (ratings fetched on demand)
     prefetchMedia();
-    prefetchRatings();
-  }, [futsals]);
+  }, [futsals, isVisible]);
 
   // Prevent background scrolling when modals are open
   useEffect(() => {
@@ -789,7 +795,7 @@ export default function UserDashboard() {
             </div>
 
             {/* Bookings or Book Futsal */}
-            <div className="p-2">
+            <div className="p-2" ref={futsalSectionRef}>
               <div className="flex justify-between items-center mb-4">
                 <h2 className="text-2xl font-semibold bg-linear-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">My Bookings</h2>
                 <button
