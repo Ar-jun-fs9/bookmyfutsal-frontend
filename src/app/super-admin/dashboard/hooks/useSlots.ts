@@ -1,6 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuthStore } from '@/stores/authStore';
 import { useSocketStore } from '@/stores/socketStore';
+import { useEffect, useRef, useCallback } from 'react';
 
 interface Slot {
   slot_id: number;
@@ -15,144 +16,166 @@ interface Slot {
   booker_name?: string;
 }
 
+// Stable query key generator
+const createSlotsQueryKey = (futsalId: number | null, date: string) => 
+  futsalId ? ['slots', futsalId, date] : ['slots', 'all', date];
+
+// Fetch slots for a single futsal
+async function fetchSlotsForFutsal(
+  accessToken: string | undefined, 
+  futsalId: number, 
+  date: string,
+  futsalName?: string
+): Promise<Slot[]> {
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_API_URL}/api/time-slots/admin/futsal/${futsalId}/date/${date}`, 
+    {
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+        'Content-Type': 'application/json'
+      }
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error('Failed to fetch slots');
+  }
+
+  const data = await response.json();
+  return data.slots.map((slot: any) => ({
+    ...slot,
+    futsal_name: futsalName || 'Unknown Futsal'
+  }));
+}
+
+// Fetch slots for all futsals
+async function fetchAllFutsalsSlots(
+  accessToken: string | undefined, 
+  futsals: any[], 
+  date: string
+): Promise<Slot[]> {
+  if (!futsals.length || !accessToken) return [];
+  
+  // Fetch all slots in parallel
+  const results = await Promise.all(
+    futsals.map(futsal => 
+      fetchSlotsForFutsal(accessToken, futsal.futsal_id, date, futsal.name)
+        .catch(error => {
+          console.error(`Error fetching slots for futsal ${futsal.futsal_id}:`, error);
+          return [];
+        })
+    )
+  );
+
+  return results.flat();
+}
+
 export function useSlots() {
   const { tokens } = useAuthStore();
   const { socket } = useSocketStore();
-  const [slots, setSlots] = useState<Slot[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const queryClient = useQueryClient();
+  
+  // Track current selection to avoid duplicate fetches
+  const currentKeyRef = useRef<string>('');
 
-  const fetchSlots = async (futsalId: number, date: string, futsals: any[]) => {
-    try {
-      setLoading(true);
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/time-slots/admin/futsal/${futsalId}/date/${date}`, {
-        headers: {
-          'Authorization': `Bearer ${tokens?.accessToken}`,
-          'Content-Type': 'application/json'
-        }
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        const futsalName = futsals.find(f => f.futsal_id === futsalId)?.name || 'Unknown Futsal';
-        const slotsWithFutsal = data.slots.map((slot: any) => ({
-          ...slot,
-          futsal_name: futsalName
-        }));
-        setSlots(slotsWithFutsal);
-        setError(null);
-      } else if (response.status === 401) {
-        setError('Unauthorized');
-      } else {
-        setError('Failed to fetch slots');
-      }
-    } catch (err) {
-      setError('Error fetching slots');
-      console.error('Error fetching slots:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const fetchAllSlots = async (futsals: any[], date: string) => {
-    try {
-      setLoading(true);
-      const allSlots = [];
-      for (const futsal of futsals) {
-        try {
-          const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/time-slots/admin/futsal/${futsal.futsal_id}/date/${date}`, {
-            headers: {
-              'Authorization': `Bearer ${tokens?.accessToken}`,
-              'Content-Type': 'application/json'
-            }
-          });
-          if (response.ok) {
-            const data = await response.json();
-            const slotsWithFutsal = data.slots.map((slot: any) => ({
-              ...slot,
-              futsal_name: futsal.name
-            }));
-            allSlots.push(...slotsWithFutsal);
-          }
-        } catch (error) {
-          console.error(`Error fetching slots for futsal ${futsal.futsal_id}:`, error);
-        }
-      }
-      setSlots(allSlots);
-      setError(null);
-    } catch (err) {
-      setError('Error fetching slots');
-      console.error('Error fetching all slots:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const updateSlotStatus = async (slotId: number, status: 'available' | 'disabled') => {
-    try {
+  // Mutation for updating slot status
+  const updateSlotStatusMutation = useMutation({
+    mutationFn: async ({ slotId, status }: { slotId: number; status: 'available' | 'disabled' }) => {
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/time-slots/${slotId}/status`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status }),
       });
 
-      if (response.ok) {
-        setSlots(slots.map(slot =>
-          slot.slot_id === slotId ? { ...slot, status } : slot
-        ));
-        return { success: true };
-      } else {
-        return { success: false, error: 'Error updating slot status' };
+      if (!response.ok) {
+        throw new Error('Error updating slot status');
       }
-    } catch (err) {
-      console.error('Error updating slot status:', err);
-      return { success: false, error: 'Error updating slot status' };
-    }
-  };
+      
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['slots'] });
+    },
+  });
 
-  const bulkUpdateSlots = async (futsalId: number | null, date: string, action: 'close' | 'open', futsals: any[]) => {
-    try {
+  // Mutation for bulk updating slots
+  const bulkUpdateSlotsMutation = useMutation({
+    mutationFn: async ({ 
+      futsalId, 
+      date, 
+      action 
+    }: { 
+      futsalId: number | null; 
+      date: string; 
+      action: 'close' | 'open'; 
+    }) => {
       let response;
       if (futsalId) {
-        response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/time-slots/futsal/${futsalId}/date/${date}/${action}-all`, {
-          method: 'PUT',
-        });
+        response = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/api/time-slots/futsal/${futsalId}/date/${date}/${action}-all`, 
+          { method: 'PUT' }
+        );
       } else {
-        response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/time-slots/${action}-all-available`, {
-          method: 'PUT',
-        });
+        response = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/api/time-slots/${action}-all-available`, 
+          { method: 'PUT' }
+        );
       }
 
-      if (response.ok) {
-        const data = await response.json();
-        // Refresh slots after bulk update
-        if (futsalId) {
-          await fetchSlots(futsalId, date, futsals);
-        } else {
-          await fetchAllSlots(futsals, date);
-        }
-        return { success: true, updatedSlots: data.updatedSlots };
-      } else {
-        return { success: false, error: `Error ${action}ing slots` };
+      if (!response.ok) {
+        throw new Error(`Error ${action}ing slots`);
       }
-    } catch (err) {
-      console.error(`Error ${action}ing slots:`, err);
-      return { success: false, error: `Error ${action}ing slots` };
+      
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['slots'] });
+    },
+  });
+
+  // Fetch slots for a single futsal (with caching)
+  const fetchSlots = useCallback(async (futsalId: number, date: string, futsals: any[]) => {
+    const queryKey = createSlotsQueryKey(futsalId, date);
+    const futsalName = futsals.find(f => f.futsal_id === futsalId)?.name;
+    
+    // Check if already cached
+    const cached = queryClient.getQueryData<Slot[]>(queryKey);
+    if (cached) {
+      return cached;
     }
-  };
+    
+    // Fetch and cache
+    return queryClient.fetchQuery({
+      queryKey,
+      queryFn: () => fetchSlotsForFutsal(tokens?.accessToken, futsalId, date, futsalName),
+      staleTime: 1000 * 60 * 2, // 2 minutes
+    });
+  }, [queryClient, tokens?.accessToken]);
+
+  // Fetch slots for all futsals (with caching)
+  const fetchAllSlots = useCallback(async (futsals: any[], date: string) => {
+    const queryKey = createSlotsQueryKey(null, date);
+    
+    // Check if already cached
+    const cached = queryClient.getQueryData<Slot[]>(queryKey);
+    if (cached) {
+      return cached;
+    }
+    
+    // Fetch and cache
+    return queryClient.fetchQuery({
+      queryKey,
+      queryFn: () => fetchAllFutsalsSlots(tokens?.accessToken, futsals, date),
+      staleTime: 1000 * 60 * 2, // 2 minutes
+    });
+  }, [queryClient, tokens?.accessToken]);
 
   // Real-time updates via socket
   useEffect(() => {
     if (!socket) return;
 
-    const handleSlotStatusUpdate = (data: any) => {
-      setSlots(prevSlots =>
-        prevSlots.map(slot =>
-          slot.slot_id === data.slotId
-            ? { ...slot, status: data.status }
-            : slot
-        )
-      );
+    const handleSlotStatusUpdate = () => {
+      queryClient.invalidateQueries({ queryKey: ['slots'] });
     };
 
     socket.on('slotStatusUpdated', handleSlotStatusUpdate);
@@ -160,12 +183,36 @@ export function useSlots() {
     return () => {
       socket.off('slotStatusUpdated', handleSlotStatusUpdate);
     };
-  }, [socket]);
+  }, [socket, queryClient]);
+
+  // Wrapper functions for compatibility
+  const updateSlotStatus = async (slotId: number, status: 'available' | 'disabled') => {
+    try {
+      await updateSlotStatusMutation.mutateAsync({ slotId, status });
+      return { success: true };
+    } catch (err: any) {
+      return { success: false, error: err.message };
+    }
+  };
+
+  const bulkUpdateSlots = async (
+    futsalId: number | null, 
+    date: string, 
+    action: 'close' | 'open', 
+    futsals: any[]
+  ) => {
+    try {
+      await bulkUpdateSlotsMutation.mutateAsync({ futsalId, date, action });
+      return { success: true };
+    } catch (err: any) {
+      return { success: false, error: err.message };
+    }
+  };
 
   return {
-    slots,
-    loading,
-    error,
+    slots: [], // Not used - slots are fetched via fetchSlots/fetchAllSlots
+    loading: false,
+    error: null,
     updateSlotStatus,
     bulkUpdateSlots,
     fetchSlots,

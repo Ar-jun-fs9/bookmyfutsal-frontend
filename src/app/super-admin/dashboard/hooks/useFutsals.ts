@@ -1,6 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuthStore } from '@/stores/authStore';
 import { useSocketStore } from '@/stores/socketStore';
+import { useEffect } from 'react';
 
 interface UseFutsalsOptions {
   enabled?: boolean;
@@ -27,95 +28,161 @@ interface Futsal {
   updated_at?: string;
 }
 
+const QUERY_KEY = ['futsals'];
+
+async function fetchFutsals(accessToken?: string): Promise<Futsal[]> {
+  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/futsals`, {
+    headers: {
+      'Authorization': `Bearer ${accessToken}`,
+      'Content-Type': 'application/json'
+    }
+  });
+  
+  if (!response.ok) {
+    if (response.status === 401) {
+      throw new Error('Unauthorized');
+    }
+    throw new Error('Failed to fetch futsals');
+  }
+  
+  return response.json();
+}
+
 export function useFutsals(options: UseFutsalsOptions = {}) {
   const { enabled = true } = options;
   const { tokens } = useAuthStore();
   const { socket } = useSocketStore();
-  const [futsals, setFutsals] = useState<Futsal[]>([]);
-  const [loading, setLoading] = useState(!enabled);
-  const [error, setError] = useState<string | null>(null);
+  const queryClient = useQueryClient();
 
-  const fetchFutsals = async () => {
-    try {
-      setLoading(true);
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/futsals`, {
-        headers: {
-          'Authorization': `Bearer ${tokens?.accessToken}`,
-          'Content-Type': 'application/json'
-        }
-      });
-      if (response.ok) {
-        const data = await response.json();
-        setFutsals(data);
-        setError(null);
-      } else if (response.status === 401) {
-        setError('Unauthorized');
-      } else {
-        setError('Failed to fetch futsals');
-      }
-    } catch (err) {
-      setError('Error fetching futsals');
-      console.error('Error fetching futsals:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
+  // Use React Query for data fetching with caching
+  const { data: futsals = [], isLoading: loading, error, refetch } = useQuery({
+    queryKey: QUERY_KEY,
+    queryFn: () => fetchFutsals(tokens?.accessToken),
+    enabled: enabled && !!tokens?.accessToken,
+    staleTime: 1000 * 60 * 5, // 5 minutes - data stays fresh for 5 mins
+    gcTime: 1000 * 60 * 10, // 10 minutes - cache persists for 10 mins
+    refetchOnMount: false, // Don't refetch when component mounts
+    refetchOnWindowFocus: false, // Don't refetch when window regains focus
+    throwOnError: false,
+  });
 
-  const createFutsal = async (formData: FormData) => {
-    try {
+  // Mutation for creating futsal
+  const createMutation = useMutation({
+    mutationFn: async (formData: FormData) => {
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/futsals`, {
         method: 'POST',
         body: formData,
       });
 
-      if (response.ok) {
-        await fetchFutsals(); // Refresh the list
-        return { success: true };
-      } else {
+      if (!response.ok) {
         const errorData = await response.json();
-        return { success: false, error: errorData.message || 'Error creating futsal' };
+        throw new Error(errorData.message || 'Error creating futsal');
       }
-    } catch (err) {
-      console.error('Error creating futsal:', err);
-      return { success: false, error: 'Error creating futsal' };
-    }
-  };
+      
+      return response.json();
+    },
+    onSuccess: () => {
+      // Invalidate and refetch
+      queryClient.invalidateQueries({ queryKey: QUERY_KEY });
+    },
+  });
 
-  const updateFutsal = async (id: number, formData: FormData) => {
-    try {
+  // Mutation for updating futsal
+  const updateMutation = useMutation({
+    mutationFn: async ({ id, formData }: { id: number; formData: FormData }) => {
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/futsals/${id}`, {
         method: 'PUT',
         body: formData,
       });
 
-      if (response.ok) {
-        await fetchFutsals(); // Refresh the list
-        return { success: true };
-      } else {
+      if (!response.ok) {
         const errorData = await response.json();
-        return { success: false, error: errorData.message || 'Error updating futsal' };
+        throw new Error(errorData.message || 'Error updating futsal');
       }
-    } catch (err) {
-      console.error('Error updating futsal:', err);
-      return { success: false, error: 'Error updating futsal' };
+      
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: QUERY_KEY });
+    },
+  });
+
+  // Mutation for deleting futsal
+  const deleteMutation = useMutation({
+    mutationFn: async (id: number) => {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/futsals/${id}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        throw new Error('Error deleting futsal');
+      }
+      
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: QUERY_KEY });
+    },
+  });
+
+  // Real-time updates via socket - update cache directly
+  useEffect(() => {
+    if (!socket) return;
+
+    const handleFutsalCreated = (data: any) => {
+      queryClient.setQueryData<Futsal[]>(QUERY_KEY, (old) => 
+        old ? [data.futsal, ...old] : [data.futsal]
+      );
+    };
+
+    const handleFutsalUpdated = (data: any) => {
+      queryClient.setQueryData<Futsal[]>(QUERY_KEY, (old) =>
+        old ? old.map(f => f.futsal_id === data.futsal.futsal_id ? data.futsal : f) : old
+      );
+    };
+
+    const handleFutsalDeleted = (data: any) => {
+      queryClient.setQueryData<Futsal[]>(QUERY_KEY, (old) =>
+        old ? old.filter(f => f.futsal_id !== data.futsalId) : old
+      );
+    };
+
+    socket.on('futsalCreated', handleFutsalCreated);
+    socket.on('futsalUpdated', handleFutsalUpdated);
+    socket.on('futsalDeleted', handleFutsalDeleted);
+
+    return () => {
+      socket.off('futsalCreated', handleFutsalCreated);
+      socket.off('futsalUpdated', handleFutsalUpdated);
+      socket.off('futsalDeleted', handleFutsalDeleted);
+    };
+  }, [socket, queryClient]);
+
+  // Wrapper functions for compatibility
+  const createFutsal = async (formData: FormData) => {
+    try {
+      await createMutation.mutateAsync(formData);
+      return { success: true };
+    } catch (err: any) {
+      return { success: false, error: err.message };
+    }
+  };
+
+  const updateFutsal = async (id: number, formData: FormData) => {
+    try {
+      await updateMutation.mutateAsync({ id, formData });
+      return { success: true };
+    } catch (err: any) {
+      return { success: false, error: err.message };
     }
   };
 
   const deleteFutsal = async (id: number) => {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/futsals/${id}`, {
-        method: 'DELETE',
-      });
-
-      if (response.ok) {
-        setFutsals(futsals.filter(f => f.futsal_id !== id));
-        return { success: true };
-      } else {
-        return { success: false, error: 'Error deleting futsal' };
-      }
-    } catch (err) {
-      console.error('Error deleting futsal:', err);
-      return { success: false, error: 'Error deleting futsal' };
+      await deleteMutation.mutateAsync(id);
+      return { success: true };
+    } catch (err: any) {
+      return { success: false, error: err.message };
     }
   };
 
@@ -131,7 +198,8 @@ export function useFutsals(options: UseFutsalsOptions = {}) {
       const successfulDeletes = results.filter(response => response.ok).length;
 
       if (successfulDeletes > 0) {
-        setFutsals(futsals.filter(f => !futsalIds.includes(f.futsal_id)));
+        // Invalidate to refetch
+        queryClient.invalidateQueries({ queryKey: QUERY_KEY });
         return { success: true, deletedCount: successfulDeletes };
       } else {
         return { success: false, error: 'Error deleting futsals' };
@@ -142,52 +210,14 @@ export function useFutsals(options: UseFutsalsOptions = {}) {
     }
   };
 
-  useEffect(() => {
-    if (enabled && tokens?.accessToken) {
-      fetchFutsals();
-    } else if (!enabled) {
-      // Reset state when disabled
-      setFutsals([]);
-      setLoading(false);
-      setError(null);
-    }
-  }, [enabled, tokens?.accessToken]);
-
-  // Real-time updates via socket
-  useEffect(() => {
-    if (!socket) return;
-
-    const handleFutsalCreated = (data: any) => {
-      setFutsals(prev => [data.futsal, ...prev]);
-    };
-
-    const handleFutsalUpdated = (data: any) => {
-      setFutsals(prev => prev.map(f => f.futsal_id === data.futsal.futsal_id ? data.futsal : f));
-    };
-
-    const handleFutsalDeleted = (data: any) => {
-      setFutsals(prev => prev.filter(f => f.futsal_id !== data.futsalId));
-    };
-
-    socket.on('futsalCreated', handleFutsalCreated);
-    socket.on('futsalUpdated', handleFutsalUpdated);
-    socket.on('futsalDeleted', handleFutsalDeleted);
-
-    return () => {
-      socket.off('futsalCreated', handleFutsalCreated);
-      socket.off('futsalUpdated', handleFutsalUpdated);
-      socket.off('futsalDeleted', handleFutsalDeleted);
-    };
-  }, [socket]);
-
   return {
     futsals,
     loading,
-    error,
+    error: error as Error | null,
     createFutsal,
     updateFutsal,
     deleteFutsal,
     bulkDelete,
-    refetch: fetchFutsals
+    refetch
   };
 }

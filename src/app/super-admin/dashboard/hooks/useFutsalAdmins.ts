@@ -1,6 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuthStore } from '@/stores/authStore';
 import { useSocketStore } from '@/stores/socketStore';
+import { useEffect } from 'react';
 
 interface UseFutsalAdminsOptions {
   enabled?: boolean;
@@ -18,42 +19,47 @@ interface FutsalAdmin {
   blocked_until?: string;
 }
 
+const QUERY_KEY = ['futsal-admins'];
+
+async function fetchFutsalAdmins(accessToken?: string): Promise<FutsalAdmin[]> {
+  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/futsal-admins`, {
+    headers: {
+      'Authorization': `Bearer ${accessToken}`,
+      'Content-Type': 'application/json'
+    }
+  });
+  
+  if (!response.ok) {
+    if (response.status === 401) {
+      throw new Error('Unauthorized');
+    }
+    throw new Error('Failed to fetch futsal admins');
+  }
+  
+  return response.json();
+}
+
 export function useFutsalAdmins(options: UseFutsalAdminsOptions = {}) {
   const { enabled = true } = options;
   const { tokens } = useAuthStore();
   const { socket } = useSocketStore();
-  const [admins, setAdmins] = useState<FutsalAdmin[]>([]);
-  const [loading, setLoading] = useState(!enabled);
-  const [error, setError] = useState<string | null>(null);
+  const queryClient = useQueryClient();
 
-  const fetchAdmins = async () => {
-    try {
-      setLoading(true);
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/futsal-admins`, {
-        headers: {
-          'Authorization': `Bearer ${tokens?.accessToken}`,
-          'Content-Type': 'application/json'
-        }
-      });
-      if (response.ok) {
-        const data = await response.json();
-        setAdmins(data);
-        setError(null);
-      } else if (response.status === 401) {
-        setError('Unauthorized');
-      } else {
-        setError('Failed to fetch futsal admins');
-      }
-    } catch (err) {
-      setError('Error fetching futsal admins');
-      console.error('Error fetching futsal admins:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
+  // Use React Query for data fetching with caching
+  const { data: admins = [], isLoading: loading, error, refetch } = useQuery({
+    queryKey: QUERY_KEY,
+    queryFn: () => fetchFutsalAdmins(tokens?.accessToken),
+    enabled: enabled && !!tokens?.accessToken,
+    staleTime: 1000 * 60 * 5, // 5 minutes
+    gcTime: 1000 * 60 * 10, // 10 minutes
+    refetchOnMount: false, // Don't refetch when component mounts
+    refetchOnWindowFocus: false, // Don't refetch when window regains focus
+    throwOnError: false,
+  });
 
-  const createAdmin = async (formData: any) => {
-    try {
+  // Mutation for creating admin
+  const createMutation = useMutation({
+    mutationFn: async (formData: any) => {
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/futsal-admins`, {
         method: 'POST',
         headers: {
@@ -63,21 +69,21 @@ export function useFutsalAdmins(options: UseFutsalAdminsOptions = {}) {
         body: JSON.stringify(formData),
       });
 
-      if (response.ok) {
-        await fetchAdmins(); // Refresh the list
-        return { success: true };
-      } else {
+      if (!response.ok) {
         const errorData = await response.json();
-        return { success: false, error: errorData.message || 'Error creating futsal admin' };
+        throw new Error(errorData.message || 'Error creating futsal admin');
       }
-    } catch (err) {
-      console.error('Error creating futsal admin:', err);
-      return { success: false, error: 'Error creating futsal admin' };
-    }
-  };
+      
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: QUERY_KEY });
+    },
+  });
 
-  const updateAdmin = async (id: number, formData: any) => {
-    try {
+  // Mutation for updating admin
+  const updateMutation = useMutation({
+    mutationFn: async ({ id, formData }: { id: number; formData: any }) => {
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/futsal-admins/${id}`, {
         method: 'PUT',
         headers: {
@@ -87,21 +93,21 @@ export function useFutsalAdmins(options: UseFutsalAdminsOptions = {}) {
         body: JSON.stringify(formData),
       });
 
-      if (response.ok) {
-        await fetchAdmins(); // Refresh the list
-        return { success: true };
-      } else {
+      if (!response.ok) {
         const errorData = await response.json();
-        return { success: false, error: errorData.message || 'Error updating futsal admin' };
+        throw new Error(errorData.message || 'Error updating futsal admin');
       }
-    } catch (err) {
-      console.error('Error updating futsal admin:', err);
-      return { success: false, error: 'Error updating futsal admin' };
-    }
-  };
+      
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: QUERY_KEY });
+    },
+  });
 
-  const deleteAdmin = async (id: number) => {
-    try {
+  // Mutation for deleting admin
+  const deleteMutation = useMutation({
+    mutationFn: async (id: number) => {
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/futsal-admins/${id}`, {
         method: 'DELETE',
         headers: {
@@ -109,15 +115,120 @@ export function useFutsalAdmins(options: UseFutsalAdminsOptions = {}) {
         },
       });
 
-      if (response.ok) {
-        setAdmins(admins.filter(a => a.id !== id));
-        return { success: true };
-      } else {
-        return { success: false, error: 'Error deleting futsal admin' };
+      if (!response.ok) {
+        throw new Error('Error deleting futsal admin');
       }
-    } catch (err) {
-      console.error('Error deleting futsal admin:', err);
-      return { success: false, error: 'Error deleting futsal admin' };
+      
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: QUERY_KEY });
+    },
+  });
+
+  // Mutation for blocking admin
+  const blockMutation = useMutation({
+    mutationFn: async ({ id, reason, duration }: { id: number; reason?: string; duration?: number }) => {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/futsal-admins/${id}/block`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${tokens?.accessToken}`,
+        },
+        body: JSON.stringify({ reason, duration_minutes: duration }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Error blocking futsal admin');
+      }
+      
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: QUERY_KEY });
+    },
+  });
+
+  // Mutation for unblocking admin
+  const unblockMutation = useMutation({
+    mutationFn: async (id: number) => {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/futsal-admins/${id}/unblock`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${tokens?.accessToken}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Error unblocking futsal admin');
+      }
+      
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: QUERY_KEY });
+    },
+  });
+
+  // Real-time updates via socket - update cache directly
+  useEffect(() => {
+    if (!socket) return;
+
+    const handleAdminCreated = (data: any) => {
+      queryClient.setQueryData<FutsalAdmin[]>(QUERY_KEY, (old) =>
+        old ? [data.admin, ...old] : [data.admin]
+      );
+    };
+
+    const handleAdminUpdated = (data: any) => {
+      queryClient.setQueryData<FutsalAdmin[]>(QUERY_KEY, (old) =>
+        old ? old.map(a => a.id === data.admin.id ? data.admin : a) : old
+      );
+    };
+
+    const handleAdminDeleted = (data: any) => {
+      queryClient.setQueryData<FutsalAdmin[]>(QUERY_KEY, (old) =>
+        old ? old.filter(a => a.id !== data.adminId) : old
+      );
+    };
+
+    socket.on('futsalAdminCreated', handleAdminCreated);
+    socket.on('futsalAdminUpdated', handleAdminUpdated);
+    socket.on('futsalAdminDeleted', handleAdminDeleted);
+
+    return () => {
+      socket.off('futsalAdminCreated', handleAdminCreated);
+      socket.off('futsalAdminUpdated', handleAdminUpdated);
+      socket.off('futsalAdminDeleted', handleAdminDeleted);
+    };
+  }, [socket, queryClient]);
+
+  // Wrapper functions for compatibility
+  const createAdmin = async (formData: any) => {
+    try {
+      await createMutation.mutateAsync(formData);
+      return { success: true };
+    } catch (err: any) {
+      return { success: false, error: err.message };
+    }
+  };
+
+  const updateAdmin = async (id: number, formData: any) => {
+    try {
+      await updateMutation.mutateAsync({ id, formData });
+      return { success: true };
+    } catch (err: any) {
+      return { success: false, error: err.message };
+    }
+  };
+
+  const deleteAdmin = async (id: number) => {
+    try {
+      await deleteMutation.mutateAsync(id);
+      return { success: true };
+    } catch (err: any) {
+      return { success: false, error: err.message };
     }
   };
 
@@ -136,7 +247,7 @@ export function useFutsalAdmins(options: UseFutsalAdminsOptions = {}) {
       const successfulDeletes = results.filter(response => response.ok).length;
 
       if (successfulDeletes > 0) {
-        setAdmins(admins.filter(a => !adminIds.includes(a.id)));
+        queryClient.invalidateQueries({ queryKey: QUERY_KEY });
         return { success: true, deletedCount: successfulDeletes };
       } else {
         return { success: false, error: 'Error deleting futsal admins' };
@@ -149,96 +260,32 @@ export function useFutsalAdmins(options: UseFutsalAdminsOptions = {}) {
 
   const blockAdmin = async (id: number, reason?: string, duration?: number) => {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/futsal-admins/${id}/block`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${tokens?.accessToken}`,
-        },
-        body: JSON.stringify({ reason, duration_minutes: duration }),
-      });
-
-      if (response.ok) {
-        return { success: true };
-      } else {
-        const errorData = await response.json();
-        return { success: false, error: errorData.message || 'Error blocking futsal admin' };
-      }
-    } catch (err) {
-      console.error('Error blocking futsal admin:', err);
-      return { success: false, error: 'Error blocking futsal admin' };
+      await blockMutation.mutateAsync({ id, reason, duration });
+      return { success: true };
+    } catch (err: any) {
+      return { success: false, error: err.message };
     }
   };
 
   const unblockAdmin = async (id: number) => {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/futsal-admins/${id}/unblock`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${tokens?.accessToken}`,
-        },
-      });
-
-      if (response.ok) {
-        return { success: true };
-      } else {
-        const errorData = await response.json();
-        return { success: false, error: errorData.message || 'Error unblocking futsal admin' };
-      }
-    } catch (err) {
-      console.error('Error unblocking futsal admin:', err);
-      return { success: false, error: 'Error unblocking futsal admin' };
+      await unblockMutation.mutateAsync(id);
+      return { success: true };
+    } catch (err: any) {
+      return { success: false, error: err.message };
     }
   };
-
-  useEffect(() => {
-    if (enabled && tokens?.accessToken) {
-      fetchAdmins();
-    } else if (!enabled) {
-      // Reset state when disabled
-      setAdmins([]);
-      setLoading(false);
-      setError(null);
-    }
-  }, [enabled, tokens?.accessToken]);
-
-  // Real-time updates via socket
-  useEffect(() => {
-    if (!socket) return;
-
-    const handleAdminCreated = (data: any) => {
-      setAdmins(prev => [data.admin, ...prev]);
-    };
-
-    const handleAdminUpdated = (data: any) => {
-      setAdmins(prev => prev.map(a => a.id === data.admin.id ? data.admin : a));
-    };
-
-    const handleAdminDeleted = (data: any) => {
-      setAdmins(prev => prev.filter(a => a.id !== data.adminId));
-    };
-
-    socket.on('futsalAdminCreated', handleAdminCreated);
-    socket.on('futsalAdminUpdated', handleAdminUpdated);
-    socket.on('futsalAdminDeleted', handleAdminDeleted);
-
-    return () => {
-      socket.off('futsalAdminCreated', handleAdminCreated);
-      socket.off('futsalAdminUpdated', handleAdminUpdated);
-      socket.off('futsalAdminDeleted', handleAdminDeleted);
-    };
-  }, [socket]);
 
   return {
     admins,
     loading,
-    error,
+    error: error as Error | null,
     createAdmin,
     updateAdmin,
     deleteAdmin,
     bulkDelete,
     blockAdmin,
     unblockAdmin,
-    refetch: fetchAdmins
+    refetch
   };
 }

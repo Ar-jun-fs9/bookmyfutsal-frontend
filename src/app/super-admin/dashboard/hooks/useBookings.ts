@@ -1,8 +1,8 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuthStore } from '@/stores/authStore';
 import { useSocketStore } from '@/stores/socketStore';
+import { useEffect, useMemo, useState } from 'react';
 import { filterBookings } from '../utils/searchUtils';
-import { categorizeBooking } from '../utils/bookingUtils';
 
 interface UseBookingsOptions {
   enabled?: boolean;
@@ -27,169 +27,165 @@ interface Booking {
   last_updated_by?: string;
 }
 
+const QUERY_KEY = ['bookings', 'all'];
+
+async function fetchBookings(accessToken?: string): Promise<{ bookings: Booking[] }> {
+  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/bookings/all`, {
+    headers: {
+      'Authorization': `Bearer ${accessToken}`,
+      'Content-Type': 'application/json'
+    }
+  });
+  
+  if (!response.ok) {
+    if (response.status === 401) {
+      throw new Error('Unauthorized');
+    }
+    if (response.status === 429) {
+      throw new Error('Rate limit exceeded. Please wait before retrying.');
+    }
+    throw new Error('Failed to fetch bookings');
+  }
+  
+  return response.json();
+}
+
 export function useBookings(options: UseBookingsOptions = {}) {
   const { enabled = true } = options;
   const { tokens } = useAuthStore();
   const { socket } = useSocketStore();
-  const [bookings, setBookings] = useState<Booking[]>([]);
-  const [loading, setLoading] = useState(!enabled);
-  const [error, setError] = useState<string | null>(null);
+  const queryClient = useQueryClient();
+  
+  // Local filter state - kept for client-side filtering
   const [searchTerm, setSearchTerm] = useState('');
   const [futsalFilter, setFutsalFilter] = useState('');
   const [bookingFilter, setBookingFilter] = useState<'all' | 'past' | 'today' | 'future' | 'cancelled'>('all');
   const [dateStart, setDateStart] = useState('');
   const [dateEnd, setDateEnd] = useState('');
 
-  const fetchBookings = async () => {
-    try {
-      setLoading(true);
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/bookings/all`, {
-        headers: {
-          'Authorization': `Bearer ${tokens?.accessToken}`,
-          'Content-Type': 'application/json'
-        }
-      });
-      if (response.ok) {
-        const data = await response.json();
-        setBookings(data.bookings);
-        setError(null);
-      } else if (response.status === 401) {
-        setError('Unauthorized');
-      } else if (response.status === 429) {
-        setError('Rate limit exceeded. Please wait before retrying.');
-        // Auto-retry after 30 seconds
-        setTimeout(() => {
-          fetchBookings();
-        }, 30000);
-      } else {
-        setError('Failed to fetch bookings');
-      }
-    } catch (err) {
-      setError('Error fetching bookings');
-      console.error('Error fetching bookings:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
+  // Use React Query for data fetching with caching
+  const { data, isLoading: loading, error, refetch } = useQuery({
+    queryKey: QUERY_KEY,
+    queryFn: () => fetchBookings(tokens?.accessToken),
+    enabled: enabled && !!tokens?.accessToken,
+    staleTime: 1000 * 60 * 5, // 5 minutes
+    gcTime: 1000 * 60 * 10, // 10 minutes
+    refetchOnMount: false, // Don't refetch when component mounts
+    refetchOnWindowFocus: false, // Don't refetch when window regains focus
+    throwOnError: false,
+  });
 
+  const bookings = data?.bookings || [];
+
+  // Client-side filtering
   const filteredBookings = useMemo(() => {
     return filterBookings(bookings, searchTerm, futsalFilter, bookingFilter, dateStart, dateEnd);
   }, [bookings, searchTerm, futsalFilter, bookingFilter, dateStart, dateEnd]);
 
-  const updateBooking = async (id: number, formData: any) => {
-    try {
+  // Mutation for updating booking
+  const updateMutation = useMutation({
+    mutationFn: async ({ id, formData }: { id: number; formData: any }) => {
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/bookings/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
       });
 
-      if (response.ok) {
-        await fetchBookings(); // Refresh the list
-        return { success: true };
-      } else {
+      if (!response.ok) {
         const errorData = await response.json();
-        return { success: false, error: errorData.message || 'Error updating booking' };
+        throw new Error(errorData.message || 'Error updating booking');
       }
-    } catch (err) {
-      console.error('Error updating booking:', err);
-      return { success: false, error: 'Error updating booking' };
-    }
-  };
+      
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: QUERY_KEY });
+    },
+  });
 
-  const deleteBooking = async (id: number) => {
-    try {
+  // Mutation for deleting booking
+  const deleteMutation = useMutation({
+    mutationFn: async (id: number) => {
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/bookings/delete/${id}`, {
         method: 'DELETE',
       });
 
-      if (response.ok) {
-        setBookings(bookings.filter(b => b.booking_id !== id));
-        return { success: true };
-      } else {
-        return { success: false, error: 'Error deleting booking' };
+      if (!response.ok) {
+        throw new Error('Error deleting booking');
       }
-    } catch (err) {
-      console.error('Error deleting booking:', err);
-      return { success: false, error: 'Error deleting booking' };
-    }
-  };
+      
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: QUERY_KEY });
+    },
+  });
 
-  const cancelBooking = async (id: number) => {
-    try {
+  // Mutation for cancelling booking
+  const cancelMutation = useMutation({
+    mutationFn: async (id: number) => {
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/bookings/${id}`, {
         method: 'DELETE',
       });
 
-      if (response.ok) {
-        await fetchBookings(); // Refresh the list
-        return { success: true };
-      } else {
-        return { success: false, error: 'Error cancelling booking' };
+      if (!response.ok) {
+        throw new Error('Error cancelling booking');
       }
-    } catch (err) {
-      console.error('Error cancelling booking:', err);
-      return { success: false, error: 'Error cancelling booking' };
-    }
-  };
+      
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: QUERY_KEY });
+    },
+  });
 
-  const bulkDelete = async (bookingIds: number[]) => {
-    try {
+  // Mutation for bulk delete
+  const bulkDeleteMutation = useMutation({
+    mutationFn: async (bookingIds: number[]) => {
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/bookings/super-admin/bulk-delete`, {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ booking_ids: bookingIds }),
       });
 
-      if (response.ok) {
-        const data = await response.json();
-        setBookings(bookings.filter(b => !bookingIds.includes(b.booking_id)));
-        return { success: true, deletedCount: data.deletedCount };
-      } else {
-        return { success: false, error: 'Error deleting bookings' };
+      if (!response.ok) {
+        throw new Error('Error deleting bookings');
       }
-    } catch (err) {
-      console.error('Error bulk deleting bookings:', err);
-      return { success: false, error: 'Error deleting bookings' };
-    }
-  };
+      
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: QUERY_KEY });
+    },
+  });
 
-  useEffect(() => {
-    if (enabled && tokens?.accessToken) {
-      fetchBookings();
-    } else if (!enabled) {
-      // Reset state when disabled
-      setBookings([]);
-      setLoading(false);
-      setError(null);
-    }
-  }, [enabled, tokens?.accessToken]);
-
-  // Auto-refresh every 10 minutes to prevent stale data and rate limits
-  useEffect(() => {
-    if (!enabled || !tokens?.accessToken) return;
-
-    const interval = setInterval(() => {
-      fetchBookings();
-    }, 10 * 60 * 1000); // 10 minutes
-
-    return () => clearInterval(interval);
-  }, [enabled, tokens?.accessToken]);
-
-  // Real-time updates via socket
+  // Real-time updates via socket - update cache directly
   useEffect(() => {
     if (!socket) return;
 
     const handleBookingCreated = (data: any) => {
-      setBookings(prev => [data.booking, ...prev]);
+      queryClient.setQueryData<{ bookings: Booking[] }>(QUERY_KEY, (old) => {
+        if (!old) return { bookings: [data.booking] };
+        return { bookings: [data.booking, ...old.bookings] };
+      });
     };
 
     const handleBookingUpdated = (data: any) => {
-      setBookings(prev => prev.map(b => b.booking_id === data.booking.booking_id ? data.booking : b));
+      queryClient.setQueryData<{ bookings: Booking[] }>(QUERY_KEY, (old) => {
+        if (!old) return old;
+        return {
+          bookings: old.bookings.map(b => b.booking_id === data.booking.booking_id ? data.booking : b)
+        };
+      });
     };
 
     const handleBookingDeleted = (data: any) => {
-      setBookings(prev => prev.filter(b => b.booking_id !== data.bookingId));
+      queryClient.setQueryData<{ bookings: Booking[] }>(QUERY_KEY, (old) => {
+        if (!old) return old;
+        return {
+          bookings: old.bookings.filter(b => b.booking_id !== data.bookingId)
+        };
+      });
     };
 
     socket.on('bookingCreated', handleBookingCreated);
@@ -201,13 +197,50 @@ export function useBookings(options: UseBookingsOptions = {}) {
       socket.off('bookingUpdated', handleBookingUpdated);
       socket.off('bookingDeleted', handleBookingDeleted);
     };
-  }, [socket]);
+  }, [socket, queryClient]);
+
+  // Wrapper functions for compatibility
+  const updateBooking = async (id: number, formData: any) => {
+    try {
+      await updateMutation.mutateAsync({ id, formData });
+      return { success: true };
+    } catch (err: any) {
+      return { success: false, error: err.message };
+    }
+  };
+
+  const deleteBooking = async (id: number) => {
+    try {
+      await deleteMutation.mutateAsync(id);
+      return { success: true };
+    } catch (err: any) {
+      return { success: false, error: err.message };
+    }
+  };
+
+  const cancelBooking = async (id: number) => {
+    try {
+      await cancelMutation.mutateAsync(id);
+      return { success: true };
+    } catch (err: any) {
+      return { success: false, error: err.message };
+    }
+  };
+
+  const bulkDelete = async (bookingIds: number[]) => {
+    try {
+      await bulkDeleteMutation.mutateAsync(bookingIds);
+      return { success: true, deletedCount: bookingIds.length };
+    } catch (err: any) {
+      return { success: false, error: err.message };
+    }
+  };
 
   return {
     bookings,
     filteredBookings,
     loading,
-    error,
+    error: error as Error | null,
     searchTerm,
     setSearchTerm,
     futsalFilter,
@@ -222,6 +255,6 @@ export function useBookings(options: UseBookingsOptions = {}) {
     deleteBooking,
     cancelBooking,
     bulkDelete,
-    refetch: fetchBookings
+    refetch
   };
 }

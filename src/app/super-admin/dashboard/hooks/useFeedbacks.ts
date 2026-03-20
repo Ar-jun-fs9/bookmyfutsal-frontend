@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuthStore } from '@/stores/authStore';
 
 interface UseFeedbacksOptions {
@@ -22,41 +22,48 @@ interface Feedback {
   updated_at: string;
 }
 
+const QUERY_KEY = ['feedbacks'];
+
+async function fetchFeedbacks(accessToken?: string): Promise<{ feedbacks: Feedback[] }> {
+  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/feedback`, {
+    headers: {
+      'Authorization': `Bearer ${accessToken}`,
+      'Content-Type': 'application/json'
+    }
+  });
+  
+  if (!response.ok) {
+    if (response.status === 401) {
+      throw new Error('Unauthorized');
+    }
+    throw new Error('Failed to fetch feedbacks');
+  }
+  
+  return response.json();
+}
+
 export function useFeedbacks(options: UseFeedbacksOptions = {}) {
   const { enabled = true } = options;
   const { tokens } = useAuthStore();
-  const [feedbacks, setFeedbacks] = useState<Feedback[]>([]);
-  const [loading, setLoading] = useState(!enabled);
-  const [error, setError] = useState<string | null>(null);
+  const queryClient = useQueryClient();
 
-  const fetchFeedbacks = async () => {
-    try {
-      setLoading(true);
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/feedback`, {
-        headers: {
-          'Authorization': `Bearer ${tokens?.accessToken}`,
-          'Content-Type': 'application/json'
-        }
-      });
-      if (response.ok) {
-        const data = await response.json();
-        setFeedbacks(data.feedbacks);
-        setError(null);
-      } else if (response.status === 401) {
-        setError('Unauthorized');
-      } else {
-        setError('Failed to fetch feedbacks');
-      }
-    } catch (err) {
-      setError('Error fetching feedbacks');
-      console.error('Error fetching feedbacks:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
+  // Use React Query for data fetching with caching
+  const { data, isLoading: loading, error, refetch } = useQuery({
+    queryKey: QUERY_KEY,
+    queryFn: () => fetchFeedbacks(tokens?.accessToken),
+    enabled: enabled && !!tokens?.accessToken,
+    staleTime: 1000 * 60 * 5, // 5 minutes
+    gcTime: 1000 * 60 * 10, // 10 minutes
+    refetchOnMount: false, // Don't refetch when component mounts
+    refetchOnWindowFocus: false, // Don't refetch when window regains focus
+    throwOnError: false,
+  });
 
-  const deleteFeedback = async (id: number) => {
-    try {
+  const feedbacks = data?.feedbacks || [];
+
+  // Mutation for deleting feedback
+  const deleteMutation = useMutation({
+    mutationFn: async (id: number) => {
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/feedback/${id}`, {
         method: 'DELETE',
         headers: {
@@ -64,34 +71,32 @@ export function useFeedbacks(options: UseFeedbacksOptions = {}) {
         },
       });
 
-      if (response.ok) {
-        setFeedbacks(feedbacks.filter(f => f.id !== id));
-        return { success: true };
-      } else {
-        return { success: false, error: 'Error deleting feedback' };
+      if (!response.ok) {
+        throw new Error('Error deleting feedback');
       }
-    } catch (err) {
-      console.error('Error deleting feedback:', err);
-      return { success: false, error: 'Error deleting feedback' };
+      
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: QUERY_KEY });
+    },
+  });
+
+  // Wrapper functions for compatibility
+  const deleteFeedback = async (id: number) => {
+    try {
+      await deleteMutation.mutateAsync(id);
+      return { success: true };
+    } catch (err: any) {
+      return { success: false, error: err.message };
     }
   };
-
-  useEffect(() => {
-    if (enabled && tokens?.accessToken) {
-      fetchFeedbacks();
-    } else if (!enabled) {
-      // Reset state when disabled
-      setFeedbacks([]);
-      setLoading(false);
-      setError(null);
-    }
-  }, [enabled, tokens?.accessToken]);
 
   return {
     feedbacks,
     loading,
-    error,
+    error: error as Error | null,
     deleteFeedback,
-    refetch: fetchFeedbacks
+    refetch
   };
 }

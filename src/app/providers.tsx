@@ -15,6 +15,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
             gcTime: 1000 * 60 * 10, // 10 minutes
             retry: 1,
             refetchOnWindowFocus: false, // Prevent unnecessary refetches when switching tabs
+            refetchOnMount: false, // Don't refetch when component mounts (sections won't refetch on expand)
           },
         },
       })

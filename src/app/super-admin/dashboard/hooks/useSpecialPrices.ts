@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuthStore } from '@/stores/authStore';
 
 interface UseSpecialPricesOptions {
@@ -23,37 +23,123 @@ interface SpecialPrice {
   futsal_name: string;
 }
 
+const QUERY_KEY = ['special-prices', 'all'];
+
+async function fetchSpecialPrices(accessToken?: string): Promise<{ specialPrices: SpecialPrice[] }> {
+  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/special-prices/all`, {
+    headers: {
+      'Authorization': `Bearer ${accessToken}`,
+      'Content-Type': 'application/json'
+    }
+  });
+  
+  if (!response.ok) {
+    throw new Error('Failed to fetch special prices');
+  }
+  
+  return response.json();
+}
+
 export function useSpecialPrices(options: UseSpecialPricesOptions = {}) {
   const { enabled = true } = options;
   const { tokens } = useAuthStore();
-  const [specialPrices, setSpecialPrices] = useState<SpecialPrice[]>([]);
-  const [loading, setLoading] = useState(!enabled);
+  const queryClient = useQueryClient();
 
-  const fetchSpecialPrices = async (futsalId?: number) => {
-    setLoading(true);
-    try {
-      const url = futsalId
-        ? `${process.env.NEXT_PUBLIC_API_URL}/api/special-prices/${futsalId}`
-        : `${process.env.NEXT_PUBLIC_API_URL}/api/special-prices/all`; // Assuming we add an endpoint for all
+  // Use React Query for data fetching with caching
+  const { data, isLoading: loading, error, refetch } = useQuery({
+    queryKey: QUERY_KEY,
+    queryFn: () => fetchSpecialPrices(tokens?.accessToken),
+    enabled: enabled && !!tokens?.accessToken,
+    staleTime: 1000 * 60 * 5, // 5 minutes
+    gcTime: 1000 * 60 * 10, // 10 minutes
+    refetchOnMount: false, // Don't refetch when component mounts
+    refetchOnWindowFocus: false, // Don't refetch when window regains focus
+    throwOnError: false,
+  });
 
-      const response = await fetch(url, {
+  const specialPrices = data?.specialPrices || [];
+
+  // Mutation for creating special price
+  const createMutation = useMutation({
+    mutationFn: async (data: {
+      futsal_id: number;
+      type?: 'date' | 'recurring' | 'time_based';
+      special_dates?: string[];
+      recurring_days?: string[];
+      start_time?: string;
+      end_time?: string;
+      special_price: number;
+      message?: string;
+      is_offer?: boolean;
+    }) => {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/special-prices`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${tokens?.accessToken}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Error creating special price');
+      }
+      
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: QUERY_KEY });
+    },
+  });
+
+  // Mutation for updating special price
+  const updateMutation = useMutation({
+    mutationFn: async ({ id, data }: { id: number; data: any }) => {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/special-prices/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${tokens?.accessToken}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Error updating special price');
+      }
+      
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: QUERY_KEY });
+    },
+  });
+
+  // Mutation for deleting special price
+  const deleteMutation = useMutation({
+    mutationFn: async (id: number) => {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/special-prices/${id}`, {
+        method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${tokens?.accessToken}`,
           'Content-Type': 'application/json'
         }
       });
 
-      if (response.ok) {
-        const data = await response.json();
-        setSpecialPrices(data.specialPrices || []);
+      if (!response.ok) {
+        throw new Error('Error deleting special price');
       }
-    } catch (error) {
-      console.error('Error fetching special prices:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
+      
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: QUERY_KEY });
+    },
+  });
 
+  // Wrapper functions for compatibility
   const createSpecialPrice = async (data: {
     futsal_id: number;
     type?: 'date' | 'recurring' | 'time_based';
@@ -66,104 +152,57 @@ export function useSpecialPrices(options: UseSpecialPricesOptions = {}) {
     is_offer?: boolean;
   }) => {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/special-prices`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${tokens?.accessToken}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(data)
-      });
-
-      if (response.ok) {
-        return { success: true };
-      } else {
-        const errorData = await response.json();
-        return { success: false, error: errorData.message };
-      }
-    } catch (error) {
-      console.error('Error creating special price:', error);
-      return { success: false, error: 'Network error' };
+      await createMutation.mutateAsync(data);
+      return { success: true };
+    } catch (err: any) {
+      return { success: false, error: err.message };
     }
   };
 
-  const updateSpecialPrice = async (id: number, data: {
-    special_price: number;
-    message?: string;
-    offer_message?: string;
-    special_date?: string;
-    recurring_days?: string[];
-    start_time?: string;
-    end_time?: string;
-    is_offer?: boolean;
-  }) => {
+  const updateSpecialPrice = async (id: number, data: any) => {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/special-prices/${id}`, {
-        method: 'PUT',
-        headers: {
-          'Authorization': `Bearer ${tokens?.accessToken}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(data)
-      });
-
-      if (response.ok) {
-        return { success: true };
-      } else {
-        const errorData = await response.json();
-        return { success: false, error: errorData.message };
-      }
-    } catch (error) {
-      console.error('Error updating special price:', error);
-      return { success: false, error: 'Network error' };
+      await updateMutation.mutateAsync({ id, data });
+      return { success: true };
+    } catch (err: any) {
+      return { success: false, error: err.message };
     }
   };
 
   const deleteSpecialPrice = async (id: number) => {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/special-prices/${id}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${tokens?.accessToken}`,
-          'Content-Type': 'application/json'
-        }
-      });
-
-      if (response.ok) {
-        return { success: true };
-      } else {
-        const errorData = await response.json();
-        return { success: false, error: errorData.message };
-      }
-    } catch (error) {
-      console.error('Error deleting special price:', error);
-      return { success: false, error: 'Network error' };
+      await deleteMutation.mutateAsync(id);
+      return { success: true };
+    } catch (err: any) {
+      return { success: false, error: err.message };
     }
   };
 
-  useEffect(() => {
-    if (enabled && tokens?.accessToken) {
-      fetchSpecialPrices();
-    } else if (!enabled) {
-      // Reset state when disabled
-      setSpecialPrices([]);
-      setLoading(false);
-    }
-  }, [enabled, tokens?.accessToken]);
+  const fetchSpecialPricesDirect = async (futsalId?: number) => {
+    // This is kept for backwards compatibility but should use refetch() instead
+    refetch();
+  };
 
   const updateLocalSpecialPrice = (id: number, updates: Partial<SpecialPrice>) => {
-    setSpecialPrices(prev => prev.map(price =>
-      price.special_price_id === id ? { ...price, ...updates } : price
-    ));
+    queryClient.setQueryData<{ specialPrices: SpecialPrice[] }>(QUERY_KEY, (old) => {
+      if (!old) return old;
+      return {
+        ...old,
+        specialPrices: old.specialPrices.map(price =>
+          price.special_price_id === id ? { ...price, ...updates } : price
+        )
+      };
+    });
   };
 
   return {
     specialPrices,
     loading,
-    fetchSpecialPrices,
+    error: error as Error | null,
+    fetchSpecialPrices: fetchSpecialPricesDirect,
     createSpecialPrice,
     updateSpecialPrice,
     deleteSpecialPrice,
-    updateLocalSpecialPrice
+    updateLocalSpecialPrice,
+    refetch
   };
 }

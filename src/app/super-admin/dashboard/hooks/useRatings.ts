@@ -1,6 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuthStore } from '@/stores/authStore';
 import { useSocketStore } from '@/stores/socketStore';
+import { useEffect, useState } from 'react';
 
 interface UseRatingsOptions {
   enabled?: boolean;
@@ -20,87 +21,102 @@ interface Rating {
   created_at: string;
 }
 
+const QUERY_KEY = ['ratings'];
+
+async function fetchRatings(accessToken?: string): Promise<{ ratings: Rating[] }> {
+  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/ratings`, {
+    headers: {
+      'Authorization': `Bearer ${accessToken}`,
+      'Content-Type': 'application/json'
+    }
+  });
+  
+  if (!response.ok) {
+    if (response.status === 401) {
+      throw new Error('Unauthorized');
+    }
+    throw new Error('Failed to fetch ratings');
+  }
+  
+  return response.json();
+}
+
 export function useRatings(options: UseRatingsOptions = {}) {
   const { enabled = true } = options;
   const { tokens } = useAuthStore();
   const { socket } = useSocketStore();
-  const [ratings, setRatings] = useState<Rating[]>([]);
-  const [fullRatings, setFullRatings] = useState<Rating[]>([]);
-  const [loading, setLoading] = useState(!enabled);
-  const [error, setError] = useState<string | null>(null);
+  const queryClient = useQueryClient();
+  
+  // Local filter state
+  const [filteredRatings, setFilteredRatings] = useState<Rating[]>([]);
 
-  const fetchRatings = async () => {
-    try {
-      setLoading(true);
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/ratings`, {
-        headers: {
-          'Authorization': `Bearer ${tokens?.accessToken}`,
-          'Content-Type': 'application/json'
-        }
-      });
-      if (response.ok) {
-        const data = await response.json();
-        setFullRatings(data.ratings);
-        setRatings(data.ratings);
-        setError(null);
-      } else if (response.status === 401) {
-        setError('Unauthorized');
-      } else {
-        setError('Failed to fetch ratings');
-      }
-    } catch (err) {
-      setError('Error fetching ratings');
-      console.error('Error fetching ratings:', err);
-    } finally {
-      setLoading(false);
+  // Use React Query for data fetching with caching
+  const { data, isLoading: loading, error, refetch } = useQuery({
+    queryKey: QUERY_KEY,
+    queryFn: () => fetchRatings(tokens?.accessToken),
+    enabled: enabled && !!tokens?.accessToken,
+    staleTime: 1000 * 60 * 5, // 5 minutes
+    gcTime: 1000 * 60 * 10, // 10 minutes
+    refetchOnMount: false, // Don't refetch when component mounts
+    refetchOnWindowFocus: false, // Don't refetch when window regains focus
+    throwOnError: false,
+  });
+
+  const fullRatings = data?.ratings || [];
+  const ratings = filteredRatings.length > 0 ? filteredRatings : fullRatings;
+
+  // Update filtered ratings when data changes
+  useEffect(() => {
+    if (fullRatings.length > 0 && filteredRatings.length === 0) {
+      setFilteredRatings(fullRatings);
     }
-  };
+  }, [fullRatings]);
 
-  const createRating = async (formData: any) => {
-    try {
+  // Mutation for creating rating
+  const createMutation = useMutation({
+    mutationFn: async (formData: any) => {
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/ratings`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
       });
 
-      if (response.ok) {
-        await fetchRatings(); // Refresh the list
-        return { success: true };
-      } else {
+      if (!response.ok) {
         const errorData = await response.json();
-        return { success: false, error: errorData.message || 'Error creating rating' };
+        throw new Error(errorData.message || 'Error creating rating');
       }
-    } catch (err) {
-      console.error('Error creating rating:', err);
-      return { success: false, error: 'Error creating rating' };
-    }
-  };
+      
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: QUERY_KEY });
+    },
+  });
 
-  const updateRating = async (id: number, formData: any) => {
-    try {
+  // Mutation for updating rating
+  const updateMutation = useMutation({
+    mutationFn: async ({ id, formData }: { id: number; formData: any }) => {
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/ratings/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
       });
 
-      if (response.ok) {
-        setRatings(ratings.map(r => r.id === id ? { ...r, ...formData } : r));
-        setFullRatings(fullRatings.map(r => r.id === id ? { ...r, ...formData } : r));
-        return { success: true };
-      } else {
+      if (!response.ok) {
         const errorData = await response.json();
-        return { success: false, error: errorData.message || 'Error updating rating' };
+        throw new Error(errorData.message || 'Error updating rating');
       }
-    } catch (err) {
-      console.error('Error updating rating:', err);
-      return { success: false, error: 'Error updating rating' };
-    }
-  };
+      
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: QUERY_KEY });
+    },
+  });
 
-  const deleteRating = async (id: number) => {
-    try {
+  // Mutation for deleting rating
+  const deleteMutation = useMutation({
+    mutationFn: async (id: number) => {
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/ratings/${id}`, {
         method: 'DELETE',
         headers: {
@@ -108,16 +124,82 @@ export function useRatings(options: UseRatingsOptions = {}) {
         },
       });
 
-      if (response.ok) {
-        setRatings(ratings.filter(r => r.id !== id));
-        setFullRatings(fullRatings.filter(r => r.id !== id));
-        return { success: true };
-      } else {
-        return { success: false, error: 'Error deleting rating' };
+      if (!response.ok) {
+        throw new Error('Error deleting rating');
       }
-    } catch (err) {
-      console.error('Error deleting rating:', err);
-      return { success: false, error: 'Error deleting rating' };
+      
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: QUERY_KEY });
+    },
+  });
+
+  // Real-time updates via socket - update cache directly
+  useEffect(() => {
+    if (!socket) return;
+
+    const handleRatingCreated = (data: any) => {
+      queryClient.setQueryData<{ ratings: Rating[] }>(QUERY_KEY, (old) => {
+        if (!old) return { ratings: [data.rating] };
+        return { ratings: [data.rating, ...old.ratings] };
+      });
+    };
+
+    const handleRatingUpdated = (data: any) => {
+      queryClient.setQueryData<{ ratings: Rating[] }>(QUERY_KEY, (old) => {
+        if (!old) return old;
+        return {
+          ratings: old.ratings.map(r => r.id === data.rating.id ? data.rating : r)
+        };
+      });
+    };
+
+    const handleRatingDeleted = (data: any) => {
+      queryClient.setQueryData<{ ratings: Rating[] }>(QUERY_KEY, (old) => {
+        if (!old) return old;
+        return {
+          ratings: old.ratings.filter(r => r.id !== data.ratingId)
+        };
+      });
+    };
+
+    socket.on('ratingCreated', handleRatingCreated);
+    socket.on('ratingUpdated', handleRatingUpdated);
+    socket.on('ratingDeleted', handleRatingDeleted);
+
+    return () => {
+      socket.off('ratingCreated', handleRatingCreated);
+      socket.off('ratingUpdated', handleRatingUpdated);
+      socket.off('ratingDeleted', handleRatingDeleted);
+    };
+  }, [socket, queryClient]);
+
+  // Wrapper functions for compatibility
+  const createRating = async (formData: any) => {
+    try {
+      await createMutation.mutateAsync(formData);
+      return { success: true };
+    } catch (err: any) {
+      return { success: false, error: err.message };
+    }
+  };
+
+  const updateRating = async (id: number, formData: any) => {
+    try {
+      await updateMutation.mutateAsync({ id, formData });
+      return { success: true };
+    } catch (err: any) {
+      return { success: false, error: err.message };
+    }
+  };
+
+  const deleteRating = async (id: number) => {
+    try {
+      await deleteMutation.mutateAsync(id);
+      return { success: true };
+    } catch (err: any) {
+      return { success: false, error: err.message };
     }
   };
 
@@ -136,8 +218,7 @@ export function useRatings(options: UseRatingsOptions = {}) {
       const successfulDeletes = results.filter(response => response.ok).length;
 
       if (successfulDeletes > 0) {
-        setRatings(ratings.filter(r => !ratingIds.includes(r.id)));
-        setFullRatings(fullRatings.filter(r => !ratingIds.includes(r.id)));
+        queryClient.invalidateQueries({ queryKey: QUERY_KEY });
         return { success: true, deletedCount: successfulDeletes };
       } else {
         return { success: false, error: 'Error deleting ratings' };
@@ -150,65 +231,23 @@ export function useRatings(options: UseRatingsOptions = {}) {
 
   const filterRatings = (futsalId: string) => {
     if (futsalId === '') {
-      setRatings(fullRatings);
+      setFilteredRatings(fullRatings);
     } else {
       const filtered = fullRatings.filter(rating => rating.futsal_id.toString() === futsalId);
-      setRatings(filtered);
+      setFilteredRatings(filtered);
     }
   };
-
-  useEffect(() => {
-    if (enabled && tokens?.accessToken) {
-      fetchRatings();
-    } else if (!enabled) {
-      // Reset state when disabled
-      setRatings([]);
-      setFullRatings([]);
-      setLoading(false);
-      setError(null);
-    }
-  }, [enabled, tokens?.accessToken]);
-
-  // Real-time updates via socket
-  useEffect(() => {
-    if (!socket) return;
-
-    const handleRatingCreated = (data: any) => {
-      setRatings(prev => [data.rating, ...prev]);
-      setFullRatings(prev => [data.rating, ...prev]);
-    };
-
-    const handleRatingUpdated = (data: any) => {
-      setRatings(prev => prev.map(r => r.id === data.rating.id ? data.rating : r));
-      setFullRatings(prev => prev.map(r => r.id === data.rating.id ? data.rating : r));
-    };
-
-    const handleRatingDeleted = (data: any) => {
-      setRatings(prev => prev.filter(r => r.id !== data.ratingId));
-      setFullRatings(prev => prev.filter(r => r.id !== data.ratingId));
-    };
-
-    socket.on('ratingCreated', handleRatingCreated);
-    socket.on('ratingUpdated', handleRatingUpdated);
-    socket.on('ratingDeleted', handleRatingDeleted);
-
-    return () => {
-      socket.off('ratingCreated', handleRatingCreated);
-      socket.off('ratingUpdated', handleRatingUpdated);
-      socket.off('ratingDeleted', handleRatingDeleted);
-    };
-  }, [socket]);
 
   return {
     ratings,
     fullRatings,
     loading,
-    error,
+    error: error as Error | null,
     createRating,
     updateRating,
     deleteRating,
     bulkDelete,
     filterRatings,
-    refetch: fetchRatings
+    refetch
   };
 }

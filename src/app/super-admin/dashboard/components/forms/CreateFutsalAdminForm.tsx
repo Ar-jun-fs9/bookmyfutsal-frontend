@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useFutsals } from '../../hooks/useFutsals';
 
 interface Futsal {
   futsal_id: number;
@@ -8,13 +9,27 @@ interface Futsal {
 }
 
 interface CreateFutsalAdminFormProps {
-  futsals: Futsal[];
+  futsals?: Futsal[];
   superAdminId: number;
   setNotification: React.Dispatch<React.SetStateAction<{message: string, type: 'success' | 'info'} | null>>;
   onSuccess: () => void;
 }
 
-export function CreateFutsalAdminForm({ futsals, superAdminId, setNotification, onSuccess }: CreateFutsalAdminFormProps) {
+export function CreateFutsalAdminForm({ futsals: propFutsals, superAdminId, setNotification, onSuccess }: CreateFutsalAdminFormProps) {
+  // Fetch futsals if not provided via props
+  const { futsals: fetchedFutsals, loading: futsalsLoading } = useFutsals({ enabled: !propFutsals || propFutsals.length === 0 });
+  const futsals = propFutsals && propFutsals.length > 0 ? propFutsals : fetchedFutsals;
+
+  // Show loading while futsals are being fetched
+  if (futsalsLoading && (!propFutsals || propFutsals.length === 0)) {
+    return (
+      <div className="border rounded-lg p-6 bg-white">
+        <h3 className="text-lg font-semibold mb-4">Create Futsal Admin</h3>
+        <p className="text-gray-500">Loading futsals...</p>
+      </div>
+    );
+  }
+
   const [formData, setFormData] = useState({
     futsal_name: '',
     location: '',

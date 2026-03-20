@@ -19,7 +19,6 @@ import { CreateFutsalForm } from './components/forms/CreateFutsalForm';
 import { CreateFutsalAdminForm } from './components/forms/CreateFutsalAdminForm';
 import { ConfirmModal } from './components/modals/ConfirmModal';
 import { NotificationModal } from './components/modals/NotificationModal';
-import { useFutsals } from './hooks/useFutsals';
 
 interface User {
   id: number;
@@ -28,12 +27,12 @@ interface User {
 }
 
 export default function SuperAdminDashboard() {
-  const { hydrated, tokens } = useAuthStore();
-  // Only fetch futsals when CreateFutsalAdminForm is shown
+  const { hydrated } = useAuthStore();
   const [showCreateAdmin, setShowCreateAdmin] = useState(false);
-  const { futsals } = useFutsals({ enabled: showCreateAdmin });
+  // Don't fetch futsals here - child components will fetch via React Query when needed
+  // CreateFutsalAdminForm will get futsals from AdminSection or fetch its own
+  const [futsals, setFutsals] = useState<any[]>([]);
   const [user, setUser] = useState<User | null>(null);
-  const [futsalAdmins, setFutsalAdmins] = useState<any[]>([]);
   const [showCreateFutsal, setShowCreateFutsal] = useState(false);
   const [showBookings, setShowBookings] = useState(false);
   const [showSlots, setShowSlots] = useState(false);
@@ -49,31 +48,11 @@ export default function SuperAdminDashboard() {
   const [confirmModal, setConfirmModal] = useState<{ isOpen: boolean, message: string, onConfirm: () => void }>({ isOpen: false, message: '', onConfirm: () => {} });
   const router = useRouter();
 
-  const fetchFutsalAdmins = async () => {
-    try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/futsal-admins`, {
-        headers: {
-          'Authorization': `Bearer ${tokens?.accessToken}`,
-          'Content-Type': 'application/json'
-        }
-      });
-      if (response.ok) {
-        const data = await response.json();
-        setFutsalAdmins(data);
-      } else if (response.status === 401) {
-        router.push('/super-admin/signin');
-      }
-    } catch (error) {
-      console.error('Error fetching futsal admins:', error);
-    }
-  };
-
   useEffect(() => {
     if (hydrated) {
       const storedUser = sessionStorage.getItem('superadmin');
       if (storedUser) {
         setUser(JSON.parse(storedUser));
-        fetchFutsalAdmins();
       } else {
         router.push('/super-admin/signin');
       }
@@ -166,7 +145,7 @@ export default function SuperAdminDashboard() {
               
             </div>
             {showCreateFutsal && <CreateFutsalForm onSuccess={() => {}} setNotification={setNotification} />}
-            {showCreateAdmin && <CreateFutsalAdminForm futsals={futsals} superAdminId={user?.id || 0} setNotification={setNotification} onSuccess={fetchFutsalAdmins} />}
+            {showCreateAdmin && <CreateFutsalAdminForm futsals={futsals} superAdminId={user?.id || 0} setNotification={setNotification} onSuccess={() => {}} />}
             <SlotSection isVisible={showSlots} onToggle={() => setShowSlots(!showSlots)} />
             <FutsalSection isVisible={showFutsals} onToggle={() => setShowFutsals(!showFutsals)} />
             <AdminSection superAdminId={user?.id || 0} isVisible={showAdmins} onToggle={() => setShowAdmins(!showAdmins)} />

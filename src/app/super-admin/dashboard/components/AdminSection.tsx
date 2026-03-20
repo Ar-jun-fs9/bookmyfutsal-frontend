@@ -24,8 +24,8 @@ interface AdminSectionProps {
 
 export function AdminSection({ futsals: propFutsals, superAdminId, isVisible, onToggle }: AdminSectionProps) {
   const { tokens } = useAuthStore();
-  // Fetch futsals when section is visible
-  const { futsals: fetchedFutsals } = useFutsals({ enabled: isVisible });
+  // Only fetch futsals if not provided via props
+  const { futsals: fetchedFutsals } = useFutsals({ enabled: isVisible && !propFutsals });
   // Use prop futsals if provided, otherwise use fetched futsals
   const futsals = propFutsals || fetchedFutsals || [];
   const { admins, loading, error, deleteAdmin, bulkDelete, blockAdmin, unblockAdmin, refetch } = useFutsalAdmins({ enabled: isVisible });

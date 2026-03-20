@@ -1,7 +1,8 @@
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuthStore } from '@/stores/authStore';
 import { useSocketStore } from '@/stores/socketStore';
+import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
 
 interface UseUsersOptions {
   enabled?: boolean;
@@ -29,65 +30,83 @@ interface BlockedUser {
   reason: string;
 }
 
+const USERS_QUERY_KEY = ['users'];
+const BLOCKED_USERS_QUERY_KEY = ['users', 'blocked'];
+
+async function fetchUsers(accessToken?: string): Promise<{ users: User[] }> {
+  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/users`, {
+    headers: {
+      'Authorization': `Bearer ${accessToken}`,
+      'Content-Type': 'application/json'
+    }
+  });
+  
+  if (!response.ok) {
+    if (response.status === 401) {
+      throw new Error('Unauthorized');
+    }
+    throw new Error('Failed to fetch users');
+  }
+  
+  return response.json();
+}
+
+async function fetchBlockedUsers(accessToken?: string): Promise<{ blocked_users: BlockedUser[] }> {
+  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/users/blocked/list`, {
+    headers: {
+      'Authorization': `Bearer ${accessToken}`,
+      'Content-Type': 'application/json'
+    }
+  });
+  
+  if (!response.ok) {
+    if (response.status === 401) {
+      throw new Error('Unauthorized');
+    }
+    throw new Error('Failed to fetch blocked users');
+  }
+  
+  return response.json();
+}
+
 export function useUsers(options: UseUsersOptions = {}) {
   const { enabled = true } = options;
   const { hydrated, tokens } = useAuthStore();
   const { socket } = useSocketStore();
   const router = useRouter();
-  const [users, setUsers] = useState<User[]>([]);
-  const [blockedUsers, setBlockedUsers] = useState<BlockedUser[]>([]);
-  const [loading, setLoading] = useState(!enabled);
-  const [error, setError] = useState<string | null>(null);
+  const queryClient = useQueryClient();
 
-  const fetchUsers = async () => {
-    try {
-      setLoading(true);
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/users`, {
-        headers: {
-          'Authorization': `Bearer ${tokens?.accessToken}`,
-          'Content-Type': 'application/json'
-        }
-      });
-      if (response.ok) {
-        const data = await response.json();
-        setUsers(data.users);
-        setError(null);
-      } else if (response.status === 401) {
-        // Token expired or invalid, redirect to login
-        router.push('/super-admin/signin');
-      } else {
-        setError('Failed to fetch users');
-      }
-    } catch (err) {
-      setError('Error fetching users');
-      console.error('Error fetching users:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
+  // Use React Query for data fetching with caching
+  const { data: usersData, isLoading: usersLoading, error: usersError, refetch: refetchUsers } = useQuery({
+    queryKey: USERS_QUERY_KEY,
+    queryFn: () => fetchUsers(tokens?.accessToken),
+    enabled: enabled && !!tokens?.accessToken,
+    staleTime: 1000 * 60 * 5, // 5 minutes
+    gcTime: 1000 * 60 * 10, // 10 minutes
+    refetchOnMount: false, // Don't refetch when component mounts
+    refetchOnWindowFocus: false, // Don't refetch when window regains focus
+    throwOnError: false,
+  });
 
-  const fetchBlockedUsers = async () => {
-    try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/users/blocked/list`, {
-        headers: {
-          'Authorization': `Bearer ${tokens?.accessToken}`,
-          'Content-Type': 'application/json'
-        }
-      });
-      if (response.ok) {
-        const data = await response.json();
-        setBlockedUsers(data.blocked_users);
-      } else if (response.status === 401) {
-        // Token expired or invalid, redirect to login
-        router.push('/super-admin/signin');
-      }
-    } catch (err) {
-      console.error('Error fetching blocked users:', err);
-    }
-  };
+  const { data: blockedData, isLoading: blockedLoading, refetch: refetchBlockedUsers } = useQuery({
+    queryKey: BLOCKED_USERS_QUERY_KEY,
+    queryFn: () => fetchBlockedUsers(tokens?.accessToken),
+    enabled: enabled && !!tokens?.accessToken,
+    staleTime: 1000 * 60 * 5, // 5 minutes
+    gcTime: 1000 * 60 * 10, // 10 minutes
+    refetchOnMount: false, // Don't refetch when component mounts
+    refetchOnWindowFocus: false, // Don't refetch when window regains focus
+    throwOnError: false,
+  });
 
-  const updateUser = async (id: number, formData: any) => {
-    try {
+  const users = usersData?.users || [];
+  const blockedUsers = blockedData?.blocked_users || [];
+  const loading = usersLoading || blockedLoading;
+  const error = usersError as Error | null;
+
+  // Mutation for updating user
+  const updateMutation = useMutation({
+    mutationFn: async ({ id, formData }: { id: number; formData: any }) => {
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/users/${id}`, {
         method: 'PUT',
         headers: {
@@ -97,21 +116,21 @@ export function useUsers(options: UseUsersOptions = {}) {
         body: JSON.stringify(formData),
       });
 
-      if (response.ok) {
-        await fetchUsers(); // Refresh the list
-        return { success: true };
-      } else {
+      if (!response.ok) {
         const errorData = await response.json();
-        return { success: false, error: errorData.message || 'Error updating user' };
+        throw new Error(errorData.message || 'Error updating user');
       }
-    } catch (err) {
-      console.error('Error updating user:', err);
-      return { success: false, error: 'Error updating user' };
-    }
-  };
+      
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: USERS_QUERY_KEY });
+    },
+  });
 
-  const deleteUser = async (id: number) => {
-    try {
+  // Mutation for deleting user
+  const deleteMutation = useMutation({
+    mutationFn: async (id: number) => {
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/users/${id}`, {
         method: 'DELETE',
         headers: {
@@ -119,15 +138,138 @@ export function useUsers(options: UseUsersOptions = {}) {
         },
       });
 
-      if (response.ok) {
-        setUsers(users.filter(u => u.user_id !== id));
-        return { success: true };
-      } else {
-        return { success: false, error: 'Error deleting user' };
+      if (!response.ok) {
+        throw new Error('Error deleting user');
       }
-    } catch (err) {
-      console.error('Error deleting user:', err);
-      return { success: false, error: 'Error deleting user' };
+      
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: USERS_QUERY_KEY });
+    },
+  });
+
+  // Mutation for blocking user
+  const blockMutation = useMutation({
+    mutationFn: async ({ userId, reason }: { userId: number; reason: string }) => {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/users/${userId}/block`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${tokens?.accessToken}`,
+        },
+        body: JSON.stringify({ reason }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Error blocking user');
+      }
+      
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: USERS_QUERY_KEY });
+      queryClient.invalidateQueries({ queryKey: BLOCKED_USERS_QUERY_KEY });
+    },
+  });
+
+  // Mutation for unblocking user
+  const unblockMutation = useMutation({
+    mutationFn: async (userId: number) => {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/users/${userId}/unblock`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${tokens?.accessToken}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Error unblocking user');
+      }
+      
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: USERS_QUERY_KEY });
+      queryClient.invalidateQueries({ queryKey: BLOCKED_USERS_QUERY_KEY });
+    },
+  });
+
+  // Real-time updates via socket - update cache directly
+  useEffect(() => {
+    if (!socket) return;
+
+    const handleUserCreated = (data: any) => {
+      queryClient.setQueryData<{ users: User[] }>(USERS_QUERY_KEY, (old) => {
+        if (!old) return { users: [data.user] };
+        return { users: [data.user, ...old.users] };
+      });
+    };
+
+    const handleUserUpdated = (data: any) => {
+      queryClient.setQueryData<{ users: User[] }>(USERS_QUERY_KEY, (old) => {
+        if (!old) return old;
+        return {
+          users: old.users.map(u => u.user_id === data.user.user_id ? data.user : u)
+        };
+      });
+    };
+
+    const handleUserDeleted = (data: any) => {
+      queryClient.setQueryData<{ users: User[] }>(USERS_QUERY_KEY, (old) => {
+        if (!old) return old;
+        return {
+          users: old.users.filter(u => u.user_id !== data.userId)
+        };
+      });
+    };
+
+    const handleUserBlocked = () => {
+      queryClient.invalidateQueries({ queryKey: BLOCKED_USERS_QUERY_KEY });
+      queryClient.invalidateQueries({ queryKey: USERS_QUERY_KEY });
+    };
+
+    const handleUserUnblocked = (data: any) => {
+      queryClient.setQueryData<{ blocked_users: BlockedUser[] }>(BLOCKED_USERS_QUERY_KEY, (old) => {
+        if (!old) return old;
+        return {
+          blocked_users: old.blocked_users.filter(u => u.user_id !== data.userId)
+        };
+      });
+      queryClient.invalidateQueries({ queryKey: USERS_QUERY_KEY });
+    };
+
+    socket.on('userCreated', handleUserCreated);
+    socket.on('userUpdated', handleUserUpdated);
+    socket.on('userDeleted', handleUserDeleted);
+    socket.on('userBlocked', handleUserBlocked);
+    socket.on('userUnblocked', handleUserUnblocked);
+
+    return () => {
+      socket.off('userCreated', handleUserCreated);
+      socket.off('userUpdated', handleUserUpdated);
+      socket.off('userDeleted', handleUserDeleted);
+      socket.off('userBlocked', handleUserBlocked);
+      socket.off('userUnblocked', handleUserUnblocked);
+    };
+  }, [socket, queryClient]);
+
+  // Wrapper functions for compatibility
+  const updateUser = async (id: number, formData: any) => {
+    try {
+      await updateMutation.mutateAsync({ id, formData });
+      return { success: true };
+    } catch (err: any) {
+      return { success: false, error: err.message };
+    }
+  };
+
+  const deleteUser = async (id: number) => {
+    try {
+      await deleteMutation.mutateAsync(id);
+      return { success: true };
+    } catch (err: any) {
+      return { success: false, error: err.message };
     }
   };
 
@@ -146,7 +288,7 @@ export function useUsers(options: UseUsersOptions = {}) {
       const successfulDeletes = results.filter(response => response.ok).length;
 
       if (successfulDeletes > 0) {
-        setUsers(users.filter(u => !userIds.includes(u.user_id)));
+        queryClient.invalidateQueries({ queryKey: USERS_QUERY_KEY });
         return { success: true, deletedCount: successfulDeletes };
       } else {
         return { success: false, error: 'Error deleting users' };
@@ -159,48 +301,19 @@ export function useUsers(options: UseUsersOptions = {}) {
 
   const blockUser = async (userId: number, reason: string) => {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/users/${userId}/block`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${tokens?.accessToken}`,
-        },
-        body: JSON.stringify({ reason }),
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        await fetchUsers();
-        await fetchBlockedUsers();
-        return { success: true, blockedUntil: data.blocked_until };
-      } else {
-        return { success: false, error: 'Error blocking user' };
-      }
-    } catch (err) {
-      console.error('Error blocking user:', err);
-      return { success: false, error: 'Error blocking user' };
+      await blockMutation.mutateAsync({ userId, reason });
+      return { success: true };
+    } catch (err: any) {
+      return { success: false, error: err.message };
     }
   };
 
   const unblockUser = async (userId: number) => {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/users/${userId}/unblock`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${tokens?.accessToken}`,
-        },
-      });
-
-      if (response.ok) {
-        setBlockedUsers(blockedUsers.filter(u => u.user_id !== userId));
-        await fetchUsers(); // Refresh users list
-        return { success: true };
-      } else {
-        return { success: false, error: 'Error unblocking user' };
-      }
-    } catch (err) {
-      console.error('Error unblocking user:', err);
-      return { success: false, error: 'Error unblocking user' };
+      await unblockMutation.mutateAsync(userId);
+      return { success: true };
+    } catch (err: any) {
+      return { success: false, error: err.message };
     }
   };
 
@@ -219,8 +332,8 @@ export function useUsers(options: UseUsersOptions = {}) {
       const successfulUnblocks = results.filter(response => response.ok).length;
 
       if (successfulUnblocks > 0) {
-        setBlockedUsers(blockedUsers.filter(u => !userIds.includes(u.user_id)));
-        await fetchUsers(); // Refresh users list
+        queryClient.invalidateQueries({ queryKey: BLOCKED_USERS_QUERY_KEY });
+        queryClient.invalidateQueries({ queryKey: USERS_QUERY_KEY });
         return { success: true, unblockedCount: successfulUnblocks };
       } else {
         return { success: false, error: 'Error unblocking users' };
@@ -230,68 +343,6 @@ export function useUsers(options: UseUsersOptions = {}) {
       return { success: false, error: 'Error unblocking users' };
     }
   };
-
-  useEffect(() => {
-    if (!enabled) {
-      // Reset state when disabled
-      setUsers([]);
-      setBlockedUsers([]);
-      setLoading(false);
-      setError(null);
-      return;
-    }
-    
-    if (hydrated) {
-      const storedUser = sessionStorage.getItem('superadmin');
-      if (storedUser) {
-        fetchUsers();
-        fetchBlockedUsers();
-      } else {
-        router.push('/super-admin/signin');
-      }
-    }
-  }, [enabled, hydrated, router]);
-
-  // Real-time updates via socket
-  useEffect(() => {
-    if (!socket) return;
-
-    const handleUserCreated = (data: any) => {
-      setUsers(prev => [data.user, ...prev]);
-    };
-
-    const handleUserUpdated = (data: any) => {
-      setUsers(prev => prev.map(u => u.user_id === data.user.user_id ? data.user : u));
-    };
-
-    const handleUserDeleted = (data: any) => {
-      setUsers(prev => prev.filter(u => u.user_id !== data.userId));
-    };
-
-    const handleUserBlocked = (data: any) => {
-      fetchBlockedUsers();
-      fetchUsers();
-    };
-
-    const handleUserUnblocked = (data: any) => {
-      setBlockedUsers(prev => prev.filter(u => u.user_id !== data.userId));
-      fetchUsers();
-    };
-
-    socket.on('userCreated', handleUserCreated);
-    socket.on('userUpdated', handleUserUpdated);
-    socket.on('userDeleted', handleUserDeleted);
-    socket.on('userBlocked', handleUserBlocked);
-    socket.on('userUnblocked', handleUserUnblocked);
-
-    return () => {
-      socket.off('userCreated', handleUserCreated);
-      socket.off('userUpdated', handleUserUpdated);
-      socket.off('userDeleted', handleUserDeleted);
-      socket.off('userBlocked', handleUserBlocked);
-      socket.off('userUnblocked', handleUserUnblocked);
-    };
-  }, [socket]);
 
   return {
     users,
@@ -304,7 +355,7 @@ export function useUsers(options: UseUsersOptions = {}) {
     blockUser,
     unblockUser,
     bulkUnblock,
-    refetchUsers: fetchUsers,
-    refetchBlockedUsers: fetchBlockedUsers
+    refetchUsers,
+    refetchBlockedUsers
   };
 }

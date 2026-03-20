@@ -1,22 +1,92 @@
 import { useState, useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { useSlots } from '../hooks/useSlots';
 import { useFutsals } from '../hooks/useFutsals';
 import { ConfirmModal } from './modals/ConfirmModal';
 import { NotificationModal } from './modals/NotificationModal';
 import SlotLoading from '@/components/venues/SlotLoading';
+import { useAuthStore } from '@/stores/authStore';
 
 interface SlotSectionProps {
   isVisible: boolean;
   onToggle: () => void;
 }
 
+interface Slot {
+  slot_id: number;
+  futsal_id: number;
+  futsal_name?: string;
+  slot_date: string;
+  start_time: string;
+  end_time: string;
+  status: 'available' | 'disabled' | 'booked';
+  display_status?: 'available' | 'disabled' | 'booked' | 'expired';
+  shift_category: string;
+  booker_name?: string;
+}
+
+// Fetch slots for a single futsal
+async function fetchSlotsForFutsal(accessToken: string | undefined, futsalId: number, date: string, futsalName?: string) {
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_API_URL}/api/time-slots/admin/futsal/${futsalId}/date/${date}`, 
+    {
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+        'Content-Type': 'application/json'
+      }
+    }
+  );
+  if (!response.ok) throw new Error('Failed to fetch slots');
+  const data = await response.json();
+  return data.slots.map((slot: any) => ({ ...slot, futsal_name: futsalName || 'Unknown Futsal' }));
+}
+
+// Fetch slots for all futsals
+async function fetchAllFutsalsSlots(accessToken: string | undefined, futsals: any[], date: string) {
+  if (!futsals.length || !accessToken) return [];
+  const results = await Promise.all(
+    futsals.map(futsal => 
+      fetchSlotsForFutsal(accessToken, futsal.futsal_id, date, futsal.name)
+        .catch(() => [])
+    )
+  );
+  return results.flat();
+}
+
+const createSlotsQueryKey = (futsalId: number | null, date: string) => 
+  futsalId ? ['slots', futsalId, date] : ['slots', 'all', date];
+
 export function SlotSection({ isVisible, onToggle }: SlotSectionProps) {
+  const { tokens } = useAuthStore();
   const { futsals } = useFutsals({ enabled: isVisible });
-  const { slots, loading, updateSlotStatus, bulkUpdateSlots, fetchSlots, fetchAllSlots } = useSlots();
+  const { updateSlotStatus, bulkUpdateSlots } = useSlots();
   const [selectedFutsal, setSelectedFutsal] = useState<number | null>(null);
   const [slotDate, setSlotDate] = useState(new Date().toLocaleDateString('en-CA'));
   const [notification, setNotification] = useState<{ message: string, type: 'success' | 'info' } | null>(null);
   const [confirmModal, setConfirmModal] = useState<{ isOpen: boolean, message: string, onConfirm: () => void }>({ isOpen: false, message: '', onConfirm: () => { } });
+
+  // Query key based on selection
+  const queryKey = selectedFutsal 
+    ? createSlotsQueryKey(selectedFutsal, slotDate) 
+    : createSlotsQueryKey(null, slotDate);
+
+  // Use React Query to fetch and cache slots
+  const { data: slots = [], isLoading: loading, refetch } = useQuery<Slot[]>({
+    queryKey,
+    queryFn: () => {
+      if (selectedFutsal) {
+        const futsalName = futsals.find(f => f.futsal_id === selectedFutsal)?.name;
+        return fetchSlotsForFutsal(tokens?.accessToken, selectedFutsal, slotDate, futsalName);
+      } else {
+        return fetchAllFutsalsSlots(tokens?.accessToken, futsals, slotDate);
+      }
+    },
+    enabled: isVisible && !!tokens?.accessToken && (!!selectedFutsal || futsals.length > 0),
+    staleTime: 1000 * 60 * 2, // 2 minutes
+    gcTime: 1000 * 60 * 5, // 5 minutes
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
+  });
 
   // Auto-hide notifications after 2 seconds
   useEffect(() => {
@@ -27,17 +97,6 @@ export function SlotSection({ isVisible, onToggle }: SlotSectionProps) {
       return () => clearTimeout(timer);
     }
   }, [notification]);
-
-  // Auto-fetch slots when futsal or date changes
-  useEffect(() => {
-    if (isVisible) {
-      if (selectedFutsal) {
-        fetchSlots(selectedFutsal, slotDate, futsals);
-      } else {
-        fetchAllSlots(futsals, slotDate);
-      }
-    }
-  }, [selectedFutsal, slotDate, isVisible, futsals]);
 
   const toggleSlotStatus = async (slotId: number, currentStatus: string) => {
     if (currentStatus === 'booked') {
@@ -54,8 +113,8 @@ export function SlotSection({ isVisible, onToggle }: SlotSectionProps) {
   };
 
   const closeAllSlots = () => {
-    const availableSlots = slots.filter(slot => slot.status === 'available').length;
-    const disabledSlots = slots.filter(slot => slot.status === 'disabled').length;
+    const availableSlots = slots.filter((slot: Slot) => slot.status === 'available').length;
+    const disabledSlots = slots.filter((slot: Slot) => slot.status === 'disabled').length;
     const shouldClose = availableSlots > disabledSlots;
 
     const action = shouldClose ? 'close' : 'open';
@@ -70,7 +129,7 @@ export function SlotSection({ isVisible, onToggle }: SlotSectionProps) {
         setConfirmModal({ isOpen: false, message: '', onConfirm: () => { } });
         const result = await bulkUpdateSlots(selectedFutsal, slotDate, action as 'close' | 'open', futsals);
         if (result.success) {
-          setNotification({ message: `${result.updatedSlots} slots ${action}d successfully`, type: 'success' });
+          setNotification({ message: `Slots ${action}ed successfully`, type: 'success' });
         } else {
           setNotification({ message: result.error || `Error ${action}ing slots`, type: 'info' });
         }
@@ -105,14 +164,14 @@ export function SlotSection({ isVisible, onToggle }: SlotSectionProps) {
           <button
             onClick={closeAllSlots}
             className={`${(() => {
-              const availableSlots = slots.filter(slot => slot.status === 'available').length;
-              const disabledSlots = slots.filter(slot => slot.status === 'disabled').length;
+              const availableSlots = slots.filter((slot: Slot) => slot.status === 'available').length;
+              const disabledSlots = slots.filter((slot: Slot) => slot.status === 'disabled').length;
               return availableSlots > disabledSlots ? 'bg-red-600 hover:bg-red-700' : 'bg-green-600 hover:bg-green-700';
             })()} text-white px-4 py-2 rounded`}
           >
             {(() => {
-              const availableSlots = slots.filter(slot => slot.status === 'available').length;
-              const disabledSlots = slots.filter(slot => slot.status === 'disabled').length;
+              const availableSlots = slots.filter((slot: Slot) => slot.status === 'available').length;
+              const disabledSlots = slots.filter((slot: Slot) => slot.status === 'disabled').length;
               return availableSlots > disabledSlots ? (selectedFutsal ? 'Close All' : 'Close All ') : (selectedFutsal ? 'Open All ' : 'Open All ');
             })()}
           </button>
@@ -161,18 +220,18 @@ export function SlotSection({ isVisible, onToggle }: SlotSectionProps) {
         <>
           {/* Group slots by futsal and date */}
           {Object.entries(
-        slots.reduce((acc: Record<string, any[]>, slot: any) => {
+        slots.reduce((acc: Record<string, Slot[]>, slot: Slot) => {
           const formattedDate = new Date(slot.slot_date).toLocaleDateString('en-CA');
           const key = `${slot.futsal_name || 'Unknown Futsal'} - ${formattedDate}`;
           if (!acc[key]) acc[key] = [];
           acc[key].push(slot);
           return acc;
-        }, {} as Record<string, any[]>)
+        }, {} as Record<string, Slot[]>)
       ).map(([futsalDate, futsalSlots]) => (
         <div key={futsalDate} className="mb-6">
           <h4 className="text-lg font-semibold mb-3">{futsalDate}</h4>
           <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {futsalSlots.map((slot) => (
+            {futsalSlots.map((slot: Slot) => (
               <div
                 key={slot.slot_id}
                 className={`p-2 border rounded ${slot.display_status === 'booked'
