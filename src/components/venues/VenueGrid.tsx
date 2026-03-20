@@ -68,30 +68,38 @@ export default function VenueGrid() {
    // Fetch special prices for visible futsals only (lazy load)
    // =============================================================================
    // Only fetches when section becomes visible to reduce initial API calls
-   // Uses on-demand fetching when user scrolls to this section
+   // Uses BATCH endpoint to fetch all special prices in ONE request
+   // This reduces N+1 problem (18 requests) to just 1 request
    // =============================================================================
    useEffect(() => {
      if (!isVisible || futsals.length === 0) return;
 
      const fetchSpecialPrices = async () => {
-       const prices: {[key: number]: any[]} = {};
-       // Only fetch for first 20 futsals to avoid too many requests
-       const futsalsToFetch = futsals.slice(0, 20);
-       for (const futsal of futsalsToFetch) {
-         try {
-           const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/special-prices/${futsal.futsal_id}`);
-           if (response.ok) {
-             const data = await response.json();
-             prices[futsal.futsal_id] = data.specialPrices || [];
-             
-             // Store special prices in cache for DetailsModal
-             usePrefetchStore.getState().setSpecialPrices(futsal.futsal_id, data.specialPrices || []);
+       try {
+         // Only fetch for first 20 futsals to avoid rate limiting
+         const futsalsToFetch = futsals.slice(0, 20);
+         const futsalIds = futsalsToFetch.map((f: Futsal) => f.futsal_id).join(',');
+         
+         // Single batch request instead of N individual requests
+         const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/special-prices/batch?ids=${futsalIds}`);
+         if (response.ok) {
+           const data = await response.json();
+           const prices: {[key: number]: any[]} = {};
+           
+           // Process batch response - data.specialPrices is an object with futsal_id as keys
+           if (data.specialPrices) {
+             Object.entries(data.specialPrices).forEach(([futsalId, specialPrices]: [string, any]) => {
+               const id = parseInt(futsalId);
+               prices[id] = specialPrices || [];
+               // Cache each futsal's special prices
+               usePrefetchStore.getState().setSpecialPrices(id, specialPrices || []);
+             });
            }
-         } catch (error) {
-           console.error('Error fetching special prices for futsal', futsal.futsal_id, error);
+           setFutsalSpecialPrices(prices);
          }
+       } catch (error) {
+         console.error('Error fetching special prices:', error);
        }
-       setFutsalSpecialPrices(prices);
      };
 
      fetchSpecialPrices();
