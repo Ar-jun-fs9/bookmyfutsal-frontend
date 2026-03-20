@@ -14,7 +14,7 @@ interface BookingSectionProps {
 }
 
 export function BookingSection({ isVisible, onToggle }: BookingSectionProps) {
-  const { futsals } = useFutsals();
+  const { futsals } = useFutsals({ enabled: isVisible });
   const {
     filteredBookings,
     loading,
@@ -31,7 +31,7 @@ export function BookingSection({ isVisible, onToggle }: BookingSectionProps) {
     deleteBooking,
     cancelBooking,
     bulkDelete
-  } = useBookings();
+  } = useBookings({ enabled: isVisible });
   const { selectedItems, showCheckboxes, toggleSelection, toggleSelectAll, clearSelection, selectedCount } = useBulkOperations();
   const [editingBooking, setEditingBooking] = useState<any | null>(null);
   const [viewingOriginalBooking, setViewingOriginalBooking] = useState<any | null>(null);

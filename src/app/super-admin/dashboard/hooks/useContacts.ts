@@ -1,6 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useAuthStore } from '@/stores/authStore';
 
+interface UseContactsOptions {
+  enabled?: boolean;
+}
+
 interface Contact {
   id: number;
   name: string;
@@ -15,10 +19,11 @@ interface Contact {
   updated_at: string;
 }
 
-export function useContacts() {
+export function useContacts(options: UseContactsOptions = {}) {
+  const { enabled = true } = options;
   const { tokens } = useAuthStore();
   const [contacts, setContacts] = useState<Contact[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(!enabled);
   const [error, setError] = useState<string | null>(null);
 
   const fetchContacts = async () => {
@@ -92,10 +97,15 @@ export function useContacts() {
   };
 
   useEffect(() => {
-    if (tokens?.accessToken) {
+    if (enabled && tokens?.accessToken) {
       fetchContacts();
+    } else if (!enabled) {
+      // Reset state when disabled
+      setContacts([]);
+      setLoading(false);
+      setError(null);
     }
-  }, [tokens?.accessToken]);
+  }, [enabled, tokens?.accessToken]);
 
   return {
     contacts,

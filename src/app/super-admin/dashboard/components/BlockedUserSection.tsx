@@ -9,7 +9,7 @@ interface BlockedUserSectionProps {
 }
 
 export function BlockedUserSection({ isVisible, onToggle }: BlockedUserSectionProps) {
-  const { blockedUsers, unblockUser } = useUsers();
+  const { blockedUsers, unblockUser } = useUsers({ enabled: isVisible });
   const [notification, setNotification] = useState<{message: string, type: 'success' | 'info'} | null>(null);
   const [confirmModal, setConfirmModal] = useState<{isOpen: boolean, message: string, onConfirm: () => void}>({isOpen: false, message: '', onConfirm: () => {}});
 

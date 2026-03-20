@@ -13,8 +13,8 @@ interface RatingSectionProps {
 }
 
 export function RatingSection({ isVisible, onToggle }: RatingSectionProps) {
-  const { futsals } = useFutsals();
-  const { ratings, loading, deleteRating, bulkDelete, updateRating, filterRatings, refetch } = useRatings();
+  const { futsals } = useFutsals({ enabled: isVisible });
+  const { ratings, loading, deleteRating, bulkDelete, updateRating, filterRatings, refetch } = useRatings({ enabled: isVisible });
   const { selectedItems, showCheckboxes, toggleSelection, toggleSelectAll, clearSelection, selectedCount } = useBulkOperations();
   const [creatingRating, setCreatingRating] = useState(false);
   const [editingRating, setEditingRating] = useState<any | null>(null);

@@ -23,7 +23,7 @@ interface Contact {
 }
 
 export function ContactSection({ isVisible, onToggle }: ContactSectionProps) {
-  const { contacts, loading, deleteContact, markAsRead, refetch } = useContacts();
+  const { contacts, loading, deleteContact, markAsRead, refetch } = useContacts({ enabled: isVisible });
   const [notification, setNotification] = useState<{ message: string, type: 'success' | 'info' } | null>(null);
   const [confirmModal, setConfirmModal] = useState<{ isOpen: boolean, message: string, onConfirm: () => void }>({ isOpen: false, message: '', onConfirm: () => { } });
   const [viewModal, setViewModal] = useState<{ isOpen: boolean, contact: Contact | null }>({ isOpen: false, contact: null });

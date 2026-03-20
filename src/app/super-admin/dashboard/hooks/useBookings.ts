@@ -4,6 +4,10 @@ import { useSocketStore } from '@/stores/socketStore';
 import { filterBookings } from '../utils/searchUtils';
 import { categorizeBooking } from '../utils/bookingUtils';
 
+interface UseBookingsOptions {
+  enabled?: boolean;
+}
+
 interface Booking {
   booking_id: number;
   futsal_name: string;
@@ -23,11 +27,12 @@ interface Booking {
   last_updated_by?: string;
 }
 
-export function useBookings() {
+export function useBookings(options: UseBookingsOptions = {}) {
+  const { enabled = true } = options;
   const { tokens } = useAuthStore();
   const { socket } = useSocketStore();
   const [bookings, setBookings] = useState<Booking[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(!enabled);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [futsalFilter, setFutsalFilter] = useState('');
@@ -150,21 +155,26 @@ export function useBookings() {
   };
 
   useEffect(() => {
-    if (tokens?.accessToken) {
+    if (enabled && tokens?.accessToken) {
       fetchBookings();
+    } else if (!enabled) {
+      // Reset state when disabled
+      setBookings([]);
+      setLoading(false);
+      setError(null);
     }
-  }, [tokens?.accessToken]);
+  }, [enabled, tokens?.accessToken]);
 
   // Auto-refresh every 10 minutes to prevent stale data and rate limits
   useEffect(() => {
-    if (!tokens?.accessToken) return;
+    if (!enabled || !tokens?.accessToken) return;
 
     const interval = setInterval(() => {
       fetchBookings();
     }, 10 * 60 * 1000); // 10 minutes
 
     return () => clearInterval(interval);
-  }, [tokens?.accessToken]);
+  }, [enabled, tokens?.accessToken]);
 
   // Real-time updates via socket
   useEffect(() => {

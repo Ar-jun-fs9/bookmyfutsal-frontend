@@ -10,12 +10,23 @@ export const useBookings = (userId?: number) => {
   });
 };
 
-export const useFutsalBookings = (futsalId: number) => {
+interface UseQueryOptions {
+  enabled?: boolean;
+  staleTime?: number;
+  gcTime?: number;
+  retry?: number;
+  retryDelay?: (attemptIndex: number) => number;
+}
+
+export const useFutsalBookings = (futsalId: number, options?: UseQueryOptions) => {
   return useQuery({
     queryKey: ['futsal-bookings', futsalId],
     queryFn: () => apiService.getFutsalBookings(futsalId),
-    enabled: !!futsalId,
-    staleTime: 1000 * 60 * 2, // 2 minutes
+    enabled: !!futsalId && (options?.enabled ?? true), // Only fetch when enabled (section is open)
+    staleTime: options?.staleTime ?? (5 * 60 * 1000), // Default 5 minutes
+    gcTime: options?.gcTime ?? (10 * 60 * 1000), // Default 10 minutes
+    retry: options?.retry ?? 2,
+    retryDelay: options?.retryDelay ?? ((attemptIndex: number) => Math.min(1000 * 2 ** attemptIndex, 30000)),
   });
 };
 

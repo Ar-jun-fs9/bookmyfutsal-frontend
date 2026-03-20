@@ -26,7 +26,7 @@ interface Feedback {
 }
 
 export function FeedbackSection({ isVisible, onToggle }: FeedbackSectionProps) {
-  const { feedbacks, loading, deleteFeedback, refetch } = useFeedbacks();
+  const { feedbacks, loading, deleteFeedback, refetch } = useFeedbacks({ enabled: isVisible });
   const [notification, setNotification] = useState<{ message: string, type: 'success' | 'info' } | null>(null);
   const [confirmModal, setConfirmModal] = useState<{ isOpen: boolean, message: string, onConfirm: () => void }>({ isOpen: false, message: '', onConfirm: () => { } });
   const [viewModal, setViewModal] = useState<{ isOpen: boolean, feedback: Feedback | null }>({ isOpen: false, feedback: null });

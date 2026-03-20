@@ -31,8 +31,8 @@ interface SpecialPrice {
 }
 
 export function SpecialPriceSection({ isVisible, onToggle }: SpecialPriceSectionProps) {
-  const { specialPrices, loading, createSpecialPrice, updateSpecialPrice, deleteSpecialPrice, updateLocalSpecialPrice } = useSpecialPrices();
-  const { futsals } = useFutsals();
+  const { specialPrices, loading, createSpecialPrice, updateSpecialPrice, deleteSpecialPrice, updateLocalSpecialPrice } = useSpecialPrices({ enabled: isVisible });
+  const { futsals } = useFutsals({ enabled: isVisible });
   const { selectedItems, showCheckboxes, toggleSelection, toggleSelectAll, clearSelection, selectedCount } = useBulkOperations();
   const { tokens } = useAuthStore();
   const [showCreateForm, setShowCreateForm] = useState(false);

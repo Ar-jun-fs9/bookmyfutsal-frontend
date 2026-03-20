@@ -1,5 +1,5 @@
 import { useVenueFilters } from '@/hooks/useVenueFilters';
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import VenueCard from './VenueCard';
 import VirtualizedVenueGrid from './VirtualizedVenueGrid';
 import { useFutsals } from '@/hooks/useFutsals';
@@ -43,9 +43,62 @@ export default function VenueGrid() {
     const { data: futsals = [] } = useFutsals();
     const [futsalSpecialPrices, setFutsalSpecialPrices] = useState<{[key: number]: any[]}>({});
     const [containerDimensions, setContainerDimensions] = useState({ width: 1200, height: 800 });
+    const [isVisible, setIsVisible] = useState(false);
+    const sectionRef = useRef<HTMLElement>(null);
 
-   // Determine if we should use virtual scrolling
-   const shouldUseVirtualization = useMemo(() => {
+    // Lazy load: Only fetch extra data when section is visible
+    useEffect(() => {
+      const observer = new IntersectionObserver(
+        ([entry]) => {
+          if (entry.isIntersecting) {
+            setIsVisible(true);
+            observer.disconnect(); // Only trigger once
+          }
+        },
+        { threshold: 0.1, rootMargin: '100px' }
+      );
+
+      if (sectionRef.current) {
+        observer.observe(sectionRef.current);
+      }
+
+      return () => observer.disconnect();
+    }, []);
+
+   // Fetch special prices for visible futsals only (lazy load)
+   // =============================================================================
+   // Only fetches when section becomes visible to reduce initial API calls
+   // Uses on-demand fetching when user scrolls to this section
+   // =============================================================================
+   useEffect(() => {
+     if (!isVisible || futsals.length === 0) return;
+
+     const fetchSpecialPrices = async () => {
+       const prices: {[key: number]: any[]} = {};
+       // Only fetch for first 20 futsals to avoid too many requests
+       const futsalsToFetch = futsals.slice(0, 20);
+       for (const futsal of futsalsToFetch) {
+         try {
+           const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/special-prices/${futsal.futsal_id}`);
+           if (response.ok) {
+             const data = await response.json();
+             prices[futsal.futsal_id] = data.specialPrices || [];
+             
+             // Store special prices in cache for DetailsModal
+             usePrefetchStore.getState().setSpecialPrices(futsal.futsal_id, data.specialPrices || []);
+           }
+         } catch (error) {
+           console.error('Error fetching special prices for futsal', futsal.futsal_id, error);
+         }
+       }
+       setFutsalSpecialPrices(prices);
+     };
+
+     fetchSpecialPrices();
+   }, [futsals, isVisible]);
+
+    // Determine if we should use virtual scrolling
+    const shouldUseVirtualization = useMemo(() => {
      return filteredFutsals.length > 20; // Use virtualization for lists with more than 20 items
    }, [filteredFutsals.length]);
 
@@ -72,97 +125,8 @@ export default function VenueGrid() {
      return () => window.removeEventListener('resize', updateDimensions);
    }, []);
 
-   // Fetch special prices for all futsals and preload media
-   // =============================================================================
-   // BACKGROUND PREFETCHING - Loads data silently on page mount
-   // =============================================================================
-   // This ensures that when user clicks handleDetailsModal, the data is already
-   // cached and the modal opens instantly without loading states
-   // =============================================================================
-   useEffect(() => {
-     const fetchSpecialPrices = async () => {
-       const prices: {[key: number]: any[]} = {};
-       for (const futsal of futsals) {
-         try {
-           const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/special-prices/${futsal.futsal_id}`);
-           if (response.ok) {
-             const data = await response.json();
-             prices[futsal.futsal_id] = data.specialPrices || [];
-             
-             // =======================================================================
-             // PREFETCH: Store special prices in cache for DetailsModal
-             // =======================================================================
-             usePrefetchStore.getState().setSpecialPrices(futsal.futsal_id, data.specialPrices || []);
-           }
-         } catch (error) {
-           console.error('Error fetching special prices for futsal', futsal.futsal_id, error);
-         }
-       }
-       setFutsalSpecialPrices(prices);
-     };
-
-     if (futsals.length > 0) {
-       fetchSpecialPrices();
-     }
-   }, [futsals]);
-
-   // =============================================================================
-   // PREFETCH: Preload all images, videos, and ratings for faster modal opening
-   // =============================================================================
-   // Uses browser-native prefetching so media is in cache before modal opens
-   // Also prefetches ratings for RatingModal to open instantly
-   // =============================================================================
-   useEffect(() => {
-     if (futsals.length === 0) return;
-
-     const prefetchMedia = () => {
-       for (const futsal of futsals) {
-         // Prefetch all images
-         if (futsal.images && futsal.images.length > 0) {
-           futsal.images.forEach((imageUrl: string) => {
-             usePrefetchStore.getState().preloadImage(imageUrl);
-           });
-         }
-
-         // Prefetch video
-         if (futsal.video) {
-           usePrefetchStore.getState().preloadVideo(futsal.video);
-         }
-       }
-     };
-
-     // =============================================================================
-     // PREFETCH: Prefetch ratings for all futsals on page load
-     // =============================================================================
-     // This ensures RatingModal opens instantly when user clicks handleDescRating
-     // =============================================================================
-     const prefetchRatings = async () => {
-       for (const futsal of futsals) {
-         try {
-           const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/ratings/futsal/${futsal.futsal_id}`);
-           if (response.ok) {
-             const data = await response.json();
-             // =======================================================================
-             // PREFETCH: Store ratings in cache for RatingModal
-             // =======================================================================
-             usePrefetchStore.getState().setRatings(futsal.futsal_id, data || []);
-           }
-         } catch (error) {
-           console.error('Error prefetching ratings for futsal', futsal.futsal_id, error);
-         }
-       }
-     };
-
-     // Run prefetching after a small delay to not block initial page render
-     const timeoutId = setTimeout(() => {
-       prefetchMedia();
-       prefetchRatings();
-     }, 1000);
-     return () => clearTimeout(timeoutId);
-   }, [futsals]);
-
   return (
-    <main id="venues" className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 md:py-16">
+    <main ref={sectionRef} id="venues" className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 md:py-16">
       <div className="text-center mb-12 -up">
         <h2 className="text-4xl md:text-5xl font-bold bg-linear-to-r from-green-600 to-blue-600 bg-clip-text text-transparent mb-4">
           Available Futsals

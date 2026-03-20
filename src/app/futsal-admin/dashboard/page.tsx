@@ -17,6 +17,7 @@ import {
 } from "@/hooks/useTimeSlots";
 import { useFutsalRatings } from "@/hooks/useRatings";
 import { filterReducer, initialFilterState } from "@/reducers/filterReducer";
+import { useSectionState } from "@/hooks/useSectionState";
 // import { useSocketHandler } from '@/hooks/useSocketHandler';
 import { useSpecialPrices } from "./hooks/useSpecialPrices";
 import { useTimeBasedPricing } from "./hooks/useTimeBasedPricing";
@@ -144,15 +145,16 @@ export default function FutsalAdminDashboard() {
   >(null);
   const [editingRating, setEditingRating] = useState<any | null>(null);
   const [creatingRating, setCreatingRating] = useState(false);
-  const [showFutsalInfo, setShowFutsalInfo] = useState(false);
-  const [showBookings, setShowBookings] = useState(false);
-  const [showRatings, setShowRatings] = useState(false);
-  const [showSpecialPrices, setShowSpecialPrices] = useState(false);
+  // Section state management - uses lazy loading to fetch data only when section is open
+  const {
+    isOpen,
+    toggleSection,
+  } = useSectionState();
+  
   const [creatingSpecialPrice, setCreatingSpecialPrice] = useState(false);
   const [editingSpecialPrice, setEditingSpecialPrice] = useState<any | null>(
     null,
   );
-  const [showTimeBasedPricing, setShowTimeBasedPricing] = useState(false);
   const [creatingTimeBasedPricing, setCreatingTimeBasedPricing] =
     useState(false);
   const [editingTimeBasedPricing, setEditingTimeBasedPricing] = useState<
@@ -189,24 +191,46 @@ export default function FutsalAdminDashboard() {
   // Reducer for filters
   const [filterState, dispatch] = useReducer(filterReducer, initialFilterState);
 
-  // React Query hooks
+  // React Query hooks - only fetch when section is open (lazy loading)
   const { data: futsalsData } = useFutsals();
   const futsal = admin?.futsal_id
     ? futsalsData?.find((f: Futsal) => f.futsal_id === admin.futsal_id)
     : null;
+  
+  // Bookings - only fetch when bookings section is open
   const {
     data: bookingsData,
     refetch: refetchBookings,
     error: bookingsError,
-  } = useFutsalBookings(futsal?.futsal_id || 0);
+  } = useFutsalBookings(futsal?.futsal_id || 0, {
+    enabled: isOpen('bookings'), // Only fetch when bookings section is open
+    staleTime: 5 * 60 * 1000, // 5 minutes cache
+    gcTime: 10 * 60 * 1000, // 10 minutes garbage collection
+  });
+  
+  // Slots - only fetch when slots section is open
   const { data: slotsData, isLoading: isSlotsLoading } = useFutsalSlotsForDate(
     futsal?.futsal_id ?? 0,
     slotDate,
+    {
+      enabled: isOpen('slots'), // Only fetch when slots section is open
+      staleTime: 5 * 60 * 1000, // 5 minutes cache
+      gcTime: 10 * 60 * 1000, // 10 minutes garbage collection
+    }
   );
+  
   const closeAllSlotsMutation = useCloseAllSlotsForDate();
   const openAllSlotsMutation = useOpenAllSlotsForDate();
   const updateSlotStatusMutation = useUpdateSlotStatus();
-  const { data: ratingsData } = useFutsalRatings(futsal?.futsal_id);
+  
+  // Ratings - only fetch when ratings section is open
+  const { data: ratingsData } = useFutsalRatings(futsal?.futsal_id, {
+    enabled: isOpen('ratings'), // Only fetch when ratings section is open
+    staleTime: 5 * 60 * 1000, // 5 minutes cache
+    gcTime: 10 * 60 * 1000, // 10 minutes garbage collection
+  });
+  
+  // Special Prices - only fetch when special prices section is open
   const {
     specialPrices,
     loading: specialPricesLoading,
@@ -214,7 +238,9 @@ export default function FutsalAdminDashboard() {
     updateSpecialPrice,
     deleteSpecialPrice,
     updateLocalSpecialPrice,
-  } = useSpecialPrices(futsal?.futsal_id);
+  } = useSpecialPrices(futsal?.futsal_id, isOpen('special-prices'));
+  
+  // Time-Based Pricing - only fetch when section is open
   const {
     timeBasedPricings,
     loading: timeBasedPricingLoading,
@@ -1082,16 +1108,16 @@ export default function FutsalAdminDashboard() {
                 </h2>
                 <div className="flex space-x-2">
                   <button
-                    onClick={() => setShowFutsalInfo(!showFutsalInfo)}
+                    onClick={() => toggleSection('futsal')}
                     className={`text-white font-bold py-2 px-4 rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 ${
-                      showFutsalInfo
+                      isOpen('futsal')
                         ? "bg-linear-to-r from-red-600 to-red-700 border border-red-500/30 hover:border-red-400/50"
                         : "bg-linear-to-r from-green-600 to-green-700 border border-green-500/30 hover:border-green-400/50"
                     }`}
                   >
-                    {showFutsalInfo ? "X" : "Show"}
+                    {isOpen('futsal') ? "X" : "Show"}
                   </button>
-                  {showFutsalInfo && (
+                  {isOpen('futsal') && (
                     <button
                       onClick={() => setEditingFutsal(!editingFutsal)}
                       className={`text-white font-bold py-2 px-4 rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 ${
@@ -1106,7 +1132,7 @@ export default function FutsalAdminDashboard() {
                 </div>
               </div>
 
-              {showFutsalInfo &&
+              {isOpen('futsal') &&
                 (editingFutsal && futsal ? (
                   <EditFutsalForm
                     futsal={futsal as Futsal}
@@ -1188,7 +1214,7 @@ export default function FutsalAdminDashboard() {
             </div>
 
             {/* Slot Management */}
-            {showSlots && (
+            {isOpen('slots') && (
               <div className="bg-white rounded-lg p-2">
                 <div className="flex justify-between items-center mb-4">
                   <h3 className="text-xl font-semibold bg-linear-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">
@@ -1222,7 +1248,7 @@ export default function FutsalAdminDashboard() {
                       })()}
                     </button>
                     <button
-                      onClick={() => setShowSlots(false)}
+                      onClick={() => toggleSection('slots')}
                       className="bg-linear-to-r from-red-600 to-red-700 text-white font-bold py-2 px-4 rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 border border-red-400/30 hover:border-red-400/50 text-sm w-full sm:w-auto"
                     >
                       X
@@ -1315,14 +1341,14 @@ export default function FutsalAdminDashboard() {
               </div>
             )}
 
-            {!showSlots && (
+            {!isOpen('slots') && (
               <div className="bg-white rounded-lg p-2">
                 <div className="text-center">
                   <h3 className="text-xl font-semibold bg-linear-to-r from-green-600 to-blue-600 bg-clip-text text-transparent mb-4">
                     Slot Management
                   </h3>
                   <button
-                    onClick={() => setShowSlots(true)}
+                    onClick={() => toggleSection('slots')}
                     className="bg-linear-to-r from-green-600 to-green-700 text-white font-bold py-2 px-4 rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 border border-green-500/30 hover:border-green-400/50"
                   >
                     Show All Slots
@@ -1339,18 +1365,18 @@ export default function FutsalAdminDashboard() {
                 </h3>
                 <div className="flex space-x-2">
                   <button
-                    onClick={() => setShowBookings(!showBookings)}
+                    onClick={() => toggleSection('bookings')}
                     className={`text-white font-bold py-2 px-4 rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 ${
-                      showBookings
+                      isOpen('bookings')
                         ? "bg-linear-to-r from-red-600 to-red-700 border border-red-500/30 hover:border-red-400/50"
                         : "bg-linear-to-r from-green-600 to-green-700 border border-green-500/30 hover:border-green-400/50"
                     }`}
                   >
-                    {showBookings ? "X" : "Show"}
+                    {isOpen('bookings') ? "X" : "Show"}
                   </button>
                 </div>
               </div>
-              {showBookings && (
+              {isOpen('bookings') && (
                 <>
                   {/* Filter Buttons */}
                   <div className="mb-4">
@@ -1794,16 +1820,16 @@ export default function FutsalAdminDashboard() {
                 </h3>
                 <div className="flex space-x-2">
                   <button
-                    onClick={() => setShowSpecialPrices(!showSpecialPrices)}
+                    onClick={() => toggleSection('special-prices')}
                     className={`text-white font-bold py-2 px-4 rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 ${
-                      showSpecialPrices
+                      isOpen('special-prices')
                         ? "bg-linear-to-r from-red-600 to-red-700 border border-red-500/30 hover:border-red-400/50"
                         : "bg-linear-to-r from-green-600 to-green-700 border border-green-500/30 hover:border-green-400/50"
                     }`}
                   >
-                    {showSpecialPrices ? "X" : "Show"}
+                    {isOpen('special-prices') ? "X" : "Show"}
                   </button>
-                  {showSpecialPrices && (
+                  {isOpen('special-prices') && (
                     <button
                       onClick={() =>
                         setCreatingSpecialPrice(!creatingSpecialPrice)
@@ -1819,7 +1845,7 @@ export default function FutsalAdminDashboard() {
                   )}
                 </div>
               </div>
-              {showSpecialPrices && (
+              {isOpen('special-prices') && (
                 <>
                   {creatingSpecialPrice && futsal && (
                     <div className="mb-6 relative bg-white rounded-2xl shadow-2xl overflow-hidden transform transition-all duration-500 hover:scale-[1.01]">
@@ -2012,16 +2038,16 @@ export default function FutsalAdminDashboard() {
                 </h3>
                 <div className="flex space-x-2">
                   <button
-                    onClick={() => setShowRatings(!showRatings)}
+                    onClick={() => toggleSection('ratings')}
                     className={`text-white font-bold py-2 px-4 rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 ${
-                      showRatings
+                      isOpen('ratings')
                         ? "bg-linear-to-r from-red-600 to-red-700 border border-red-500/30 hover:border-red-400/50"
                         : "bg-linear-to-r from-green-600 to-green-700 border border-green-500/30 hover:border-green-400/50"
                     }`}
                   >
-                    {showRatings ? "X" : "Show"}
+                    {isOpen('ratings') ? "X" : "Show"}
                   </button>
-                  {showRatings && (
+                  {isOpen('ratings') && (
                     <button
                       onClick={() => setCreatingRating(!creatingRating)}
                       className={`text-white font-bold py-2 px-4 rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 ${
@@ -2035,7 +2061,7 @@ export default function FutsalAdminDashboard() {
                   )}
                 </div>
               </div>
-              {showRatings && (
+              {isOpen('ratings') && (
                 <>
                   {/* Select All and Delete Controls for Ratings */}
                   <div className="mb-4 p-3 bg-gray-50 rounded-lg">

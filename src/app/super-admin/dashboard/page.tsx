@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/stores/authStore';
-import { useFutsals } from './hooks/useFutsals';
 import { DashboardHeader } from './components/DashboardHeader';
 import { DashboardInfo } from './components/DashboardInfo';
 import { FutsalSection } from './components/FutsalSection';
@@ -20,6 +19,7 @@ import { CreateFutsalForm } from './components/forms/CreateFutsalForm';
 import { CreateFutsalAdminForm } from './components/forms/CreateFutsalAdminForm';
 import { ConfirmModal } from './components/modals/ConfirmModal';
 import { NotificationModal } from './components/modals/NotificationModal';
+import { useFutsals } from './hooks/useFutsals';
 
 interface User {
   id: number;
@@ -29,11 +29,12 @@ interface User {
 
 export default function SuperAdminDashboard() {
   const { hydrated, tokens } = useAuthStore();
-  const { futsals } = useFutsals();
+  // Only fetch futsals when CreateFutsalAdminForm is shown
+  const [showCreateAdmin, setShowCreateAdmin] = useState(false);
+  const { futsals } = useFutsals({ enabled: showCreateAdmin });
   const [user, setUser] = useState<User | null>(null);
   const [futsalAdmins, setFutsalAdmins] = useState<any[]>([]);
   const [showCreateFutsal, setShowCreateFutsal] = useState(false);
-  const [showCreateAdmin, setShowCreateAdmin] = useState(false);
   const [showBookings, setShowBookings] = useState(false);
   const [showSlots, setShowSlots] = useState(false);
   const [showRatings, setShowRatings] = useState(false);
@@ -168,7 +169,7 @@ export default function SuperAdminDashboard() {
             {showCreateAdmin && <CreateFutsalAdminForm futsals={futsals} superAdminId={user?.id || 0} setNotification={setNotification} onSuccess={fetchFutsalAdmins} />}
             <SlotSection isVisible={showSlots} onToggle={() => setShowSlots(!showSlots)} />
             <FutsalSection isVisible={showFutsals} onToggle={() => setShowFutsals(!showFutsals)} />
-            <AdminSection futsals={futsals} superAdminId={user?.id || 0} isVisible={showAdmins} onToggle={() => setShowAdmins(!showAdmins)} />
+            <AdminSection superAdminId={user?.id || 0} isVisible={showAdmins} onToggle={() => setShowAdmins(!showAdmins)} />
             <UserSection isVisible={showUsers} onToggle={() => setShowUsers(!showUsers)} />
             <BlockedUserSection isVisible={showBlockedUsers} onToggle={() => setShowBlockedUsers(!showBlockedUsers)} />
             <BookingSection isVisible={showBookings} onToggle={() => setShowBookings(!showBookings)} />

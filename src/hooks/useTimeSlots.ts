@@ -10,12 +10,23 @@ export const useTimeSlots = (futsalId: number, date: string, shift: string) => {
   });
 };
 
-export const useFutsalSlotsForDate = (futsalId: number, date: string) => {
+interface UseQueryOptions {
+  enabled?: boolean;
+  staleTime?: number;
+  gcTime?: number;
+  retry?: number;
+  retryDelay?: (attemptIndex: number) => number;
+}
+
+export const useFutsalSlotsForDate = (futsalId: number, date: string, options?: UseQueryOptions) => {
   return useQuery({
     queryKey: ['futsal-slots', futsalId, date],
     queryFn: () => apiService.getFutsalSlotsForDate(futsalId, date),
-    enabled: !!(futsalId && date),
-    staleTime: 1000 * 60 * 1, // 1 minute
+    enabled: !!(futsalId && date) && (options?.enabled ?? true), // Only fetch when enabled (section is open)
+    staleTime: options?.staleTime ?? (5 * 60 * 1000), // Default 5 minutes
+    gcTime: options?.gcTime ?? (10 * 60 * 1000), // Default 10 minutes
+    retry: options?.retry ?? 2,
+    retryDelay: options?.retryDelay ?? ((attemptIndex: number) => Math.min(1000 * 2 ** attemptIndex, 30000)),
   });
 };
 

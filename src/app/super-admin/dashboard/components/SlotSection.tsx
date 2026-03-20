@@ -11,7 +11,7 @@ interface SlotSectionProps {
 }
 
 export function SlotSection({ isVisible, onToggle }: SlotSectionProps) {
-  const { futsals } = useFutsals();
+  const { futsals } = useFutsals({ enabled: isVisible });
   const { slots, loading, updateSlotStatus, bulkUpdateSlots, fetchSlots, fetchAllSlots } = useSlots();
   const [selectedFutsal, setSelectedFutsal] = useState<number | null>(null);
   const [slotDate, setSlotDate] = useState(new Date().toLocaleDateString('en-CA'));

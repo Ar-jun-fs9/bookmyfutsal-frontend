@@ -1,6 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useAuthStore } from '@/stores/authStore';
 
+interface UseSpecialPricesOptions {
+  enabled?: boolean;
+}
+
 interface SpecialPrice {
   special_price_id: number;
   futsal_id: number;
@@ -19,10 +23,11 @@ interface SpecialPrice {
   futsal_name: string;
 }
 
-export function useSpecialPrices() {
+export function useSpecialPrices(options: UseSpecialPricesOptions = {}) {
+  const { enabled = true } = options;
   const { tokens } = useAuthStore();
   const [specialPrices, setSpecialPrices] = useState<SpecialPrice[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(!enabled);
 
   const fetchSpecialPrices = async (futsalId?: number) => {
     setLoading(true);
@@ -137,10 +142,14 @@ export function useSpecialPrices() {
   };
 
   useEffect(() => {
-    if (tokens?.accessToken) {
+    if (enabled && tokens?.accessToken) {
       fetchSpecialPrices();
+    } else if (!enabled) {
+      // Reset state when disabled
+      setSpecialPrices([]);
+      setLoading(false);
     }
-  }, [tokens?.accessToken]);
+  }, [enabled, tokens?.accessToken]);
 
   const updateLocalSpecialPrice = (id: number, updates: Partial<SpecialPrice>) => {
     setSpecialPrices(prev => prev.map(price =>

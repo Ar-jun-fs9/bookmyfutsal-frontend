@@ -1,6 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useAuthStore } from '@/stores/authStore';
 
+interface UseFeedbacksOptions {
+  enabled?: boolean;
+}
+
 interface Feedback {
   id: number;
   name: string | null;
@@ -18,10 +22,11 @@ interface Feedback {
   updated_at: string;
 }
 
-export function useFeedbacks() {
+export function useFeedbacks(options: UseFeedbacksOptions = {}) {
+  const { enabled = true } = options;
   const { tokens } = useAuthStore();
   const [feedbacks, setFeedbacks] = useState<Feedback[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(!enabled);
   const [error, setError] = useState<string | null>(null);
 
   const fetchFeedbacks = async () => {
@@ -72,10 +77,15 @@ export function useFeedbacks() {
   };
 
   useEffect(() => {
-    if (tokens?.accessToken) {
+    if (enabled && tokens?.accessToken) {
       fetchFeedbacks();
+    } else if (!enabled) {
+      // Reset state when disabled
+      setFeedbacks([]);
+      setLoading(false);
+      setError(null);
     }
-  }, [tokens?.accessToken]);
+  }, [enabled, tokens?.accessToken]);
 
   return {
     feedbacks,

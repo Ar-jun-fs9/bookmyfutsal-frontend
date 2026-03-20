@@ -2,6 +2,10 @@ import { useState, useEffect } from 'react';
 import { useAuthStore } from '@/stores/authStore';
 import { useSocketStore } from '@/stores/socketStore';
 
+interface UseRatingsOptions {
+  enabled?: boolean;
+}
+
 interface Rating {
   id: number;
   futsal_id: number;
@@ -16,12 +20,13 @@ interface Rating {
   created_at: string;
 }
 
-export function useRatings() {
+export function useRatings(options: UseRatingsOptions = {}) {
+  const { enabled = true } = options;
   const { tokens } = useAuthStore();
   const { socket } = useSocketStore();
   const [ratings, setRatings] = useState<Rating[]>([]);
   const [fullRatings, setFullRatings] = useState<Rating[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(!enabled);
   const [error, setError] = useState<string | null>(null);
 
   const fetchRatings = async () => {
@@ -153,10 +158,16 @@ export function useRatings() {
   };
 
   useEffect(() => {
-    if (tokens?.accessToken) {
+    if (enabled && tokens?.accessToken) {
       fetchRatings();
+    } else if (!enabled) {
+      // Reset state when disabled
+      setRatings([]);
+      setFullRatings([]);
+      setLoading(false);
+      setError(null);
     }
-  }, [tokens?.accessToken]);
+  }, [enabled, tokens?.accessToken]);
 
   // Real-time updates via socket
   useEffect(() => {

@@ -19,13 +19,13 @@ interface SpecialPrice {
   futsal_name: string;
 }
 
-export function useSpecialPrices(futsalId?: number) {
+export function useSpecialPrices(futsalId?: number, enabled: boolean = true) {
   const { tokens } = useAuthStore();
   const [specialPrices, setSpecialPrices] = useState<SpecialPrice[]>([]);
   const [loading, setLoading] = useState(false);
 
   const fetchSpecialPrices = async () => {
-    if (!futsalId || !tokens?.accessToken) return;
+    if (!futsalId || !tokens?.accessToken || !enabled) return;
 
     setLoading(true);
     try {
@@ -134,9 +134,12 @@ export function useSpecialPrices(futsalId?: number) {
     }
   };
 
+  // Only fetch when enabled (section is open)
   useEffect(() => {
-    fetchSpecialPrices();
-  }, [futsalId, tokens?.accessToken]);
+    if (enabled) {
+      fetchSpecialPrices();
+    }
+  }, [futsalId, tokens?.accessToken, enabled]);
 
   const updateLocalSpecialPrice = (id: number, updates: Partial<SpecialPrice>) => {
     setSpecialPrices(prev => prev.map(price =>

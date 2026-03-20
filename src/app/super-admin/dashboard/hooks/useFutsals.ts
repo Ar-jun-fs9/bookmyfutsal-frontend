@@ -2,6 +2,10 @@ import { useState, useEffect } from 'react';
 import { useAuthStore } from '@/stores/authStore';
 import { useSocketStore } from '@/stores/socketStore';
 
+interface UseFutsalsOptions {
+  enabled?: boolean;
+}
+
 interface Futsal {
   futsal_id: number;
   name: string;
@@ -23,11 +27,12 @@ interface Futsal {
   updated_at?: string;
 }
 
-export function useFutsals() {
+export function useFutsals(options: UseFutsalsOptions = {}) {
+  const { enabled = true } = options;
   const { tokens } = useAuthStore();
   const { socket } = useSocketStore();
   const [futsals, setFutsals] = useState<Futsal[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(!enabled);
   const [error, setError] = useState<string | null>(null);
 
   const fetchFutsals = async () => {
@@ -138,10 +143,15 @@ export function useFutsals() {
   };
 
   useEffect(() => {
-    if (tokens?.accessToken) {
+    if (enabled && tokens?.accessToken) {
       fetchFutsals();
+    } else if (!enabled) {
+      // Reset state when disabled
+      setFutsals([]);
+      setLoading(false);
+      setError(null);
     }
-  }, [tokens?.accessToken]);
+  }, [enabled, tokens?.accessToken]);
 
   // Real-time updates via socket
   useEffect(() => {

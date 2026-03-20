@@ -2,6 +2,10 @@ import { useState, useEffect } from 'react';
 import { useAuthStore } from '@/stores/authStore';
 import { useSocketStore } from '@/stores/socketStore';
 
+interface UseFutsalAdminsOptions {
+  enabled?: boolean;
+}
+
 interface FutsalAdmin {
   id: number;
   username: string;
@@ -14,11 +18,12 @@ interface FutsalAdmin {
   blocked_until?: string;
 }
 
-export function useFutsalAdmins() {
+export function useFutsalAdmins(options: UseFutsalAdminsOptions = {}) {
+  const { enabled = true } = options;
   const { tokens } = useAuthStore();
   const { socket } = useSocketStore();
   const [admins, setAdmins] = useState<FutsalAdmin[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(!enabled);
   const [error, setError] = useState<string | null>(null);
 
   const fetchAdmins = async () => {
@@ -187,10 +192,15 @@ export function useFutsalAdmins() {
   };
 
   useEffect(() => {
-    if (tokens?.accessToken) {
+    if (enabled && tokens?.accessToken) {
       fetchAdmins();
+    } else if (!enabled) {
+      // Reset state when disabled
+      setAdmins([]);
+      setLoading(false);
+      setError(null);
     }
-  }, [tokens?.accessToken]);
+  }, [enabled, tokens?.accessToken]);
 
   // Real-time updates via socket
   useEffect(() => {

@@ -1,12 +1,23 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiService } from '@/services/api';
 
-export const useFutsalRatings = (futsalId: number) => {
+interface UseQueryOptions {
+  enabled?: boolean;
+  staleTime?: number;
+  gcTime?: number;
+  retry?: number;
+  retryDelay?: (attemptIndex: number) => number;
+}
+
+export const useFutsalRatings = (futsalId: number, options?: UseQueryOptions) => {
   return useQuery({
     queryKey: ['ratings', futsalId],
     queryFn: () => apiService.getFutsalRatings(futsalId),
-    enabled: !!futsalId,
-    staleTime: 1000 * 60 * 5, // 5 minutes
+    enabled: !!futsalId && (options?.enabled ?? true), // Only fetch when enabled (section is open)
+    staleTime: options?.staleTime ?? (5 * 60 * 1000), // Default 5 minutes
+    gcTime: options?.gcTime ?? (10 * 60 * 1000), // Default 10 minutes
+    retry: options?.retry ?? 2,
+    retryDelay: options?.retryDelay ?? ((attemptIndex: number) => Math.min(1000 * 2 ** attemptIndex, 30000)),
   });
 };
 

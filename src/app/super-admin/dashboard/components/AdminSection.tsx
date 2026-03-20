@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuthStore } from '@/stores/authStore';
 import { useFutsalAdmins } from '../hooks/useFutsalAdmins';
+import { useFutsals } from '../hooks/useFutsals';
 import { useBulkOperations } from '../hooks/useBulkOperations';
 import { ConfirmModal } from './modals/ConfirmModal';
 import { NotificationModal } from './modals/NotificationModal';
@@ -15,15 +16,19 @@ interface Futsal {
 }
 
 interface AdminSectionProps {
-  futsals: Futsal[];
+  futsals?: Futsal[];
   superAdminId: number;
   isVisible: boolean;
   onToggle: () => void;
 }
 
-export function AdminSection({ futsals, superAdminId, isVisible, onToggle }: AdminSectionProps) {
+export function AdminSection({ futsals: propFutsals, superAdminId, isVisible, onToggle }: AdminSectionProps) {
   const { tokens } = useAuthStore();
-  const { admins, loading, error, deleteAdmin, bulkDelete, blockAdmin, unblockAdmin, refetch } = useFutsalAdmins();
+  // Fetch futsals when section is visible
+  const { futsals: fetchedFutsals } = useFutsals({ enabled: isVisible });
+  // Use prop futsals if provided, otherwise use fetched futsals
+  const futsals = propFutsals || fetchedFutsals || [];
+  const { admins, loading, error, deleteAdmin, bulkDelete, blockAdmin, unblockAdmin, refetch } = useFutsalAdmins({ enabled: isVisible });
   const { selectedItems, showCheckboxes, toggleSelection, toggleSelectAll, clearSelection, selectedCount } = useBulkOperations();
   const [showCreateAdmin, setShowCreateAdmin] = useState(false);
   const [editingAdmin, setEditingAdmin] = useState<any | null>(null);

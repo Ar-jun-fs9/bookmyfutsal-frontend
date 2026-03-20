@@ -3,6 +3,10 @@ import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/stores/authStore';
 import { useSocketStore } from '@/stores/socketStore';
 
+interface UseUsersOptions {
+  enabled?: boolean;
+}
+
 interface User {
   user_id: number;
   first_name: string;
@@ -25,13 +29,14 @@ interface BlockedUser {
   reason: string;
 }
 
-export function useUsers() {
+export function useUsers(options: UseUsersOptions = {}) {
+  const { enabled = true } = options;
   const { hydrated, tokens } = useAuthStore();
   const { socket } = useSocketStore();
   const router = useRouter();
   const [users, setUsers] = useState<User[]>([]);
   const [blockedUsers, setBlockedUsers] = useState<BlockedUser[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(!enabled);
   const [error, setError] = useState<string | null>(null);
 
   const fetchUsers = async () => {
@@ -227,6 +232,15 @@ export function useUsers() {
   };
 
   useEffect(() => {
+    if (!enabled) {
+      // Reset state when disabled
+      setUsers([]);
+      setBlockedUsers([]);
+      setLoading(false);
+      setError(null);
+      return;
+    }
+    
     if (hydrated) {
       const storedUser = sessionStorage.getItem('superadmin');
       if (storedUser) {
@@ -236,7 +250,7 @@ export function useUsers() {
         router.push('/super-admin/signin');
       }
     }
-  }, [hydrated, router]);
+  }, [enabled, hydrated, router]);
 
   // Real-time updates via socket
   useEffect(() => {

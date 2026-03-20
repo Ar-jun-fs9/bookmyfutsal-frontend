@@ -13,7 +13,7 @@ interface FutsalSectionProps {
 }
 
 export function FutsalSection({ isVisible, onToggle }: FutsalSectionProps) {
-  const { futsals, loading, deleteFutsal, bulkDelete } = useFutsals();
+  const { futsals, loading, deleteFutsal, bulkDelete } = useFutsals({ enabled: isVisible });
   const { selectedItems, showCheckboxes, toggleSelection, toggleSelectAll, clearSelection, selectedCount } = useBulkOperations();
   const [showCreateFutsal, setShowCreateFutsal] = useState(false);
   const [editingFutsalId, setEditingFutsalId] = useState<number | null>(null);
