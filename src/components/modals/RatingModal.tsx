@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { apiService } from '@/services/api';
 import { useNotificationStore } from '@/stores/notificationStore';
+import { usePrefetchStore } from '@/stores/prefetchStore';
 
 interface ConfirmModal {
   isOpen: boolean;
@@ -37,7 +38,8 @@ export default function RatingModal({ futsal, onClose, onRatingSubmitted }: Rati
   const [hoverRating, setHoverRating] = useState(0);
   const [comment, setComment] = useState('');
   const [loading, setLoading] = useState(false);
-  const [hasRated, setHasRated] = useState<boolean | null>(null);
+  // FIXED: Initialize hasRated to false instead of null to avoid showing loading every time
+  const [hasRated, setHasRated] = useState<boolean>(false);
   const [userName, setUserName] = useState('');
   const [isAnonymous, setIsAnonymous] = useState(false);
   const [userExistingRating, setUserExistingRating] = useState<Rating | null>(null);
@@ -53,13 +55,18 @@ export default function RatingModal({ futsal, onClose, onRatingSubmitted }: Rati
   });
 
   // Update ratings state when data changes
+  // FIXED: Also check prefetch cache to avoid showing loading state
   useEffect(() => {
-    if (ratingsData) {
+    // First check prefetch cache
+    const cachedRatings = usePrefetchStore?.getState()?.getRatings(futsal.futsal_id);
+    if (cachedRatings) {
+      setRatings(cachedRatings);
+      checkUserRatingFromData(cachedRatings);
+    } else if (ratingsData) {
       setRatings(ratingsData);
-      // Check user rating from fetched data
       checkUserRatingFromData(ratingsData);
     }
-  }, [ratingsData]);
+  }, [ratingsData, futsal.futsal_id]);
 
   // Check user rating from fetched data (runs once when ratingsData is available)
   const checkUserRatingFromData = (ratings: any[]) => {

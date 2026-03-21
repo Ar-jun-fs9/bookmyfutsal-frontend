@@ -1780,7 +1780,9 @@ function RatingModal({ futsal, onClose, onRatingSubmitted, showNotification, set
   const [hoverRating, setHoverRating] = useState(0);
   const [comment, setComment] = useState('');
   const [loading, setLoading] = useState(false);
-  const [hasRated, setHasRated] = useState<boolean | null>(null);
+  // FIXED: Initialize hasRated to false instead of null to avoid showing loading every time
+  // The checkUserRatingFromCache will properly set this based on cached data
+  const [hasRated, setHasRated] = useState<boolean>(false);
   const [userName, setUserName] = useState('');
   const [isAnonymous, setIsAnonymous] = useState(false);
   const [userExistingRating, setUserExistingRating] = useState<any | null>(null);
@@ -1804,14 +1806,22 @@ function RatingModal({ futsal, onClose, onRatingSubmitted, showNotification, set
   // =============================================================================
   // FIXED: Using React Query data instead of manual fetch
   // React Query handles caching and deduplication automatically
+  // Also check cached data immediately to avoid showing loading state
   // =============================================================================
   useEffect(() => {
-    if (ratingsData) {
+    // First, check if there's already cached data from a previous session
+    // This prevents showing loading state when data is already available
+    const cachedRatings = usePrefetchStore.getState().getRatings(futsal.futsal_id);
+    if (cachedRatings) {
+      setRatings(cachedRatings);
+      checkUserRatingFromCache(cachedRatings);
+    } else if (ratingsData) {
+      // If no prefetch cache, use React Query data
       setRatings(ratingsData);
-      // Check user rating from fetched data
       checkUserRatingFromCache(ratingsData);
     }
-  }, [ratingsData]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ratingsData, futsal.futsal_id]);
 
   // =============================================================================
   // PREFETCH: Check user rating from cached ratings (no API call needed)
