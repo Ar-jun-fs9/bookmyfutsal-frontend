@@ -6,7 +6,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useAuthStore } from "@/stores/authStore";
 import { useNotificationStore } from "@/stores/notificationStore";
 import { useSocketStore } from "@/stores/socketStore";
-import { useFutsals } from "@/hooks/useFutsals";
+import { useFutsal } from "@/hooks/useFutsals";
 import { useBookings, useFutsalBookings } from "@/hooks/useBookings";
 import {
   useTimeSlots,
@@ -191,11 +191,8 @@ export default function FutsalAdminDashboard() {
   // Reducer for filters
   const [filterState, dispatch] = useReducer(filterReducer, initialFilterState);
 
-  // React Query hooks - only fetch when section is open (lazy loading)
-  const { data: futsalsData } = useFutsals();
-  const futsal = admin?.futsal_id
-    ? futsalsData?.find((f: Futsal) => f.futsal_id === admin.futsal_id)
-    : null;
+  // React Query hooks - fetch the assigned futsal only
+  const { data: futsal } = useFutsal(admin?.futsal_id || 0);
   
   // Bookings - only fetch when bookings section is open
   const {
@@ -3726,10 +3723,7 @@ function EditSpecialPriceForm({
   }) => void;
 }) {
   const { updateSpecialPrice } = useSpecialPrices(price.futsal_id);
-  const { data: futsalsData } = useFutsals();
-  const futsal = futsalsData?.find(
-    (f: Futsal) => f.futsal_id === price.futsal_id,
-  );
+  const { data: futsal } = useFutsal(price.futsal_id);
   const [formData, setFormData] = useState({
     special_price: price.special_price.toString(),
     message: price.message || "",
