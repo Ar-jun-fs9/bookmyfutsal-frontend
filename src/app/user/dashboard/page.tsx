@@ -1851,17 +1851,23 @@ function RatingModal({ futsal, onClose, onRatingSubmitted, showNotification, set
             const ratingInfo = JSON.parse(storedRatingInfo);
             let userRating = cachedRatings.find((r: any) => r.id === ratingInfo.rating_id);
             if (!userRating) {
-              userRating = cachedRatings.find((r: any) =>
-                r.users === ratingInfo.users && r.users_type === ratingInfo.users_type
-              );
+              // Check by users field - handle both old 'Anonymous' and new 'Anonymous_xyz' format
+              userRating = cachedRatings.find((r: any) => {
+                const isStoredAnon = ratingInfo.users === 'Anonymous' || ratingInfo.users?.startsWith('Anonymous_');
+                const isCachedAnon = r.users === 'Anonymous' || r.users?.startsWith('Anonymous_');
+                if (isStoredAnon && isCachedAnon) return true;
+                return r.users === ratingInfo.users && r.users_type === ratingInfo.users_type;
+              });
             }
             if (userRating) {
               setHasRated(true);
               setUserExistingRating(userRating);
               setUserRating(userRating.rating);
               setComment(userRating.comment || '');
-              setUserName(userRating.users !== 'Anonymous' ? userRating.users : '');
-              setIsAnonymous(userRating.users === 'Anonymous');
+              // Handle both old 'Anonymous' and new 'Anonymous_xyz' format
+              const isAnonUser = userRating.users === 'Anonymous' || userRating.users?.startsWith('Anonymous_');
+              setUserName(!isAnonUser ? userRating.users : '');
+              setIsAnonymous(isAnonUser);
             } else {
               setHasRated(false);
               setUserExistingRating(null);
@@ -1911,7 +1917,8 @@ function RatingModal({ futsal, onClose, onRatingSubmitted, showNotification, set
       } else {
         // Unregistered user
         if (isAnonymous) {
-          users = 'Anonymous';
+          // Generate unique token for anonymous users to avoid duplicate constraint issues
+          users = generateAnonymousToken();
           users_type = 'anonymous user';
         } else {
           users = userName.trim() || generateAnonymousToken();
@@ -2030,13 +2037,16 @@ function RatingModal({ futsal, onClose, onRatingSubmitted, showNotification, set
       } else {
         // Unregistered user
         if (isAnonymous) {
-          users = 'Anonymous';
+          // Generate unique token for anonymous users to avoid duplicate constraint issues
+          users = generateAnonymousToken();
           users_type = 'anonymous user';
         } else {
           users = userName.trim() || generateAnonymousToken();
           users_type = 'anonymous user';
         }
       }
+
+      // console.log('Submitting rating:', { users, users_type, futsal_id: futsal.futsal_id });
 
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/ratings`, {
         method: 'POST',
@@ -2325,7 +2335,7 @@ function RatingModal({ futsal, onClose, onRatingSubmitted, showNotification, set
                         <span className="ml-2 text-sm font-medium">
                           {rating.first_name && rating.last_name
                             ? `${rating.first_name} ${rating.last_name}`
-                            : rating.users || 'Anonymous User'
+                            : (rating.users?.startsWith('Anonymous_') ? 'Anonymous' : rating.users) || 'Anonymous User'
                           }
                         </span>
                       </div>

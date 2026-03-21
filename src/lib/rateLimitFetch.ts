@@ -93,7 +93,7 @@ export async function fetchWithRateLimitRetry(
         await new Promise(resolve => setTimeout(resolve, error.retryAfter));
         attempt++;
         
-        console.log(`Rate limited. Retrying (${attempt}/${maxRetries}) after ${error.retryAfter}ms...`);
+        // console.log(`Rate limited. Retrying (${attempt}/${maxRetries}) after ${error.retryAfter}ms...`);
       } else {
         // Non-rate-limit error, throw immediately
         throw error;
