@@ -73,8 +73,10 @@ export function UserSection({ isVisible, onToggle }: UserSectionProps) {
       userId,
       onConfirm: async (reason: string) => {
         const result = await blockUser(userId, reason);
-        if (result.success) {
-          setNotification({ message: `User blocked until ${new Date(result.blockedUntil!).toLocaleString()}`, type: 'success' });
+        if (result.success && 'blockedUntil' in result && result.blockedUntil) {
+          setNotification({ message: `User blocked until ${new Date(result.blockedUntil).toLocaleString()}`, type: 'success' });
+        } else if (result.success) {
+          setNotification({ message: 'User blocked successfully', type: 'success' });
         } else {
           setNotification({ message: result.error || 'Error blocking user', type: 'info' });
         }

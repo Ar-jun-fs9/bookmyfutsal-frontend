@@ -301,8 +301,9 @@ export function useUsers(options: UseUsersOptions = {}) {
 
   const blockUser = async (userId: number, reason: string) => {
     try {
-      await blockMutation.mutateAsync({ userId, reason });
-      return { success: true };
+      const result = await blockMutation.mutateAsync({ userId, reason });
+      // Return the blockedUntil date from the response
+      return { success: true, blockedUntil: result.blockedUntil };
     } catch (err: any) {
       return { success: false, error: err.message };
     }
