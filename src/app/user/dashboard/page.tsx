@@ -1,6 +1,8 @@
 'use client';
 
 import { useEffect, useState, useRef, useReducer, useCallback } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { apiService } from '@/services/api';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useFutsals } from '@/hooks/useFutsals';
@@ -1771,6 +1773,7 @@ function DetailsModal({ futsal, onClose }: { futsal: Futsal, onClose: () => void
 }
 
 // Rating Modal Component
+// FIXED: Using React Query like the home page RatingModal to prevent duplicate API calls
 function RatingModal({ futsal, onClose, onRatingSubmitted, showNotification, setConfirmModal }: { futsal: Futsal, onClose: () => void, onRatingSubmitted: () => void, showNotification: (notification: { message: string, type: 'success' | 'info' }) => void, setConfirmModal: (modal: { isOpen: boolean, message: string, onConfirm: () => void }) => void }) {
   const [ratings, setRatings] = useState<any[]>([]);
   const [userRating, setUserRating] = useState(0);
@@ -1783,6 +1786,14 @@ function RatingModal({ futsal, onClose, onRatingSubmitted, showNotification, set
   const [userExistingRating, setUserExistingRating] = useState<any | null>(null);
   const [isEditing, setIsEditing] = useState(false);
 
+  // Use React Query for fetching ratings - handles caching and deduplication automatically
+  const { data: ratingsData, isLoading: ratingsLoading, refetch: refetchRatings } = useQuery({
+    queryKey: ['ratings', futsal.futsal_id],
+    queryFn: () => apiService.getFutsalRatings(futsal.futsal_id),
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    gcTime: 10 * 60 * 1000, // 10 minutes
+  });
+
   const formatTimeSlot = (timeString: string): string => {
     const [hours, minutes] = timeString.split(':').map(Number);
     const period = hours >= 12 ? 'PM' : 'AM';
@@ -1791,25 +1802,16 @@ function RatingModal({ futsal, onClose, onRatingSubmitted, showNotification, set
   };
 
   // =============================================================================
-  // PREFETCH: Try to get ratings from cache first
-  // =============================================================================
-  // Page prefetches ratings on load, so modal opens instantly
-  // Falls back to fetching if not yet prefetched
+  // FIXED: Using React Query data instead of manual fetch
+  // React Query handles caching and deduplication automatically
   // =============================================================================
   useEffect(() => {
-    const cachedRatings = usePrefetchStore.getState().getRatings(futsal.futsal_id);
-    
-    if (cachedRatings) {
-      // Ratings already prefetched - use cached data
-      setRatings(cachedRatings);
-      // Check user rating from cached data
-      checkUserRatingFromCache(cachedRatings);
-    } else {
-      // Not prefetched yet - fetch on demand (fallback)
-      fetchRatings();
-      checkUserRating();
+    if (ratingsData) {
+      setRatings(ratingsData);
+      // Check user rating from fetched data
+      checkUserRatingFromCache(ratingsData);
     }
-  }, [futsal.futsal_id]);
+  }, [ratingsData]);
 
   // =============================================================================
   // PREFETCH: Check user rating from cached ratings (no API call needed)
@@ -1869,92 +1871,8 @@ function RatingModal({ futsal, onClose, onRatingSubmitted, showNotification, set
     }
   };
 
-  const fetchRatings = async () => {
-    try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/ratings/futsal/${futsal.futsal_id}`);
-      if (response.ok) {
-        const data = await response.json();
-        setRatings(data);
-      }
-    } catch (error) {
-      console.error('Error fetching ratings:', error);
-    }
-  };
-
-  const checkUserRating = async () => {
-    try {
-      const user = sessionStorage.getItem('user');
-      const userData = user ? JSON.parse(user) : null;
-
-      if (userData) {
-        // Registered user - check if they have rated this futsal
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/ratings/futsal/${futsal.futsal_id}`);
-        if (response.ok) {
-          const futsalRatings = await response.json();
-          const userRating = futsalRatings.find((r: any) => r.user_id === userData.user_id);
-          if (userRating) {
-            setHasRated(true);
-            setUserExistingRating(userRating);
-            // Pre-populate form with existing data
-            setUserRating(userRating.rating);
-            setComment(userRating.comment || '');
-          } else {
-            setHasRated(false);
-            setUserExistingRating(null);
-          }
-        }
-      } else {
-        // Unregistered user - check sessionStorage for rating info
-        const storedRatingInfo = sessionStorage.getItem(`rating_${futsal.futsal_id}`);
-
-        if (storedRatingInfo) {
-          try {
-            const ratingInfo = JSON.parse(storedRatingInfo);
-
-            // Try to find the rating by ID first
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/ratings/futsal/${futsal.futsal_id}`);
-            if (response.ok) {
-              const futsalRatings = await response.json();
-              let userRating = futsalRatings.find((r: any) => r.id === ratingInfo.rating_id);
-
-              // If not found by ID, try to match by users and users_type
-              if (!userRating) {
-                userRating = futsalRatings.find((r: any) =>
-                  r.users === ratingInfo.users && r.users_type === ratingInfo.users_type
-                );
-              }
-
-              if (userRating) {
-                setHasRated(true);
-                setUserExistingRating(userRating);
-                // Pre-populate form with existing data
-                setUserRating(userRating.rating);
-                setComment(userRating.comment || '');
-                setUserName(userRating.users !== 'Anonymous' ? userRating.users : '');
-                setIsAnonymous(userRating.users === 'Anonymous');
-              } else {
-                // If we can't find the rating, reset the state
-                setHasRated(false);
-                setUserExistingRating(null);
-                sessionStorage.removeItem(`rating_${futsal.futsal_id}`);
-              }
-            }
-          } catch (error) {
-            // Invalid localStorage data, reset
-            setHasRated(false);
-            setUserExistingRating(null);
-            sessionStorage.removeItem(`rating_${futsal.futsal_id}`);
-          }
-        } else {
-          setHasRated(false);
-          setUserExistingRating(null);
-        }
-      }
-    } catch (error) {
-      console.error('Error checking user rating:', error);
-      setHasRated(false);
-    }
-  };
+  // REMOVED: fetchRatings and checkUserRating functions - now using React Query
+  // React Query handles caching and deduplication automatically
 
   const generateAnonymousToken = () => {
     return 'Anonymous_' + Math.random().toString(36).substr(2, 9) + Date.now().toString(36);
@@ -2022,7 +1940,7 @@ function RatingModal({ futsal, onClose, onRatingSubmitted, showNotification, set
         setUserExistingRating(data.rating);
 
         onRatingSubmitted();
-        fetchRatings();
+        refetchRatings();
         setIsEditing(false);
       } else {
         const error = await response.json();
@@ -2067,7 +1985,7 @@ function RatingModal({ futsal, onClose, onRatingSubmitted, showNotification, set
             }
 
             onRatingSubmitted();
-            fetchRatings();
+            refetchRatings();
           } else {
             showNotification({ message: "Error deleting rating", type: 'info' });
           }
@@ -2142,7 +2060,7 @@ function RatingModal({ futsal, onClose, onRatingSubmitted, showNotification, set
         }
 
         onRatingSubmitted();
-        fetchRatings();
+        refetchRatings();
         setUserRating(0);
         setComment('');
         setUserName('');
