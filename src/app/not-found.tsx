@@ -110,11 +110,11 @@ export default function NotFoundPage() {
       </header>
 
       {/* Page Header */}
-      <div className="bg-linear-to-r from-red-600 to-orange-600 text-white py-16">
+      <div className="bg-linear-to-r  text-white py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <div className="text-8xl mb-4">😵</div>
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">Oops! Page Not Found</h1>
-          <p className="text-xl text-red-100 max-w-3xl mx-auto">
+          <h1 className="text-4xl text-red-500 md:text-5xl font-bold mb-4">Oops! Page Not Found</h1>
+          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
             The page you're looking for doesn't exist. It might have been moved, deleted, or you entered the wrong URL.
           </p>
         </div>
