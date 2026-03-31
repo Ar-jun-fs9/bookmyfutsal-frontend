@@ -1,6 +1,41 @@
 'use client';
 
 import { useEffect, useState, useRef, useReducer, useCallback } from 'react';
+
+// Input validation helpers
+const validateTeamName = (teamName: string): { valid: boolean; message?: string } => {
+  // Trim the input first
+  const trimmed = teamName.trim();
+  
+  // If empty, it's optional (allow empty)
+  if (trimmed.length === 0) {
+    return { valid: true };
+  }
+  
+  // Check length (2-50 characters)
+  if (trimmed.length < 2 || trimmed.length > 50) {
+    return { valid: false, message: 'Team name must be 2-50 characters' };
+  }
+  
+  // Check: letters, numbers, spaces only
+  const teamNameRegex = /^[A-Za-z0-9][A-Za-z0-9 \-]{1,48}[A-Za-z0-9]$/
+  
+  if (!teamNameRegex.test(trimmed)) {
+    return { valid: false, message: 'Only letters, numbers, hyphens and spaces allowed' };
+  }
+  
+  // Check for multiple consecutive spaces
+  if (trimmed.includes('  ')) {
+    return { valid: false, message: 'Only single spaces between words allowed' };
+  }
+  
+  // Check not only spaces or only numbers
+  if (!/[A-Za-z]/.test(trimmed)) {
+    return { valid: false, message: 'Team name must contain at least one letter' };
+  }
+  
+  return { valid: true };
+};
 import { useQuery } from '@tanstack/react-query';
 import { apiService } from '@/services/api';
 import { useRouter } from 'next/navigation';
@@ -2443,7 +2478,7 @@ function EditUserForm({ user, onUpdate, onCancel, showNotification }: { user: Us
     setLoading(true);
 
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/users/${user.user_id}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/users/profile/update`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -2502,6 +2537,7 @@ function BookingModal({ futsal, user, onClose, onSuccess, setSuccessModal, setCo
   const [selectedSlotIds, setSelectedSlotIds] = useState<number[]>([]);
   const [numberOfPlayers, setNumberOfPlayers] = useState('');
   const [teamName, setTeamName] = useState('');
+  const [teamNameError, setTeamNameError] = useState<string | null>(null);
   const [esewaPhone, setEsewaPhone] = useState(user?.phone || '');
   const [loading, setLoading] = useState(false);
   const [currentPrice, setCurrentPrice] = useState<{ normalPrice: number, specialPrice?: { price: number, message?: string }, effectivePrice: number } | null>(null);
@@ -3477,15 +3513,39 @@ function BookingModal({ futsal, user, onClose, onSuccess, setSuccessModal, setCo
                                 id="teamname"
                                 placeholder="Enter team name"
                                 value={teamName}
-                                onChange={(e) => setTeamName(e.target.value)}
-                                className="w-full px-4 py-3 pl-12 bg-white border-2 border-gray-200 rounded-lg text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-400/50 focus:border-green-400/50 transition-all duration-300 font-medium text-sm"
+                                onChange={(e) => {
+                                  const value = e.target.value;
+                                  // Allow empty (optional field), validate when has content
+                                  if (value.length === 0) {
+                                    setTeamNameError(null);
+                                    setTeamName(value);
+                                  } else {
+                                    const validation = validateTeamName(value);
+                                    setTeamNameError(validation.valid ? null : validation.message || null);
+                                    setTeamName(value);
+                                  }
+                                }}
+                                onBlur={(e) => {
+                                  // Validate on blur
+                                  const value = e.target.value;
+                                  if (value.length > 0) {
+                                    const validation = validateTeamName(value);
+                                    setTeamNameError(validation.valid ? null : validation.message || null);
+                                  }
+                                }}
+                                className={`w-full px-4 py-3 pl-12 bg-white border-2 rounded-lg text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-400/50 focus:border-green-400/50 transition-all duration-300 font-medium text-sm ${
+                                  teamNameError ? 'border-red-500 focus:ring-red-400/50 focus:border-red-400/50' : 'border-gray-200'
+                                }`}
                               />
-                              <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-green-500">
+                              <div className={`absolute left-3 top-1/2 transform -translate-y-1/2 ${teamNameError ? 'text-red-500' : 'text-green-500'}`}>
                                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                                 </svg>
                               </div>
                             </div>
+                            {teamNameError && (
+                              <p className="mt-1 text-sm text-red-600">{teamNameError}</p>
+                            )}
                           </div>
                         </div>
 
@@ -3759,6 +3819,7 @@ function UpdateBookingModal({ booking, onClose, onSuccess, setSuccessModal, show
   const [selectedSlotIds, setSelectedSlotIds] = useState<number[]>([]);
   const [numberOfPlayers, setNumberOfPlayers] = useState(booking.number_of_players.toString());
   const [teamName, setTeamName] = useState(booking.team_name || '');
+  const [teamNameError, setTeamNameError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   // Slot cache to avoid re-fetching when revisiting same date/shift (like futsalId/page.tsx)
   const [slotCache, setSlotCache] = useState<{ [key: string]: { slots: any[], timestamp: number } }>({});
@@ -4462,9 +4523,25 @@ function UpdateBookingModal({ booking, onClose, onSuccess, setSuccessModal, show
                                 id="updateTeamname"
                                 placeholder="Enter team name"
                                 value={teamName}
-                                onChange={(e) => setTeamName(e.target.value)}
-                                className="w-full px-4 py-3 pl-12 border-2 border-gray-200 rounded-xl focus:border-green-500 focus:ring-4 focus:ring-green-100 transition-all duration-300 text-gray-700 font-medium"
+                                onChange={(e) => {
+                                  const value = e.target.value;
+                                  if (value.length === 0) {
+                                    setTeamNameError(null);
+                                    setTeamName(value);
+                                  } else if (value.length < 2) {
+                                    setTeamNameError(null);
+                                    setTeamName(value);
+                                  } else {
+                                    const validation = validateTeamName(value);
+                                    setTeamNameError(validation.valid ? null : validation.message || null);
+                                    setTeamName(value);
+                                  }
+                                }}
+                                className={`w-full px-4 py-3 pl-12 border-2 ${teamNameError ? 'border-red-500 focus:ring-red-400/50 focus:border-red-400/50' : 'border-gray-200'} rounded-xl focus:border-green-500 focus:ring-4 focus:ring-green-100 transition-all duration-300 text-gray-700 font-medium`}
                               />
+                              {teamNameError && (
+                                <p className="mt-1 text-sm text-red-600">{teamNameError}</p>
+                              )}
                               <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-green-500">
                                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
