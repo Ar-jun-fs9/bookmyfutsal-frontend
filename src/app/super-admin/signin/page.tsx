@@ -115,7 +115,7 @@ export default function SuperAdminSignin() {
       const data = await response.json();
 
       if (response.ok) {
-        setNotification({ message: `OTP sent to ${forgotEmail}. OTP: ${data.otp_code}`, type: 'info' }); // Remove OTP display in production
+        setNotification({ message: `Testing Mode: OTP sent to ${forgotEmail} or displayed here: ${data.otp_code}`, type: 'info' }); // Remove OTP display in production
         setForgotStep(2);
         setOtpCountdown(60); // Start 1-minute countdown
       } else {

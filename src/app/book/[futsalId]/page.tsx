@@ -654,7 +654,8 @@ export default function BookFutsal() {
 
       if (otpResponse.ok) {
         const otpData = await otpResponse.json();
-        showNotification({ message: `OTP sent to ${bookingState.phone}. OTP: ${otpData.otp_code}`, type: 'info' });
+        // showNotification({ message: `OTP sent to ${bookingState.phone}. OTP: ${otpData.otp_code}`, type: 'info' });
+        showNotification({ message: `(Testing Mode): OTP sent to ${bookingState.phone} or displayed here: ${otpData.otp_code}`, type: 'info' });
         setOtpCountdown(60); // Start 1-minute countdown
         dispatch({ type: 'SET_STEP', payload: 4 }); // Go to OTP verification step
       } else {
@@ -1671,8 +1672,11 @@ export default function BookFutsal() {
                       <svg className="w-5 h-5 text-green-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                       </svg>
-                      <span className="text-sm font-medium text-green-800">
+                      {/* <span className="text-sm font-medium text-green-800">
                         OTP sent to: <span className="font-bold">{bookingState.phone}</span>
+                      </span> */}
+                      <span className="text-sm font-medium text-green-800">
+                        Testing Mode: OTP sent to or Display here: <span className="font-bold">{bookingState.phone}</span>
                       </span>
                     </div>
                   </div>
