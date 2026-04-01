@@ -419,7 +419,7 @@ export default function RootPage() {
    return (
      <div className="min-h-screen bg-linear-to-br from-green-50 via-white to-blue-50">
        {/* Header */}
-       <header className="sticky top-0 z-50 bg-linear-to-r from-gray-900 via-green-900 to-blue-900 backdrop-blur-md shadow-2xl border-b border-green-500/20">
+       <header className="sticky top-0 z-50 bg-gray-900">
          <div className="max-w-7xl mx-auto px-1 sm:px-6 lg:px-8">
            <div className="flex justify-between items-center py-4 px-2">
              {/* Logo */}
@@ -491,7 +491,7 @@ export default function RootPage() {
 
            {/* Mobile Menu */}
            {isMobileMenuOpen && (
-             <div className="md:hidden border-t border-green-500/20 py-4 px-2 bg-linear-to-b from-gray-900/95 to-green-900/95 backdrop-blur-md">
+             <div className="md:hidden border-t  py-4 px-2 bg-gray-900">
                <nav className="flex flex-col space-y-4">
                  <Link href="/" onClick={() => setIsMobileMenuOpen(false)} className="text-gray-200 hover:text-green-400 font-semibold transition-all duration-300 px-3 py-2 rounded-lg hover:bg-green-900/50">Home</Link>
                  <Link href="/venues" onClick={() => setIsMobileMenuOpen(false)} className="text-gray-200 hover:text-green-400 font-semibold transition-all duration-300 px-3 py-2 rounded-lg hover:bg-green-900/50">Venues</Link>

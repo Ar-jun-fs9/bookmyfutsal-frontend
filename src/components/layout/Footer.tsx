@@ -2,7 +2,7 @@ import Link from 'next/link';
 
 export default function Footer() {
   return (
-    <footer id="contact" className="bg-linear-to-r from-gray-900 via-green-900 to-blue-900 text-white py-16">
+    <footer id="contact" className="bg-gray-900 text-white py-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Mobile Footer Layout */}
         <div className="grid grid-cols-1 gap-8 mb-8 md:hidden">
