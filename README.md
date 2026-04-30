@@ -35,7 +35,7 @@ BookMyFutsal is a comprehensive web platform for booking futsal venues in Nepal.
 - **Real-time**: Socket.io
 - **Email Service**: Nodemailer
 - **Logging**: Winston
-- **File Uploads**: Multer
+- **File Uploads**: Cloudinary
 
 ### Frontend
 
