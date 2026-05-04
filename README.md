@@ -230,7 +230,7 @@ BookMyFutsal is a comprehensive web platform for booking futsal venues in Nepal.
 └── 📄 production.md                                          # Production deployment documentation
 ```
 
-## 🔒 Security Measures
+##  Security Measures
 
 ### Authentication & Authorization
 
