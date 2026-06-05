@@ -61,7 +61,7 @@ export default function VenuesPage() {
   const [filterState, dispatch] = useReducer(filterReducer, initialFilterState);
   const scrollPositionRef = useRef<number>(0);
   const { showNotification } = useNotificationStore();
-  const { setSelectedFutsal } = useFutsalStore();
+  // const { setSelectedFutsal } = useFutsalStore();
   const {
     errorModal,
     setErrorModal,
