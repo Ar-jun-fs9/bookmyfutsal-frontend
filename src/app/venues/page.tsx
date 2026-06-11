@@ -389,16 +389,6 @@ export default function VenuesPage() {
         </div>
       </header>
 
-      {/* Page Header */}
-      {/* <div className="bg-linear-to-r from-green-600 to-blue-600 text-white py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">Available Futsal Venues</h1>
-          <p className="text-xl text-green-100 max-w-3xl mx-auto">
-            Discover and book premium futsal venues across the city. Find the perfect spot for your next game.
-          </p>
-        </div>
-      </div> */}
-
       {/* Main Content */}
       <main className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
         <VenueGrid />
